@@ -138,6 +138,7 @@ table.credentials {
 .message {
     color: magenta;
     font-weight: bold;
+    height: 30px;
 }
 
 .centre {

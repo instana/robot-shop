@@ -110,9 +110,9 @@
         });
     });
 
-    robotshop.controller('productform', function($scope, $http, $routeParams, currentUser) {
+    robotshop.controller('productform', function($scope, $http, $routeParams, $timeout, currentUser) {
         $scope.data = {};
-        $scope.data.message = '';
+        $scope.data.message = ' ';
         $scope.data.product = {};
         $scope.data.quantity = 1;
 
@@ -125,11 +125,11 @@
             }).then((res) => {
                 console.log('cart', res);
                 $scope.data.message = 'Added to cart';
-                setTimeout(clearMessage, 3000);
+                $timeout(clearMessage, 3000);
             }).catch((e) => {
                 console.log('ERROR', e);
                 $scope.data.message = 'ERROR ' + e;
-                setTimeout(clearMessage, 3000);
+                $timeout(clearMessage, 3000);
             });
         };
 
@@ -145,9 +145,10 @@
         }
 
         function clearMessage() {
-            $scope.data.message = '';
+            console.log('clear message');
+            $scope.data.message = ' ';
         }
-
+        
         loadProduct($routeParams.sku);
     });
 
