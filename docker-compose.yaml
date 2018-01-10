@@ -1,0 +1,70 @@
+version: '3'
+services:
+  mongodb:
+    build:
+      context: mongo
+    image: steveww/rs-mongodb
+    ports:
+      - "27017"
+    networks:
+      - robot-shop
+  redis:
+    image: redis:4.0.5
+    ports:
+      - "6379"
+    networks:
+      - robot-shop
+  catalogue:
+    build:
+      context: catalogue
+    image: steveww/rs-catalogue
+    depends_on:
+      - mongodb
+    ports:
+      - "8080"
+    networks:
+      - robot-shop
+  user:
+    build:
+      context: user
+    image: steveww/rs-user
+    depends_on:
+      - mongodb
+      - redis
+    ports:
+      - "8080"
+    networks:
+      - robot-shop
+  cart:
+    build:
+      context: cart
+    image: steveww/rs-cart
+    depends_on:
+      - redis
+    ports:
+      - "8080"
+    networks:
+      - robot-shop
+  shipping:
+    build:
+      context: shipping
+    image: steveww/rs-shipping
+    ports:
+      - "8080"
+    networks:
+      - robot-shop
+  web:
+    build:
+      context: web
+    image: steveww/rs-web
+    depends_on:
+      - catalogue
+      - user
+    ports:
+      - "8080:8080"
+    networks:
+      - robot-shop
+
+networks:
+  robot-shop:
+

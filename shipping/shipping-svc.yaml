@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: shipping
+  namespace: robot-shop
+  labels:
+    app: shipping
+spec:
+  ports:
+    - name: shipping
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: shipping

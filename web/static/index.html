@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Stan's Robot Shop</title>
+    <style type="text/css">
+        @import url('https://fonts.googleapis.com/css?family=Orbitron');
+        @import url('css/style.css');
+    </style>
+    <meta http-equiv="Cache-Control" content="no-Cache">
+    <meta http-equiv="Pragma" content="no-cache">
+</head>
+
+<body ng-app="robotshop">
+<div ng-controller="shopform">
+    <h1><a href="/">Stan's Robot Shop</a></h1>
+    <span id="stan">
+        <img src="media/stan.png"/>
+    </span>
+    <span id="search">
+        <form>
+            <input type="text" size="20"/>
+            <button>Search</button>
+        </form>
+    </span>
+
+    <div class="row">
+        <!-- left nav -->
+        <div class="nav column">
+            <h3><a href="login">Login / Register</a></h3>
+            <h3><a href="cart">Cart</a></h3>
+            <h3>Categories</h3>
+            <ul class="products">
+                <li ng-repeat="cat in data.categories">
+                    <span ng-click="getProducts(cat);" class="category">{{ cat }}</span>
+                    <ul ng-if="data.products[cat]">
+                        <li ng-repeat="prod in data.products[cat]">
+                            <a class="product" href="product/{{ prod.sku }}">{{ prod.name }}</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <!-- main display area -->
+        <div class="main column">
+            <div ng-view></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        {{ data.uniqueid }}
+    </div>
+
+</div>
+
+<!-- JavaScript -->
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.7/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.7/angular-route.min.js"></script>
+<script src="js/controller.js"></script>
+<script type="text/javascript">
+    angular.element(document.getElementsByTagName('head')).append(angular.element('<base href="' + window.location.pathname + '" />'));
+</script>
+
+</body>
+</html>

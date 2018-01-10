@@ -1,0 +1,146 @@
+:root {
+    font-family: sans-serif;
+}
+
+body {
+    background: linear-gradient(180deg, #0c1415, #16363e);
+    color: cyan;
+    height: 1000px;
+}
+
+h1 {
+    font-family: 'Orbitron', sans-serif;
+}
+
+h1 a:link {
+    color: cyan;
+    text-decoration: none;
+}
+
+h1 a:visited {
+    color: cyan;
+    text-decoration: none;
+}
+
+h3 {
+    font-family: 'Orbitron', sans-serif;
+    margin: 5px;
+}
+
+h3 a:link {
+    color: cyan;
+    text-decoration: none;
+}
+
+h3 a:visited {
+    color: cyan;
+    text-decoration: none;
+}
+
+.category {
+    font-size: 14pt;
+    cursor: context-menu;
+    text-transform: capitalize;
+}
+
+ul.products {
+    margin: 5px;
+}
+
+a.product:visited {
+    color: cyan;
+    text-decoration: none;
+}
+
+a.product:link {
+    color: cyan;
+    text-decoration: none;
+}
+
+a.product:hover {
+    color: white;
+    text-decoration: none;
+}
+
+#stan {
+    float: right;
+    position: relative;
+    top: -75px;
+    padding: 0px;
+    margin-top: 0px;
+    margin-right: 20%;
+    margin-bottom: 0px;
+    margin-left: 0px;
+}
+
+#search {
+    float: right;
+    position: relative;
+    top: -50px;
+}
+
+.row, .column, .nav, .main {
+    margin: 0px;
+    box-sizing: border-box;
+}
+
+.column {
+    float: left;
+    padding: 10px;
+}
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.nav {
+    width: 25%;
+}
+
+.main {
+    width: auto;
+}
+
+.footer {
+    font-size: 8pt;
+}
+
+/* product details */
+.productimage {
+    border: 2px solid cyan;
+    padding: 5px;
+    margin: 10px;
+    width: 300px;
+    height: 300px;
+}
+
+.description {
+    width: 300px;
+    margin: 10px;
+}
+
+.productcart {
+    border: 1px solid cyan;
+    margin: 10px;
+    padding: 5px;
+    width: 300px;
+}
+
+/* login register */
+table.credentials {
+    border: 2px solid cyan;
+    padding: 10px;
+    margin: 10px;
+}
+
+.message {
+    color: magenta;
+    font-weight: bold;
+}
+
+.centre {
+    text-align: center;
+}
+

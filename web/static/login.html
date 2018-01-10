@@ -1,0 +1,51 @@
+<!-- login / register -->
+<div ng-controller="loginform">
+    <div class="message">
+        {{ data.message }}
+    </div>
+
+    <div ng-if="data.user.name === undefined">
+        <table class="credentials">
+            <tr>
+                <td>Name</td>
+                <td><input type="text" size="20" ng-model="data.name"/></td>
+            </tr>
+            <tr>
+                <td>Password</td>
+                <td><input type="password" size="20" ng-model="data.password"/></td>
+            </tr>
+            <tr>
+                <td colspan="2" class="centre"><button ng-click="login();">Login</button></td>
+            </tr>
+        </table>
+
+        <table class="credentials">
+            <tr>
+                <td>Name</td>
+                <td><input type="text" size="20" ng-model="data.name"/></td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td><input type="email" size="20" ng-model="data.email"/></td>
+            </tr>
+            <tr>
+                <td>Password</td>
+                <td><input type="password" size="20" ng-model="data.password"/></td>
+            </tr>
+            <tr>
+                <td>Confirm Password</td>
+                <td><input type="password" size="20" ng-model="data.password2"/></td>
+            </tr>
+            <tr>
+                <td colspan="2" class="centre"><button ng-click="register();">Register</button></td>
+            </tr>
+        </table>
+    </div>
+
+    <div ng-if="data.user.name !== undefined">
+        <h3>Greetings {{ data.user.name }}</h3>
+        <p>Email - {{ data.user.email }}</p>
+        <h3>Order History</h3>
+        <p>Order history will be here</p>
+    </div>
+</div>

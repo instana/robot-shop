@@ -1,0 +1,24 @@
+<!-- product details -->
+<div ng-controller="productform">
+    <div class="message">
+        {{ data.message }}
+    </div>
+
+    <h3>{{ data.product.name }}</h3>
+    <div class="productimage">
+        <img src="images/{{ data.product.sku }}"/>
+    </div>
+    <div class="description">
+        {{ data.product.description }}
+    </div>
+    <div class="productcart">
+        Price &euro;{{ data.product.price }}
+        <span ng-if="data.product.instock == 0">
+            Out of stock
+        </span>
+        <span ng-if="data.product.instock != 0">
+            Quantity <input type="number" size="2" min="1" max="10" ng-model="data.quantity"/>
+            <button ng-click="addToCart();">Add to cart</button>
+        </span>
+    </div>
+</div>

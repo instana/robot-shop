@@ -1,0 +1,17 @@
+{
+  "name": "catalogue",
+  "version": "1.0.0",
+  "description": "product catalogue REST API",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "SteveW",
+  "license": "Apache-2.0",
+  "dependencies": {
+      "body-parser": "^1.18.1",
+      "express": "^4.15.4",
+      "mongodb": "^2.2.33",
+      "instana-nodejs-sensor": "^1.28.0"
+  }
+}
