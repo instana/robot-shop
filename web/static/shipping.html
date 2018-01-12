@@ -1,0 +1,13 @@
+<!-- shipping template -->
+<div>
+    <h3>Shipping information</h3>
+    <div>
+        Enter country code <select ng-model="data.selectedCode" ng-options="opt.code for opt in data.codes"></select>
+    </div>
+    <div>
+        Enter your location <input type="text" size="20" ng-model="data.location" ng-disabled="!data.selectedCode"/>
+        <button ng-click="addLocation();">Calculate</button>
+    </div>
+    <!-- TODO - add in shipping distance and cost -->
+</div>
+

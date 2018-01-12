@@ -43,6 +43,10 @@ h3 a:visited {
     text-transform: capitalize;
 }
 
+.carttotal {
+    margin-left: 25px;
+}
+
 ul.products {
     margin: 5px;
 }
@@ -143,5 +147,10 @@ table.credentials {
 
 .centre {
     text-align: center;
+}
+
+/* cart */
+.currency {
+    text-align: right;
 }
 

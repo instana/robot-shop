@@ -28,6 +28,12 @@
         <div class="nav column">
             <h3><a href="login">Login / Register</a></h3>
             <h3><a href="cart">Cart</a></h3>
+            <div ng-if="data.cart.total == 0" class="carttotal">
+                Empty
+            </div>
+            <div ng-if="data.cart.total != 0" class="carttotal">
+                &euro;{{ data.cart.total }}
+            </div>
             <h3>Categories</h3>
             <ul class="products">
                 <li ng-repeat="cat in data.categories">
@@ -54,8 +60,8 @@
 </div>
 
 <!-- JavaScript -->
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.7/angular.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.7/angular-route.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.7/angular.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.7/angular-route.js"></script>
 <script src="js/controller.js"></script>
 <script type="text/javascript">
     angular.element(document.getElementsByTagName('head')).append(angular.element('<base href="' + window.location.pathname + '" />'));

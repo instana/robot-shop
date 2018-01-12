@@ -1,4 +1,39 @@
 <!-- shopping cart -->
 <div>
-    Shopping cart for {{ data.uniqueid }} will be here
+    Shopping cart for {{ data.uniqueid }}
+    <div ng-if="data.cart.total == 0">
+        Your cart is empty, get shopping
+    </div>
+    <div ng-if="data.cart.total != 0">
+        <table>
+            <tr>
+                <th>QTY</th>
+                <th>Name</th>
+                <th>Sub Total</th>
+            </tr>
+            <tr ng-repeat="item in data.cart.items">
+                <td><input type="number" size="2" min="0" max="10" ng-model="item.qty" ng-change="change(item.sku, item.qty);"/></td>
+                <td>{{ item.name }}</td>
+                <td class="currency">&euro;{{ item.subtotal }}</td>
+            </tr>
+            <tr>
+                <td colspan="3">&nbsp;</td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td>Tax</td>
+                <td class="currency">&euro;{{ data.cart.tax }}</td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td>Total</td>
+                <td class="currency">&euro;{{ data.cart.total }}</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <button ng-click="buy();">Buy</button>
+                </td>
+            </tr>
+        </table>
+    </div>
 </div>

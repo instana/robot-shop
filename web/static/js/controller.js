@@ -8,6 +8,9 @@
         var data = {
             uniqueid: '',
             user: {},
+            cart: {
+                total: 0
+            }
         };
 
         return data;
@@ -26,6 +29,9 @@
         }).when('/cart', {
             templateUrl: 'cart.html',
             controller: 'cartform'
+        }).when('/shipping', {
+            templateUrl: 'shipping.html',
+            controller: 'shipform'
         });
 
         // needed for URL rewrite hash
@@ -46,6 +52,10 @@
         $scope.data.uniqueid = 'foo';
         $scope.data.categories = [];
         $scope.data.products = {};
+        // empty cart
+        $scope.data.cart = {
+            total: 0
+        };
 
         $scope.getProducts = function(category) {
             if($scope.data.products[category]) {
@@ -108,6 +118,13 @@
                 $scope.data.uniqueid = currentUser.uniqueid;
             }
         });
+
+        // watch for cart changes
+        $scope.$watch(() => { return currentUser.cart.total; }, (newVal, oldVal) => {
+            if(newVal !== oldVal) {
+                $scope.data.cart = currentUser.cart;
+            }
+        });
     });
 
     robotshop.controller('productform', function($scope, $http, $routeParams, $timeout, currentUser) {
@@ -123,7 +140,8 @@
                 url: url,
                 method: 'GET'
             }).then((res) => {
-                console.log('cart', res);
+                console.log('cart', res.data);
+                currentUser.cart = res.data;
                 $scope.data.message = 'Added to cart';
                 $timeout(clearMessage, 3000);
             }).catch((e) => {
@@ -152,9 +170,62 @@
         loadProduct($routeParams.sku);
     });
 
-    robotshop.controller('cartform', function($scope, $http, currentUser) {
+    robotshop.controller('cartform', function($scope, $http, $location, currentUser) {
         $scope.data = {};
+        $scope.data.cart = {};
+        $scope.data.cart.total = 0;
         $scope.data.uniqueid = currentUser.uniqueid;
+
+        $scope.buy = function() {
+            $location.url('/shipping');
+        };
+        
+        $scope.change = function(sku, qty) {
+            // update the cart
+            var url = '/api/cart/update/' + $scope.data.uniqueid + '/' + sku + '/' + qty;
+            console.log('change', url);
+            $http({
+                url: url,
+                method: 'GET'
+            }).then((res) => {
+                $scope.data.cart = res.data;
+                currentUser.cart = res.data;
+            }).catch((e) => {
+                console.log('ERROR', e);
+            });
+        };
+
+        function loadCart(id) {
+            $http({
+                url: '/api/cart/cart/' + id,
+                method: 'GET'
+            }).then((res) => {
+                $scope.data.cart = res.data;
+            }).catch((e) => {
+                console.log('ERROR', e);
+            });
+        }
+
+        loadCart($scope.data.uniqueid);
+    });
+
+    robotshop.controller('shipform', function($scope, $http, currentUser) {
+        $scope.data = {};
+        $scope.data.codes = [ ];
+
+        function loadCodes() {
+            $http({
+                url: '/api/shipping/codes',
+                method: 'GET'
+            }).then((res) => {
+                $scope.data.codes = res.data;
+            }).catch((e) => {
+                console.log('ERROR', e);
+            });
+        }
+
+        loadCodes();
+        console.log('shipform init');
     });
 
     robotshop.controller('loginform', function($scope, $http, currentUser) {

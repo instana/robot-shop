@@ -45,10 +45,20 @@ services:
       - "8080"
     networks:
       - robot-shop
+  mysql:
+    build:
+      context: shipping/database
+    image: steveww/rs-shipping-db
+    ports:
+      - "3306"
+    networks:
+      - robot-shop
   shipping:
     build:
-      context: shipping
+      context: shipping/service
     image: steveww/rs-shipping
+    depends_on:
+      - mysql
     ports:
       - "8080"
     networks:
