@@ -50,7 +50,7 @@ public class Main {
         });
 
         Spark.get("/codes", (req, res) -> {
-            String data = query("select distinct country_code as code from cities order by code asc");
+            String data = query("select code, name from codes order by name asc");
             res.header("Content-Type", "application/json");
 
             return data;
