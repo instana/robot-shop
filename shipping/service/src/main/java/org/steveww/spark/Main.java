@@ -57,7 +57,7 @@ public class Main {
         });
 
         Spark.get("/match/:code/:text", (req, res) -> {
-            String query = "select name from cities where country_code ='" + req.params(":code") + "' and city like '" + req.params(":text") + "%' order by name asc limit 10";
+            String query = "select uuid, name from cities where country_code ='" + req.params(":code") + "' and city like '" + req.params(":text") + "%' order by name asc limit 10";
             logger.info("Query " + query);
             String data = query(query);
             res.header("Content-Type", "application/json");
@@ -65,10 +65,38 @@ public class Main {
             return data;
         });
 
+        Spark.get("/calc/:uuid", (req, res) -> {
+            double homeLat = 51.164896;
+            double homeLong = 7.068792;
+            StringBuilder buffer = new StringBuilder();
+
+            res.header("Content-Type", "application/json");
+            buffer.append('{');
+            Location location = getLocation(req.params(":uuid"));
+            if(location != null) {
+                // charge 0.05 Euro per km
+                double distance = location.getDistance(homeLat, homeLong);
+                double cost = distance * 0.05;
+                buffer.append(write("distance", distance)).append(',');
+                buffer.append(write("cost", cost));
+            } else {
+                res.status(500);
+            }
+            buffer.append('}');
+
+            return buffer.toString();
+        });
+
+        Spark.post("/confirm", (req, res) -> {
+            logger.info("confirm " + req.body());
+            return "OK";
+        });
+
         logger.info("Ready");
     }
 
 
+    // TODO - use Jackson Jr here
     private static String query(String query) {
         StringBuilder buffer = new StringBuilder();
         Connection conn = null;
@@ -131,8 +159,7 @@ public class Main {
         }
         catch(Exception e) {
             logger.error("Query Exception", e);
-        }
-        finally {
+        } finally {
             if(rs != null) {
                 try {
                     rs.close();
@@ -166,5 +193,49 @@ public class Main {
         buffer.append('"').append(key).append('"').append(": ").append(val);
 
         return buffer.toString();
+    }
+
+    private static Location getLocation(String uuid) {
+        Location location = null;
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        String query = "select latitude, longitude from cities where uuid = " + uuid;
+
+        try {
+            conn = cpds.getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(query);
+            while(rs.next()) {
+                location = new Location(rs.getDouble(1), rs.getDouble(2));
+                break;
+            }
+        } catch(Exception e) {
+            logger.error("Query exception", e);
+        } finally {
+            if(rs != null) {
+                try {
+                    rs.close();
+                } catch(Exception e) {
+                    logger.error("Close Exception", e);
+                }
+            }
+            if(stmt != null) {
+                try {
+                    stmt.close();
+                } catch(Exception e) {
+                    logger.error("Close Exception", e);
+                }
+            }
+            if(conn != null) {
+                try {
+                    conn.close();
+                } catch(Exception e) {
+                    logger.error("Close Exception", e);
+                }
+            }
+        }
+
+        return location;
     }
 }

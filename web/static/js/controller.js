@@ -211,21 +211,98 @@
 
     robotshop.controller('shipform', function($scope, $http, currentUser) {
         $scope.data = {};
-        $scope.data.codes = [ ];
+        $scope.data.countries = [];
+        $scope.data.selectedCountry = '';
+        $scope.data.selectedLocation = '';
+        $scope.data.disableCity = true;
+        $scope.data.disableCalc = true;
+        $scope.data.shipping = '';
+
+        $scope.calcShipping = function() {
+            console.log('calc uuid', uuid);
+            $http({
+                url: '/api/shipping/calc/' + uuid,
+                method: 'GET'
+            }).then((res) => {
+                console.log('shipping data', res.data);
+                $scope.data.shipping = res.data;
+            }).catch((e) => {
+                console.log('ERROR', e);
+            });
+        };
+
+        $scope.confirmShipping = function() {
+            console.log('shipping confirmed');
+            $http({
+                url: '/api/shipping/confirm',
+                method: 'POST',
+                data: $scope.data.shipping
+            }).then((res) => {
+                // go to final confirmation
+            }).catch((e) => {
+                console.log('ERROR', e);
+            });
+        };
+
+        $scope.countryChanged = function() {
+            console.log('selected', $scope.data.selectedCountry);
+            if($scope.data.selectedCountry) {
+                $scope.data.disableCity = false;
+            }
+            $scope.data.selectedLocation = '';
+            $scope.data.disableCalc = true;
+        };
+
+        // auto-complete
+        var autoLocation;
+        var uuid;
 
         function loadCodes() {
             $http({
                 url: '/api/shipping/codes',
                 method: 'GET'
             }).then((res) => {
-                $scope.data.codes = res.data;
+                $scope.data.countries = res.data;
             }).catch((e) => {
                 console.log('ERROR', e);
             });
         }
+        
+        function buildauto() {
+            autoLocation = new autoComplete({
+                selector: 'input[id=location]',
+                source: (term, suggest) => {
+                    console.log('autocomplete', term);
+                    $scope.data.disableCalc = true;
+                    $http({
+                        url: '/api/shipping/match/' + $scope.data.selectedCountry.code + '/' + term,
+                        method: 'GET'
+                    }).then((res) => {
+                        console.log('suggest', res.data);
+                        suggest(res.data);
+                    }).catch((e) => {
+                        console.log('ERROR', e);
+                    });
+                },
+                renderItem: (item, search) => {
+                    console.log('render', item, search);
+                    return '<div class="autocomplete-suggestion" loc-uuid="' + item.uuid + '" data-val="' + item.name + '">' + item.name + '</div>';
+                },
+                onSelect: (e, term, item) => {
+                    console.log('select', term, item);
+                    console.log('content', item.textContent);
+                    console.log('attrib', item.getAttribute('loc-uuid'));
+                    uuid = item.getAttribute('loc-uuid');
+                    $scope.data.disableCalc = false;
+                    // synchronise angular
+                    $scope.$apply();
+                }
+            });
+        }
 
-        loadCodes();
         console.log('shipform init');
+        loadCodes();
+        buildauto();
     });
 
     robotshop.controller('loginform', function($scope, $http, currentUser) {

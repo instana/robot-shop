@@ -9,7 +9,7 @@ services:
     networks:
       - robot-shop
   redis:
-    image: redis:4.0.5
+    image: redis:4.0.6
     ports:
       - "6379"
     networks:
