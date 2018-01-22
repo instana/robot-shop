@@ -6,11 +6,19 @@ import spark.Spark;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.MapListHandler;
+import org.apache.commons.dbutils.DbUtils;
+import com.google.gson.Gson;
+
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Types;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 
 public class Main {
     private static Logger logger = LoggerFactory.getLogger(Main.class);
@@ -43,24 +51,49 @@ public class Main {
         Spark.get("/health", (req, res) -> "OK");
 
         Spark.get("/count", (req, res) -> {
-            String data = query("select count(*) as count from cities");
-            res.header("Content-Type", "application/json");
+            String data;
+            try {
+                Connection conn = cpds.getConnection();
+                data = queryToJson(conn, "select count(*) as count from cities");
+                res.header("Content-Type", "application/json");
+            } catch(Exception e) {
+                logger.error("count", e);
+                res.status(500);
+                data = "ERROR";
+            }
 
             return data;
         });
 
         Spark.get("/codes", (req, res) -> {
-            String data = query("select code, name from codes order by name asc");
-            res.header("Content-Type", "application/json");
+            String data;
+            try {
+                Connection conn = cpds.getConnection();
+                String query = "select code, name from codes order by name asc";
+                data = queryToJson(conn, query);
+                res.header("Content-Type", "application/json");
+            } catch(Exception e) {
+                logger.error("codes", e);
+                res.status(500);
+                data = "ERROR";
+            }
 
             return data;
         });
 
         Spark.get("/match/:code/:text", (req, res) -> {
-            String query = "select uuid, name from cities where country_code ='" + req.params(":code") + "' and city like '" + req.params(":text") + "%' order by name asc limit 10";
-            logger.info("Query " + query);
-            String data = query(query);
-            res.header("Content-Type", "application/json");
+            String data;
+            try {
+                Connection conn = cpds.getConnection();
+                String query = "select uuid, name from cities where country_code ='" + req.params(":code") + "' and city like '" + req.params(":text") + "%' order by name asc limit 10";
+                logger.info("Query " + query);
+                data = queryToJson(conn, query);
+                res.header("Content-Type", "application/json");
+            } catch(Exception e) {
+                logger.error("match", e);
+                res.status(500);
+                data = "ERROR";
+            }
 
             return data;
         });
@@ -96,105 +129,26 @@ public class Main {
     }
 
 
-    // TODO - use Jackson Jr here
-    private static String query(String query) {
-        StringBuilder buffer = new StringBuilder();
-        Connection conn = null;
-        Statement stmt = null;
-        ResultSet rs = null;
+
+    /**
+     * Query to Json - QED
+     **/
+    private static String queryToJson(Connection connection, String query) {
+        List<Map<String, Object>> listOfMaps = null;
         try {
-            conn = cpds.getConnection();
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(query);
-            ResultSetMetaData metadata = rs.getMetaData();
-            int colCount = metadata.getColumnCount();
-            buffer.append('[');
-            while(rs.next()) {
-                // result set to JSON
-                buffer.append('{');
-                for(int idx = 1; idx <= colCount; idx++) {
-                    String name = metadata.getColumnLabel(idx);
-                    switch(metadata.getColumnType(idx)) {
-                        case Types.INTEGER:
-                            int i = rs.getInt(idx);
-                            buffer.append(write(name, rs.getInt(idx)));
-                            break;
-                        case Types.BIGINT:
-                            buffer.append(write(name, rs.getLong(idx)));
-                            break;
-                        case Types.DECIMAL:
-                        case Types.NUMERIC:
-                            buffer.append(write(name, rs.getBigDecimal(idx)));
-                            break;
-                        case Types.FLOAT:
-                        case Types.REAL:
-                        case Types.DOUBLE:
-                            buffer.append(write(name, rs.getDouble(idx)));
-                            break;
-                        case Types.NVARCHAR:
-                        case Types.VARCHAR:
-                        case Types.LONGNVARCHAR:
-                        case Types.LONGVARCHAR:
-                            buffer.append(write(name, '"' + rs.getString(idx) + '"'));
-                            break;
-                        case Types.TINYINT:
-                        case Types.SMALLINT:
-                            buffer.append(write(name, rs.getShort(idx)));
-                            break;
-                        default:
-                            logger.info("Unknown type " + metadata.getColumnType(idx));
-                    }
-                    if(idx != colCount) {
-                        buffer.append(',');
-                    }
-                }
-                buffer.append("}, ");
-            }
-            // trim off trailing ,
-            int idx = buffer.lastIndexOf(",");
-            if(idx != -1) {
-                buffer.setCharAt(idx, ' ');
-            }
-            buffer.append(']');
-        }
-        catch(Exception e) {
-            logger.error("Query Exception", e);
+            QueryRunner queryRunner = new QueryRunner();
+            listOfMaps = queryRunner.query(connection, query, new MapListHandler());
+        } catch (SQLException se) {
+            throw new RuntimeException("Couldn't query the database.", se);
         } finally {
-            if(rs != null) {
-                try {
-                    rs.close();
-                } catch(Exception e) {
-                    logger.error("Close Exception", e);
-                }
-            }
-            if(stmt != null) {
-                try {
-                    stmt.close();
-                } catch(Exception e) {
-                    logger.error("Close Exception", e);
-                }
-            }
-            if(conn != null) {
-                try {
-                    conn.close();
-                } catch(Exception e) {
-                    logger.error("Close Exception", e);
-                }
-            }
+            DbUtils.closeQuietly(connection);
         }
-
-        return buffer.toString();
+        return new Gson().toJson(listOfMaps);
     }
 
-
-    private static String write(String key, Object val) {
-        StringBuilder buffer = new StringBuilder();
-
-        buffer.append('"').append(key).append('"').append(": ").append(val);
-
-        return buffer.toString();
-    }
-
+    /**
+     * Special case for location, dont want Json
+     **/
     private static Location getLocation(String uuid) {
         Location location = null;
         Connection conn = null;
@@ -213,29 +167,17 @@ public class Main {
         } catch(Exception e) {
             logger.error("Query exception", e);
         } finally {
-            if(rs != null) {
-                try {
-                    rs.close();
-                } catch(Exception e) {
-                    logger.error("Close Exception", e);
-                }
-            }
-            if(stmt != null) {
-                try {
-                    stmt.close();
-                } catch(Exception e) {
-                    logger.error("Close Exception", e);
-                }
-            }
-            if(conn != null) {
-                try {
-                    conn.close();
-                } catch(Exception e) {
-                    logger.error("Close Exception", e);
-                }
-            }
+            DbUtils.closeQuietly(conn, stmt, rs);
         }
 
         return location;
+    }
+
+    private static String write(String key, Object val) {
+        StringBuilder buffer = new StringBuilder();
+
+        buffer.append('"').append(key).append('"').append(": ").append(val);
+
+        return buffer.toString();
     }
 }
