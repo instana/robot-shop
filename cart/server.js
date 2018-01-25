@@ -99,8 +99,8 @@ app.get('/add/:id/:sku/:qty', (req, res) => {
                 var list = mergeList(cart.items, item, qty);
                 cart.items = list;
                 cart.total = calcTotal(cart.items);
-                // work out tax @ 20%
-                cart.tax = (cart.total - (cart.total / 1.2));
+                // work out tax
+                cart.tax = calcTax(cart.total);
 
                 // save the new cart
                 saveCart(req.params.id, cart);
@@ -149,8 +149,8 @@ app.get('/update/:id/:sku/:qty', (req, res) => {
                         cart.items[idx].subtotal = cart.items[idx].price * qty;
                     }
                     cart.total = calcTotal(cart.items);
-                    // work out tax @ 20%
-                    cart.tax = (cart.total - (cart.total / 1.2)).toFixed(2);
+                    // work out tax
+                    cart.tax = calcTax(cart.total);
                     saveCart(req.params.id, cart);
                     res.json(cart);
                 }
@@ -186,8 +186,8 @@ app.post('/shipping/:id', (req, res) => {
                     };
                     cart.items.push(item);
                     cart.total = calcTotal(cart.items);
-                    // work out tax @ 20%
-                    cart.tax = (cart.total - (cart.total / 1.2));
+                    // work out tax
+                    cart.tax = calcTax(cart.total);
 
                     // save the updated cart
                     saveCart(req.params.id, cart);
@@ -227,6 +227,11 @@ function calcTotal(list) {
     }
 
     return total;
+}
+
+function calcTax(total) {
+    // tax @ 20%
+    return (total - (total / 1.2));
 }
 
 function getProduct(sku) {
