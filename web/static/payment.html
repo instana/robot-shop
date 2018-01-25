@@ -1,6 +1,6 @@
-<!-- shopping cart -->
+<!-- payment template -->
 <div>
-    Shopping cart for {{ data.uniqueid }}
+    <h3>Review your order</h3>
     <div ng-if="data.cart.total == 0">
         Your cart is empty, get shopping
     </div>
@@ -12,7 +12,7 @@
                 <th>Sub Total</th>
             </tr>
             <tr ng-repeat="item in data.cart.items">
-                <td><input type="number" size="2" min="0" max="10" ng-model="item.qty" ng-change="change(item.sku, item.qty);"/></td>
+                <td>{{ item.qty }}</td>
                 <td>{{ item.name }}</td>
                 <td class="currency">&euro;{{ item.subtotal.toFixed(2) }}</td>
             </tr>
@@ -31,7 +31,7 @@
             </tr>
             <tr>
                 <td colspan="3">
-                    <button ng-click="buy();">Checkout</button>
+                    <button ng-click="pay();">Pay with Paypal</button>
                 </td>
             </tr>
         </table>

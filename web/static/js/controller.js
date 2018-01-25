@@ -32,6 +32,9 @@
         }).when('/shipping', {
             templateUrl: 'shipping.html',
             controller: 'shipform'
+        }).when('/payment', {
+            templateUrl: 'payment.html',
+            controller: 'paymentform'
         });
 
         // needed for URL rewrite hash
@@ -209,7 +212,7 @@
         loadCart($scope.data.uniqueid);
     });
 
-    robotshop.controller('shipform', function($scope, $http, currentUser) {
+    robotshop.controller('shipform', function($scope, $http, $location, currentUser) {
         $scope.data = {};
         $scope.data.countries = [];
         $scope.data.selectedCountry = '';
@@ -226,6 +229,7 @@
             }).then((res) => {
                 console.log('shipping data', res.data);
                 $scope.data.shipping = res.data;
+                $scope.data.shipping.location = $scope.data.selectedCountry.name + ' ' + autoLocation;
             }).catch((e) => {
                 console.log('ERROR', e);
             });
@@ -234,11 +238,15 @@
         $scope.confirmShipping = function() {
             console.log('shipping confirmed');
             $http({
-                url: '/api/shipping/confirm',
+                url: '/api/shipping/confirm/' + currentUser.uniqueid,
                 method: 'POST',
                 data: $scope.data.shipping
             }).then((res) => {
                 // go to final confirmation
+                console.log('confirm cart', res.data);
+                // save new cart
+                currentUser.cart = res.data;
+                $location.url('/payment');
             }).catch((e) => {
                 console.log('ERROR', e);
             });
@@ -251,6 +259,7 @@
             }
             $scope.data.selectedLocation = '';
             $scope.data.disableCalc = true;
+            $scope.data.shipping = '';
         };
 
         // auto-complete
@@ -290,10 +299,10 @@
                 },
                 onSelect: (e, term, item) => {
                     console.log('select', term, item);
-                    console.log('content', item.textContent);
-                    console.log('attrib', item.getAttribute('loc-uuid'));
                     uuid = item.getAttribute('loc-uuid');
+                    autoLocation = item.getAttribute('data-val');
                     $scope.data.disableCalc = false;
+                    $scope.data.shipping = '';
                     // synchronise angular
                     $scope.$apply();
                 }
@@ -303,6 +312,17 @@
         console.log('shipform init');
         loadCodes();
         buildauto();
+    });
+
+    robotshop.controller('paymentform', function($scope, $http, currentUser) {
+        $scope.data = {};
+        $scope.data.uniqueid = currentUser.uniqueid;
+        $scope.data.cart = currentUser.cart;
+
+        $scope.pay = function() {
+        };
+
+        console.log('paymentform init');
     });
 
     robotshop.controller('loginform', function($scope, $http, currentUser) {

@@ -20,7 +20,7 @@ public class Location {
     /**
      * Calculate the distance in km between this location and the given coordinates
      **/
-    public double getDistance(double targetLatitude, double targetLongitude) {
+    public long getDistance(double targetLatitude, double targetLongitude) {
         double distance = 0.0;
 
         double diffLat = Math.pow(this.latitude - targetLatitude, 2);
@@ -30,6 +30,6 @@ public class Location {
         // 1 nautical mile == 1.852km
         distance = distance * 60.0 / 1.852;
 
-        return Math.round(distance);
+        return (long)(Math.round(distance));
     }
 }

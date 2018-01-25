@@ -12,8 +12,8 @@
     </div>
     <!-- add in shipping distance and cost -->
     <div ng-if="data.shipping">
-        <div>Distance {{ data.shipping.distance }}</div>
-        <div>Cost &euro;{{ data.shipping.cost }}</div>
+        <div>Distance {{ data.shipping.distance }}km</div>
+        <div>Cost &euro;{{ data.shipping.cost.toFixed(2) }}</div>
         <div>
             <button ng-click="confirmShipping();">Confirm</button>
         </div>

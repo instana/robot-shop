@@ -6,11 +6,20 @@ import spark.Spark;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.apache.commons.dbutils.DbUtils;
 import com.google.gson.Gson;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
@@ -21,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Main {
+    private static String CART_URL = "http://cart:8080/shipping/";
     private static Logger logger = LoggerFactory.getLogger(Main.class);
     private static ComboPooledDataSource cpds = null;
 
@@ -53,8 +63,7 @@ public class Main {
         Spark.get("/count", (req, res) -> {
             String data;
             try {
-                Connection conn = cpds.getConnection();
-                data = queryToJson(conn, "select count(*) as count from cities");
+                data = queryToJson("select count(*) as count from cities");
                 res.header("Content-Type", "application/json");
             } catch(Exception e) {
                 logger.error("count", e);
@@ -68,9 +77,8 @@ public class Main {
         Spark.get("/codes", (req, res) -> {
             String data;
             try {
-                Connection conn = cpds.getConnection();
                 String query = "select code, name from codes order by name asc";
-                data = queryToJson(conn, query);
+                data = queryToJson(query);
                 res.header("Content-Type", "application/json");
             } catch(Exception e) {
                 logger.error("codes", e);
@@ -84,10 +92,9 @@ public class Main {
         Spark.get("/match/:code/:text", (req, res) -> {
             String data;
             try {
-                Connection conn = cpds.getConnection();
                 String query = "select uuid, name from cities where country_code ='" + req.params(":code") + "' and city like '" + req.params(":text") + "%' order by name asc limit 10";
                 logger.info("Query " + query);
-                data = queryToJson(conn, query);
+                data = queryToJson(query);
                 res.header("Content-Type", "application/json");
             } catch(Exception e) {
                 logger.error("match", e);
@@ -107,9 +114,10 @@ public class Main {
             buffer.append('{');
             Location location = getLocation(req.params(":uuid"));
             if(location != null) {
+                long distance = location.getDistance(homeLat, homeLong);
                 // charge 0.05 Euro per km
-                double distance = location.getDistance(homeLat, homeLong);
-                double cost = distance * 0.05;
+                // try to avoid rounding errors
+                double cost = ((double)(distance * 5)) / 100.0;
                 buffer.append(write("distance", distance)).append(',');
                 buffer.append(write("cost", cost));
             } else {
@@ -120,9 +128,18 @@ public class Main {
             return buffer.toString();
         });
 
-        Spark.post("/confirm", (req, res) -> {
-            logger.info("confirm " + req.body());
-            return "OK";
+        Spark.post("/confirm/:id", (req, res) -> {
+            logger.info("confirm " + req.params(":id") + " - " + req.body());
+            String cart = addToCart(req.params(":id"), req.body());
+            logger.info("new cart " + cart);
+
+            if(cart.equals("")) {
+                res.status(404);
+            } else {
+                res.header("Content-Type", "application/json");
+            }
+
+            return cart;
         });
 
         logger.info("Ready");
@@ -133,16 +150,15 @@ public class Main {
     /**
      * Query to Json - QED
      **/
-    private static String queryToJson(Connection connection, String query) {
+    private static String queryToJson(String query) {
         List<Map<String, Object>> listOfMaps = null;
         try {
-            QueryRunner queryRunner = new QueryRunner();
-            listOfMaps = queryRunner.query(connection, query, new MapListHandler());
+            QueryRunner queryRunner = new QueryRunner(cpds);
+            listOfMaps = queryRunner.query(query, new MapListHandler());
         } catch (SQLException se) {
             throw new RuntimeException("Couldn't query the database.", se);
-        } finally {
-            DbUtils.closeQuietly(connection);
         }
+
         return new Gson().toJson(listOfMaps);
     }
 
@@ -177,6 +193,42 @@ public class Main {
         StringBuilder buffer = new StringBuilder();
 
         buffer.append('"').append(key).append('"').append(": ").append(val);
+
+        return buffer.toString();
+    }
+
+    private static String addToCart(String id, String data) {
+        StringBuilder buffer = new StringBuilder();
+
+        DefaultHttpClient httpClient = null;
+        try {
+            // set timeout to 5 secs
+            HttpParams httpParams = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParams, 5000);
+
+            httpClient = new DefaultHttpClient(httpParams);
+            HttpPost postRequest = new HttpPost(CART_URL + id);
+            StringEntity payload = new StringEntity(data);
+            payload.setContentType("application/json");
+            postRequest.setEntity(payload);
+            HttpResponse res = httpClient.execute(postRequest);
+
+            if(res.getStatusLine().getStatusCode() == 200) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(res.getEntity().getContent()));
+                String line;
+                while((line = in.readLine()) != null) {
+                    buffer.append(line);
+                }
+            } else {
+                logger.warn("Failed with code: " + res.getStatusLine().getStatusCode());
+            }
+        } catch(Exception e) {
+            logger.error("http client exception", e);
+        } finally {
+            if(httpClient != null) {
+                httpClient.getConnectionManager().shutdown();
+            }
+        }
 
         return buffer.toString();
     }

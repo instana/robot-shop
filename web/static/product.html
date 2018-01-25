@@ -12,7 +12,7 @@
         {{ data.product.description }}
     </div>
     <div class="productcart">
-        Price &euro;{{ data.product.price }}
+        Price &euro;{{ data.product.price.toFixed(2) }}
         <span ng-if="data.product.instock == 0">
             Out of stock
         </span>

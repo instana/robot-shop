@@ -100,7 +100,7 @@ app.get('/add/:id/:sku/:qty', (req, res) => {
                 cart.items = list;
                 cart.total = calcTotal(cart.items);
                 // work out tax @ 20%
-                cart.tax = (cart.total - (cart.total / 1.2)).toFixed(2);
+                cart.tax = (cart.total - (cart.total / 1.2));
 
                 // save the new cart
                 saveCart(req.params.id, cart);
@@ -157,6 +157,45 @@ app.get('/update/:id/:sku/:qty', (req, res) => {
             }
         }
     });
+});
+
+// add shipping
+app.post('/shipping/:id', (req, res) => {
+    var shipping = req.body;
+    if(shipping.distance === undefined || shipping.cost === undefined || shipping.location == undefined) {
+        console.log('bad shipping data', shipping);
+        res.status(400).send('shipping data missing');
+    } else {
+        // get the cart
+        redisClient.get(req.params.id, (err, data) => {
+            if(err) {
+                console.log('ERROR', err);
+                res.status(500).send(err);
+            } else {
+                if(data == null) {
+                    console.log('no cart for', req.params.id);
+                    res.status(404).send('cart not found');
+                } else {
+                    var cart = JSON.parse(data);
+                    var item = {
+                        qty: 1,
+                        sku: 'SHIP',
+                        name: 'shipping to ' + shipping.location,
+                        price: shipping.cost,
+                        subtotal: shipping.cost
+                    };
+                    cart.items.push(item);
+                    cart.total = calcTotal(cart.items);
+                    // work out tax @ 20%
+                    cart.tax = (cart.total - (cart.total / 1.2));
+
+                    // save the updated cart
+                    saveCart(req.params.id, cart);
+                    res.json(cart);
+                }
+            }
+        });
+    }
 });
 
 function mergeList(list, product, qty) {

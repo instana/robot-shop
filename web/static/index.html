@@ -33,7 +33,7 @@
                 Empty
             </div>
             <div ng-if="data.cart.total != 0" class="carttotal">
-                &euro;{{ data.cart.total }}
+                &euro;{{ data.cart.total.toFixed(2) }}
             </div>
             <h3>Categories</h3>
             <ul class="products">
