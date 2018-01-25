@@ -63,6 +63,14 @@ services:
       - "8080"
     networks:
       - robot-shop
+  payment:
+    build:
+      context: payment
+    image: steveww/rs-payment
+    ports:
+      - "8080"
+    networks:
+      - robot-shop
   web:
     build:
       context: web
@@ -71,6 +79,7 @@ services:
       - catalogue
       - user
       - shipping
+      - payment
     ports:
       - "8080:8080"
     networks:

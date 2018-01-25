@@ -320,6 +320,15 @@
         $scope.data.cart = currentUser.cart;
 
         $scope.pay = function() {
+            $http({
+                url: '/api/payment/pay/' + $scope.data.uniqueid,
+                method: 'POST',
+                data: $scope.data.cart
+            }).then((res) => {
+                console.log('payment ok');
+            }).catch((e) => {
+                console.log('ERROR', e);
+            });
         };
 
         console.log('paymentform init');
