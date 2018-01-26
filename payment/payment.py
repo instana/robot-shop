@@ -1,9 +1,13 @@
 import os
 import sys
+import time
 import logging
+import uuid
 import requests
 from flask import Flask
 from flask import request
+from flask import jsonify
+from rabbitmq import Publisher
 
 app = Flask(__name__)
 
@@ -21,9 +25,21 @@ def pay(id):
     req = requests.get('https://paypal.com/')
     app.logger.info('paypal returned {}'.format(req.status_code))
 
+    # Generate order id
+    orderid = str(uuid.uuid4())
+    queueOrder({ 'order': orderid, 'cart': cart })
+
     # TDOD - order history
 
-    return 'OK'
+    return jsonify({ 'order': orderid })
+
+
+def queueOrder(order):
+    app.logger.info('queue order')
+    publisher.publish(order)
+
+# RabbitMQ
+publisher = Publisher(app.logger)
 
 if __name__ == "__main__":
     sh = logging.StreamHandler(sys.stdout)

@@ -50,6 +50,22 @@ app.get('/cart/:id', (req, res) => {
     });
 });
 
+// delete cart with id
+app.delete('/cart/:id', (req, res) => {
+    redisClient.del(req.params.id, (err, data) => {
+        if(err) {
+            console.log('ERROR', err);
+            res.status(500).send(err);
+        } else {
+            if(data == 1) {
+                res.send('OK');
+            } else {
+                res.status(404).send('cart not found');
+            }
+        }
+    });
+});
+
 // update/create cart
 app.get('/add/:id/:sku/:qty', (req, res) => {
     // check quantity
@@ -184,7 +200,20 @@ app.post('/shipping/:id', (req, res) => {
                         price: shipping.cost,
                         subtotal: shipping.cost
                     };
-                    cart.items.push(item);
+                    // check shipping already in the cart
+                    var idx;
+                    var len = cart.items.length;
+                    for(idx = 0; idx < len; idx++) {
+                        if(cart.items[idx].sku == item.sku) {
+                            break;
+                        }
+                    }
+                    if(idx == len) {
+                        // not already in cart
+                        cart.items.push(item);
+                    } else {
+                        cart.items[idx] = item;
+                    }
                     cart.total = calcTotal(cart.items);
                     // work out tax
                     cart.tax = calcTax(cart.total);

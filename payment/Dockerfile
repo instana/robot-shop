@@ -8,6 +8,6 @@ COPY requirements.txt /app/
 
 RUN pip install -r requirements.txt
 
-COPY payment.py /app/
+COPY *.py /app/
 
 CMD ["python", "payment.py"]

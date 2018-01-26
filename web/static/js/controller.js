@@ -316,18 +316,40 @@
 
     robotshop.controller('paymentform', function($scope, $http, currentUser) {
         $scope.data = {};
+        $scope.data.message = ' ';
+        $scope.data.buttonDisabled = false;
+        $scope.data.cont = false;
         $scope.data.uniqueid = currentUser.uniqueid;
         $scope.data.cart = currentUser.cart;
 
         $scope.pay = function() {
+            $scope.data.buttonDisabled = true;
             $http({
                 url: '/api/payment/pay/' + $scope.data.uniqueid,
                 method: 'POST',
                 data: $scope.data.cart
             }).then((res) => {
-                console.log('payment ok');
+                console.log('order', res.data);
+                $scope.data.message = 'Order placed ' + res.data.orderid;
+                // clear down cart
+                $scope.data.cart = {
+                    total: 0,
+                    items: []
+                };
+                currentUser.cart = $scope.data.cart;
+                $scope.data.cont = true;
+                $http({
+                    url: '/api/cart/cart/' + $scope.data.uniqueid,
+                    method: 'DELETE'
+                }).then((res) => {
+                    console.log('cart deleted ok');
+                }).catch((e) => {
+                    console.log('ERROR cart delete', e);
+                });
             }).catch((e) => {
                 console.log('ERROR', e);
+                $scope.data.message = 'ERROR placing order';
+                $scope.data.buttonDisabled = false;
             });
         };
 

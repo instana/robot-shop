@@ -1,0 +1,14 @@
+version: '3'
+services:
+  rabbitmq:
+    image: rabbitmq:3.7-alpine
+    ports:
+      - "5672"
+  payment:
+    build:
+      context: .
+    image: steveww/rs-payment
+    depends_on:
+      - rabbitmq
+    ports:
+      - "8080:8080"

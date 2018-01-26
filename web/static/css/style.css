@@ -154,3 +154,22 @@ table.credentials {
     text-align: right;
 }
 
+/* payment */
+a.cont:visited {
+    color: cyan;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a.cont:link {
+    color: cyan;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a.cont:hover {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+

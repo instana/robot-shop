@@ -1,9 +1,6 @@
 <!-- payment template -->
 <div>
     <h3>Review your order</h3>
-    <div ng-if="data.cart.total == 0">
-        Your cart is empty, get shopping
-    </div>
     <div ng-if="data.cart.total != 0">
         <table>
             <tr>
@@ -31,9 +28,16 @@
             </tr>
             <tr>
                 <td colspan="3">
-                    <button ng-click="pay();">Pay with Paypal</button>
+                    <button ng-disabled="data.buttonDisabled" ng-click="pay();">Pay with Paypal</button>
                 </td>
             </tr>
         </table>
+    </div>
+    <div class="message">
+        {{ data.message }}
+    </div>
+    <div ng-if="data.cont">
+        Thankyou for your order
+        <a class="cont" href="/">Continue shopping</a>
     </div>
 </div>
