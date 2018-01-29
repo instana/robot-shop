@@ -1,0 +1,30 @@
+version: '3'
+services:
+  rabbitmq:
+    image: rabbitmq:3.7-management-alpine
+    ports:
+      - "5672"
+      - "15672:15672"
+    networks:
+      - robot-shop
+  payment:
+    build:
+      context: ../payment
+    image: steveww/rs-payment
+    depends_on:
+      - rabbitmq
+    ports:
+      - "8080:8080"
+    networks:
+      - robot-shop
+  dispatch:
+    build:
+      context: .
+    image: steveww/rs-dispatch
+    depends_on:
+      - rabbitmq
+    networks:
+      - robot-shop
+
+networks:
+  robot-shop:

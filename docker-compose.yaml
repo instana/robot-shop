@@ -75,8 +75,18 @@ services:
     image: steveww/rs-payment
     depends_on:
       - rabbitmq
+    environment:
+      - AUTOWRAPT_BOOTSTRAP=flask
     ports:
       - "8080"
+    networks:
+      - robot-shop
+  dispatch:
+    build:
+      context: dispatch
+    image: steveww/rs-dispatch
+    depends_on:
+      - rabbitmq
     networks:
       - robot-shop
   web:

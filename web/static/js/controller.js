@@ -203,13 +203,27 @@
                 url: '/api/cart/cart/' + id,
                 method: 'GET'
             }).then((res) => {
-                $scope.data.cart = res.data;
+                var cart = res.data;
+                // remove shipping - last item in cart
+                if(cart.items[cart.items.length - 1].sku == 'SHIP') {
+                    $http({
+                        url: '/api/cart/update/' + id + '/SHIP/0',
+                        method: 'GET'
+                    }).then((res) => {
+                        $scope.data.cart = res.data;
+                    }).catch((e) => {
+                        console.log('ERROR', e);
+                    });
+                } else {
+                    $scope.data.cart = cart;
+                }
             }).catch((e) => {
                 console.log('ERROR', e);
             });
         }
 
         loadCart($scope.data.uniqueid);
+        console.log('cart init');
     });
 
     robotshop.controller('shipform', function($scope, $http, $location, currentUser) {
@@ -330,7 +344,7 @@
                 data: $scope.data.cart
             }).then((res) => {
                 console.log('order', res.data);
-                $scope.data.message = 'Order placed ' + res.data.orderid;
+                $scope.data.message = 'Order placed ' + res.data.order;
                 // clear down cart
                 $scope.data.cart = {
                     total: 0,
