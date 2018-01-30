@@ -72,7 +72,7 @@ app.get('/product/:sku', (req, res) => {
 // products in a category
 app.get('/products/:cat', (req, res) => {
     if(mongoConnected) {
-        collection.find({ categories: req.params.cat}).toArray().then((products) => {
+        collection.find({ categories: req.params.cat }).sort({ name: 1 }).toArray().then((products) => {
             res.json(products);
         }).catch((e) => {
             console.log('ERROR', e);
