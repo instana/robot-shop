@@ -27,11 +27,11 @@ def pay(id):
 
     # Generate order id
     orderid = str(uuid.uuid4())
-    queueOrder({ 'order': orderid, 'cart': cart })
+    queueOrder({ 'orderid': orderid, 'user': id, 'cart': cart })
 
     # TDOD - order history
 
-    return jsonify({ 'order': orderid })
+    return jsonify({ 'orderid': orderid })
 
 
 def queueOrder(order):

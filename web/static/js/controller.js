@@ -344,7 +344,7 @@
                 data: $scope.data.cart
             }).then((res) => {
                 console.log('order', res.data);
-                $scope.data.message = 'Order placed ' + res.data.order;
+                $scope.data.message = 'Order placed ' + res.data.orderid;
                 // clear down cart
                 $scope.data.cart = {
                     total: 0,

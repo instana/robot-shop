@@ -11,7 +11,6 @@ import (
 var amqpUri string = "amqp://guest:guest@rabbitmq:5672/"
 
 var (
-    rabbitConn *amqp.Connection
     rabbitChan *amqp.Channel
     rabbitCloseError chan *amqp.Error
     rabbitReady chan bool
@@ -37,8 +36,7 @@ func rabbitConnector(uri string) {
         rabbitErr = <-rabbitCloseError
         if rabbitErr != nil {
             log.Printf("Connecting to %s\n", amqpUri)
-            rabbitConn = connectToRabbitMQ(uri)
-            rabbitCloseError = make(chan *amqp.Error)
+            rabbitConn := connectToRabbitMQ(uri)
             rabbitConn.NotifyClose(rabbitCloseError)
 
             var err error
