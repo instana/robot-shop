@@ -210,6 +210,7 @@
                         url: '/api/cart/update/' + id + '/SHIP/0',
                         method: 'GET'
                     }).then((res) => {
+                        currentUser.cart = res.data;
                         $scope.data.cart = res.data;
                     }).catch((e) => {
                         console.log('ERROR', e);
