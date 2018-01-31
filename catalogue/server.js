@@ -1,15 +1,16 @@
 const instana = require('instana-nodejs-sensor');
-const mongoClient = require('mongodb').MongoClient;
-const mongoObjectID = require('mongodb').ObjectID;
-const bodyParser = require('body-parser');
-const express = require('express');
-
 // init tracing
+// MUST be done before loading anything else!
 instana({
     tracing: {
         enabled: true
     }
 });
+
+const mongoClient = require('mongodb').MongoClient;
+const mongoObjectID = require('mongodb').ObjectID;
+const bodyParser = require('body-parser');
+const express = require('express');
 
 // MongoDB
 var db;

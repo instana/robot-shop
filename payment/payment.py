@@ -4,6 +4,8 @@ import time
 import logging
 import uuid
 import requests
+import opentracing as ot
+import opentracing.ext.tags as tags
 from flask import Flask
 from flask import request
 from flask import jsonify
@@ -36,7 +38,26 @@ def pay(id):
 
 def queueOrder(order):
     app.logger.info('queue order')
-    publisher.publish(order)
+    # RabbitMQ is not currently traced automatically
+    # opentracing tracer is automatically set to Instana tracer
+    # start a span
+    context = ot.tracer.current_context()
+    span = ot.tracer.start_span(operation_name='queue-order',
+            child_of=ot.tracer.current_context(),
+            tags={
+                tags.SPAN_KIND: 'producer',
+                tags.COMPONENT: 'payment',
+                'message_bus.destination': 'orders'
+                }
+            )
+
+    headers = {}
+    ot.tracer.inject(span.context, ot.Format.HTTP_HEADERS, headers)
+    app.logger.info('msg headers {}'.format(headers))
+    
+    publisher.publish(order, headers)
+
+    span.finish()
 
 # RabbitMQ
 publisher = Publisher(app.logger)

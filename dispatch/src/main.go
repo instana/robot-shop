@@ -8,7 +8,7 @@ import (
     "github.com/streadway/amqp"
     "github.com/instana/golang-sensor"
     ot "github.com/opentracing/opentracing-go"
-    // ext "github.com/opentracing/opentracing-go/ext"
+    ext "github.com/opentracing/opentracing-go/ext"
 )
 
 const (
@@ -77,6 +77,33 @@ func failOnError(err error, msg string) {
     }
 }
 
+func createSpan(headers map[string]interface{}) {
+    // headers is map[string]interface{}
+    // carrier is map[string]string
+    carrier := make(ot.TextMapCarrier)
+    // convert by copying k, v
+    for k, v := range headers {
+        carrier[k] = v.(string)
+    }
+
+    // opentracing
+    var span ot.Span
+    tracer := ot.GlobalTracer()
+    spanContext, err := tracer.Extract(ot.HTTPHeaders, carrier)
+    if err == nil {
+        log.Println("Creating span")
+        // create span
+        span = tracer.StartSpan("dispatch", ot.ChildOf(spanContext), ext.SpanKindConsumer)
+        ext.MessageBusDestination.Set(span, "orders")
+        ext.Component.Set(span, "dispatch")
+        defer span.Finish()
+        time.Sleep(42 * time.Millisecond)
+    } else {
+        log.Println("Failed to get span context")
+        log.Println(err)
+    }
+}
+
 
 func main() {
     // Instana tracing
@@ -106,6 +133,8 @@ func main() {
 
             for d := range msgs {
                 log.Printf("Order %s\n", d.Body)
+                log.Printf("Headers %v\n", d.Headers)
+                go createSpan(d.Headers)
             }
         }
     }()

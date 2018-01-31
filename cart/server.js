@@ -1,15 +1,16 @@
 const instana = require('instana-nodejs-sensor');
-const redis = require('redis');
-const request = require('request');
-const bodyParser = require('body-parser');
-const express = require('express');
-
 // init tracing
+// MUST be done before loading anything else!
 instana({
     tracing: {
         enabled: true
     }
 });
+
+const redis = require('redis');
+const request = require('request');
+const bodyParser = require('body-parser');
+const express = require('express');
 
 var redisConnected = false;
 
@@ -61,6 +62,24 @@ app.delete('/cart/:id', (req, res) => {
                 res.send('OK');
             } else {
                 res.status(404).send('cart not found');
+            }
+        }
+    });
+});
+
+// rename cart i.e. at login
+app.get('/rename/:from/:to', (req, res) => {
+    redisClient.get(req.params.from, (err, data) => {
+        if(err) {
+            console.log('ERROR', err);
+            res.status(500).send(err);
+        } else {
+            if(data == null) {
+                res.status(404).send('cart not found');
+            } else {
+                var cart = JSON.parse(data);
+                saveCart(req.params.to, cart);
+                res.json(cart);
             }
         }
     });
