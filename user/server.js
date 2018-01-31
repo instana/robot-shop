@@ -5,11 +5,6 @@ const redis = require('redis');
 const bodyParser = require('body-parser');
 const express = require('express');
 
-// MongoDB
-var db;
-var collection;
-var mongoConnected = false;
-
 // init tracing
 instana({
     tracing: {
@@ -17,6 +12,10 @@ instana({
     }
 });
 
+// MongoDB
+var db;
+var collection;
+var mongoConnected = false;
 
 const app = express();
 

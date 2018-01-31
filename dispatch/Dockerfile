@@ -7,7 +7,8 @@ ENV GOPATH=/opt/gorcv \
 
 # install external components
 RUN go get \
-    github.com/streadway/amqp
+    github.com/streadway/amqp \
+    github.com/instana/golang-sensor
 
 COPY src /opt/gorcv/
 

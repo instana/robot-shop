@@ -6,6 +6,13 @@ import (
     "time"
 
     "github.com/streadway/amqp"
+    "github.com/instana/golang-sensor"
+    ot "github.com/opentracing/opentracing-go"
+    // ext "github.com/opentracing/opentracing-go/ext"
+)
+
+const (
+    Service = "Dispatch"
 )
 
 var amqpUri string = "amqp://guest:guest@rabbitmq:5672/"
@@ -72,6 +79,11 @@ func failOnError(err error, msg string) {
 
 
 func main() {
+    // Instana tracing
+    ot.InitGlobalTracer(instana.NewTracerWithOptions(&instana.Options{
+        Service: Service,
+        LogLevel: instana.Info}))
+
     // MQ error channel
     rabbitCloseError = make(chan *amqp.Error)
 
@@ -89,7 +101,7 @@ func main() {
             log.Printf("Rabbit MQ ready %v\n", ready)
 
             // subscribe to bound queue
-            msgs, err := rabbitChan.Consume("orders", "", false, false, false, false, nil)
+            msgs, err := rabbitChan.Consume("orders", "", true, false, false, false, nil)
             failOnError(err, "Failed to consume")
 
             for d := range msgs {

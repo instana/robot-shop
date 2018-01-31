@@ -46,5 +46,5 @@ if __name__ == "__main__":
     sh.setLevel(logging.INFO)
     app.logger.addHandler(sh)
     app.logger.setLevel(logging.INFO)
-    port = int(os.getenv("PAYMENT_PORT", "8080"))
+    port = int(os.getenv("SHOP_PAYMENT_PORT", "8080"))
     app.run(host='0.0.0.0', port=port)
