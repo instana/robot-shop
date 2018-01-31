@@ -20,6 +20,9 @@
         $routeProvider.when('/', {
             templateUrl: 'splash.html',
             controller: 'shopform'
+        }).when('/search/:text', {
+            templateUrl: 'search.html',
+            controller: 'searchform'
         }).when('/product/:sku', {
             templateUrl: 'product.html',
             controller: 'productform'
@@ -41,7 +44,8 @@
         $locationProvider.html5Mode(true);
     }]);
 
-    // clear template fragment cache
+    // clear template fragment cache, development
+    // TODO - disable this later
     robotshop.run(function($rootScope, $templateCache) {
         $rootScope.$on('$viewContentLoaded', function() {
             console.log('>>> clearing cache');
@@ -49,12 +53,13 @@
         });
     });
 
-    robotshop.controller('shopform', function($scope, $http, currentUser) {
+    robotshop.controller('shopform', function($scope, $http, $location, currentUser) {
         $scope.data = {};
 
         $scope.data.uniqueid = 'foo';
         $scope.data.categories = [];
         $scope.data.products = {};
+        $scope.data.searchText = '';
         // empty cart
         $scope.data.cart = {
             total: 0
@@ -72,6 +77,13 @@
                 }).catch((e) => {
                     console.log('ERROR', e);
                 });
+            }
+        };
+
+        $scope.search = function() {
+            if($scope.data.searchText) {
+                $location.url('/search/' + $scope.data.searchText);
+                $scope.data.searchText = '';
             }
         };
 
@@ -128,6 +140,29 @@
                 $scope.data.cart = currentUser.cart;
             }
         });
+    });
+
+    robotshop.controller('searchform', function($scope, $http, $routeParams) {
+        $scope.data = {};
+        $scope.data.searchResults = [];
+
+        function search(text) {
+            if(text) {
+                $http({
+                    url: '/api/catalogue/search/' + text,
+                    method: 'GET'
+                }).then((res) => {
+                    console.log('search results', res.data);
+                    $scope.data.searchResults = res.data;
+                }).catch((e) => {
+                    console.log('ERROR', e);
+                });
+            }
+        }
+
+        var text = $routeParams.text;
+        console.log('search init with', text);
+        search(text);
     });
 
     robotshop.controller('productform', function($scope, $http, $routeParams, $timeout, currentUser) {
@@ -387,15 +422,25 @@
                 method: 'POST',
                 data: {
                     name: $scope.data.name,
-                    password: $scope.data.password,
-                    email: $scope.data.email
+                    password: $scope.data.password
                 }
             }).then((res) => {
+                var oldId = currentUser.uniqueid;
                 $scope.data.user = res.data;
                 $scope.data.user.password = '';
                 $scope.data.password = $scope.data.password2 = '';
                 currentUser.user = $scope.data.user;
                 currentUser.uniqueid = $scope.data.user.name;
+                // login OK move cart across
+                $http({
+                    url: '/api/cart/rename/' + oldId + '/' + $scope.data.user.name,
+                    method: 'GET'
+                }).then((res) => {
+                    console.log('cart moved OK');
+                }).catch((e) => {
+                    // 404 is OK as cart might not exist yet
+                    console.log('ERROR', e);
+                });
             }).catch((e) => {
                 console.log('ERROR', e);
                 $scope.data.message = 'ERROR ' + e.data;

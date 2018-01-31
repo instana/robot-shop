@@ -1,0 +1,16 @@
+<!-- search template -->
+<div>
+    <div ng-if="data.searchResults.length == 0">
+        Sorry nothing matches your search
+    </div>
+    <div ng-if="data.searchResults.length != 0">
+        <h3>These ecellent candidates match your search</h3>
+        <table>
+            <tr ng-repeat="item in data.searchResults">
+                <td><a class="product" href="/product/{{ item.sku }}">{{ item.name }}</a></td>
+                <td>{{ item.description }}</td>
+                <td>&euro;{{ item.price }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
