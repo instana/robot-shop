@@ -3,7 +3,7 @@ services:
   mongodb:
     build:
       context: mongo
-    image: steveww/rs-mongodb
+    image: ${REPO}/rs-mongodb:${TAG}
     ports:
       - "27017"
     networks:
@@ -24,7 +24,7 @@ services:
   catalogue:
     build:
       context: catalogue
-    image: steveww/rs-catalogue
+    image: ${REPO}/rs-catalogue:${TAG}
     depends_on:
       - mongodb
     ports:
@@ -34,7 +34,7 @@ services:
   user:
     build:
       context: user
-    image: steveww/rs-user
+    image: ${REPO}/rs-user:${TAG}
     depends_on:
       - mongodb
       - redis
@@ -45,7 +45,7 @@ services:
   cart:
     build:
       context: cart
-    image: steveww/rs-cart
+    image: ${REPO}/rs-cart:${TAG}
     depends_on:
       - redis
     ports:
@@ -55,7 +55,7 @@ services:
   mysql:
     build:
       context: shipping/database
-    image: steveww/rs-shipping-db
+    image: ${REPO}/rs-shipping-db:${TAG}
     ports:
       - "3306"
     networks:
@@ -63,7 +63,7 @@ services:
   shipping:
     build:
       context: shipping/service
-    image: steveww/rs-shipping
+    image: ${REPO}/rs-shipping:${TAG}
     depends_on:
       - mysql
     ports:
@@ -73,7 +73,7 @@ services:
   payment:
     build:
       context: payment
-    image: steveww/rs-payment
+    image: ${REPO}/rs-payment:${TAG}
     depends_on:
       - rabbitmq
     environment:
@@ -85,7 +85,7 @@ services:
   dispatch:
     build:
       context: dispatch
-    image: steveww/rs-dispatch
+    image: ${REPO}/rs-dispatch:${TAG}
     depends_on:
       - rabbitmq
     networks:
@@ -93,7 +93,7 @@ services:
   web:
     build:
       context: web
-    image: steveww/rs-web
+    image: ${REPO}/rs-web:${TAG}
     depends_on:
       - catalogue
       - user
