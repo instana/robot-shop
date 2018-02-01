@@ -108,24 +108,22 @@ public class Main {
         Spark.get("/calc/:uuid", (req, res) -> {
             double homeLat = 51.164896;
             double homeLong = 7.068792;
-            StringBuilder buffer = new StringBuilder();
 
             res.header("Content-Type", "application/json");
-            buffer.append('{');
             Location location = getLocation(req.params(":uuid"));
+            Ship ship = new Ship();
             if(location != null) {
                 long distance = location.getDistance(homeLat, homeLong);
                 // charge 0.05 Euro per km
                 // try to avoid rounding errors
                 double cost = Math.rint(distance * 5) / 100.0;
-                buffer.append(write("distance", distance)).append(',');
-                buffer.append(write("cost", cost));
+                ship.setDistance(distance);
+                ship.setCost(cost);
             } else {
                 res.status(500);
             }
-            buffer.append('}');
 
-            return buffer.toString();
+            return new Gson().toJson(ship);
         });
 
         Spark.post("/confirm/:id", (req, res) -> {
@@ -187,14 +185,6 @@ public class Main {
         }
 
         return location;
-    }
-
-    private static String write(String key, Object val) {
-        StringBuilder buffer = new StringBuilder();
-
-        buffer.append('"').append(key).append('"').append(": ").append(val);
-
-        return buffer.toString();
     }
 
     private static String addToCart(String id, String data) {
