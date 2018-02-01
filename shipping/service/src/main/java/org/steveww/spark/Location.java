@@ -17,19 +17,27 @@ public class Location {
         return this.longitude;
     }
 
+
     /**
-     * Calculate the distance in km between this location and the given coordinates
+     * Calculate the distance between this location and the target location.
+     * Use decimal lat/long degrees
+     * Formula is Haversine https://www.movable-type.co.uk/scripts/latlong.html
      **/
     public long getDistance(double targetLatitude, double targetLongitude) {
         double distance = 0.0;
+        double earthRadius = 6371e3; // meters
 
-        double diffLat = Math.pow(this.latitude - targetLatitude, 2);
-        double diffLong = Math.pow(this.longitude - targetLongitude, 2);
-        distance = Math.sqrt(diffLat + diffLong);
-        // 1 degree == 1 nautical mile
-        // 1 nautical mile == 1.852km
-        distance = distance * 60.0 / 1.852;
+        // convert to radians
+        double latitudeR = Math.toRadians(this.latitude);
+        double targetLatitudeR = Math.toRadians(targetLatitude);
+        // difference in Radians
+        double diffLatR = Math.toRadians(targetLatitude - this.latitude);
+        double diffLongR = Math.toRadians(targetLongitude - this.longitude);
 
-        return (long)(Math.round(distance));
+        double a = Math.sin(diffLatR / 2.0) * Math.sin(diffLatR / 2.0) + Math.cos(latitudeR) * Math.cos(targetLatitudeR) * Math.sin(diffLongR / 2.0) * Math.sin(diffLongR);
+
+        double c = 2.0 * Math.atan2(Math.sqrt(a), Math.sqrt(1.0 - a));
+
+        return (long)Math.rint(earthRadius * c / 1000.0);
     }
 }

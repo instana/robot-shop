@@ -117,7 +117,7 @@ public class Main {
                 long distance = location.getDistance(homeLat, homeLong);
                 // charge 0.05 Euro per km
                 // try to avoid rounding errors
-                double cost = ((double)(distance * 5)) / 100.0;
+                double cost = Math.rint(distance * 5) / 100.0;
                 buffer.append(write("distance", distance)).append(',');
                 buffer.append(write("cost", cost));
             } else {
