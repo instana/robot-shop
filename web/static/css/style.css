@@ -177,5 +177,7 @@ a.cont:hover {
 div.splash {
     background-image: url("/media/graph.png");
     background-repeat: no-repeat;
+    padding: 5px;
+    margin: 0px;
 }
 
