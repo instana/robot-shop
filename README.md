@@ -32,7 +32,11 @@ You can run it locally for testing
 If you are running it locally on a Linux host you can also run the Instana [agent](https://docs.instana.io/quick_start/agent_setup/container/docker/) locally, unfortunately the agent is currently not supported on Mac.
 
 ## Kubernetes
-The Docker container images are all available on [Docker Hub](https://hub.docker.com/u/steveww/). The deployment and service definition files using these images are in the K8s directory, use these to deploy to a Kubernetes cluster. If you pushed your own images to your own registry the deployment files will need to be updated to pull from your registry; using [kompose](https://github.com/kubernetes/kompose) may be of assistance here. *NOTE* I have found some issues with kompose reading the *.env* correctly, just export the variables in the shell environment to work around this.
+The Docker container images are all available on [Docker Hub](https://hub.docker.com/u/steveww/). The deployment and service definition files using these images are in the K8s directory, use these to deploy to a Kubernetes cluster. If you pushed your own images to your own registry the deployment files will need to be updated to pull from your registry; using [kompose](https://github.com/kubernetes/kompose) may be of assistance here.
+
+If you want to deploy Stan's Robot Shop to Google Compute you will need to edit the K8s/web-service.yaml file and change the type from NodePort to LoadBalancer.
+
+*NOTE* I have found some issues with kompose reading the *.env* correctly, just export the variables in the shell environment to work around this.
 
 You can also run Kubernetes locally using [minikube](https://github.com/kubernetes/minikube).
 
