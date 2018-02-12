@@ -46,6 +46,23 @@
         <h3>Greetings {{ data.user.name }}</h3>
         <p>Email - {{ data.user.email }}</p>
         <h3>Order History</h3>
-        <p>Order history will be here</p>
+        <table>
+            <tr>
+                <th>Order ID</th>
+                <th>Items</th>
+                <th>Total</th>
+            </tr>
+            <tr ng-repeat="hist in data.orderHistory">
+                <td>{{ hist.orderid }}</td>
+                <td>
+                    <ul>
+                        <li ng-repeat="item in hist.cart.items">{{ item.name }}</li>
+                    </ul>
+                </td>
+                <td>
+                    &euro;{{ hist.cart.total }}
+                </td>
+            </tr>
+        </table>
     </div>
 </div>

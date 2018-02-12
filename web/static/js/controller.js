@@ -441,6 +441,7 @@
                     // 404 is OK as cart might not exist yet
                     console.log('ERROR', e);
                 });
+                loadHistory(currentUser.user.name);
             }).catch((e) => {
                 console.log('ERROR', e);
                 $scope.data.message = 'ERROR ' + e.data;
@@ -485,9 +486,22 @@
             });
         };
 
+        function loadHistory(id) {
+            $http({
+                url: '/api/user/history/' + id,
+                method: 'GET'
+            }).then((res) => {
+                console.log('history', res.data);
+                $scope.data.orderHistory = res.data.history;
+            }).catch((e) => {
+                console.log('ERROR', e);
+            });
+        }
+
         console.log('loginform init');
         if(!angular.equals(currentUser.user, {})) {
             $scope.data.user = currentUser.user;
+            loadHistory(currentUser.user.name);
         }
     });
 

@@ -15,7 +15,8 @@ const express = require('express');
 
 // MongoDB
 var db;
-var collection;
+var usersCollection;
+var ordersCollection;
 var mongoConnected = false;
 
 const app = express();
@@ -55,7 +56,7 @@ app.get('/uniqueid', (req, res) => {
 // return all users for debugging only
 app.get('/users', (req, res) => {
     if(mongoConnected) {
-        collection.find().toArray().then((users) => {
+        usersCollection.find().toArray().then((users) => {
             res.json(users);
         }).catch((e) => {
             console.log('ERROR', e);
@@ -71,7 +72,7 @@ app.post('/login', (req, res) => {
     if(req.body.name === undefined || req.body.password === undefined) {
         res.status(400).send('name or passowrd not supplied');
     } else if(mongoConnected) {
-        collection.findOne({
+        usersCollection.findOne({
             name: req.body.name,
         }).then((user) => {
             console.log('user', user);
@@ -100,12 +101,12 @@ app.post('/register', (req, res) => {
         res.status(400).send('insufficient data');
     } else if(mongoConnected) {
         // check if name already exists
-        collection.findOne({name: req.body.name}).then((user) => {
+        usersCollection.findOne({name: req.body.name}).then((user) => {
             if(user) {
                 res.status(400).send('name already exists');
             } else {
                 // create new user
-                collection.insertOne({
+                usersCollection.insertOne({
                     name: req.body.name,
                     password: req.body.password,
                     email: req.body.email
@@ -119,6 +120,73 @@ app.post('/register', (req, res) => {
             }
         }).catch((e) => {
             console.log('ERROR', e);
+            res.status(500).send(e);
+        });
+    } else {
+        res.status(500).send('database not available');
+    }
+});
+
+app.post('/order/:id', (req, res) => {
+    console.log('order', req.body);
+    // only for registered users
+    if(mongoConnected) {
+        usersCollection.findOne({
+            name: req.params.id
+        }).then((user) => {
+            if(user) {
+                // found user record
+                // get orders
+                ordersCollection.findOne({
+                    name: req.params.id
+                }).then((history) => {
+                    if(history) {
+                        var list = history.history;
+                        list.push(req.body);
+                        ordersCollection.updateOne(
+                            { name: req.params.id },
+                            { $set: { history: list }}
+                        ).then((r) => {
+                            res.send('OK');
+                        }).catch((e) => {
+                            res.status(500).send(e);
+                        });
+                    } else {
+                        // no history
+                        ordersCollection.insertOne({
+                            name: req.params.id,
+                            history: [ req.body ]
+                        }).then((r) => {
+                            res.send('OK');
+                        }).catch((e) => {
+                            res.status(500).send(e);
+                        });
+                    }
+                }).catch((e) => {
+                    res.status(500).send(e);
+                });
+            } else {
+                res.status(404).send('name not found');
+            }
+        }).catch((e) => {
+            res.status(500).send(e);
+        });
+    } else {
+        res.status(500).send('database not available');
+    }
+});
+
+app.get('/history/:id', (req, res) => {
+    if(mongoConnected) {
+        ordersCollection.findOne({
+            name: req.params.id
+        }).then((history) => {
+            if(history) {
+                res.json(history);
+            } else {
+                res.status(404).send('history not found');
+            }
+        }).catch((e) => {
             res.status(500).send(e);
         });
     } else {
@@ -147,7 +215,8 @@ function mongoConnect() {
             reject(error);
         } else {
             db = _db;
-            collection = db.collection('users');
+            usersCollection = db.collection('users');
+            ordersCollection = db.collection('orders');
             resolve('connected');
         }
     });

@@ -3,6 +3,7 @@ import sys
 import time
 import logging
 import uuid
+import json
 import requests
 import opentracing as ot
 import opentracing.ext.tags as tags
@@ -30,6 +31,12 @@ def pay(id):
     # Generate order id
     orderid = str(uuid.uuid4())
     queueOrder({ 'orderid': orderid, 'user': id, 'cart': cart })
+
+    # add to history
+    req = requests.post('http://user:8080/order/' + id,
+            data=json.dumps({'orderid': orderid, 'cart': cart}),
+            headers={'Content-Type': 'application/json'})
+    app.logger.info('order history returned {}'.format(req.status_code))
 
     # TDOD - order history
 
