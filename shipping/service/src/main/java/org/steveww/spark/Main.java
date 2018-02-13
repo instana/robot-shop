@@ -89,10 +89,27 @@ public class Main {
             return data;
         });
 
+        // needed for load gen script
+        Spark.get("/cities/:code", (req, res) -> {
+            String data;
+            try {
+                String query = "select uuid, name from cities where country_code = '" + req.params(":code") + "'";
+                logger.info("Query " + query);
+                data = queryToJson(query);
+                res.header("Content-Type", "application/json");
+            } catch(Exception e) {
+                logger.error("cities", e);
+                res.status(500);
+                data = "ERROR";
+            }
+
+            return data;
+        });
+
         Spark.get("/match/:code/:text", (req, res) -> {
             String data;
             try {
-                String query = "select uuid, name from cities where country_code ='" + req.params(":code") + "' and city like '" + req.params(":text") + "%' order by name asc limit 10";
+                String query = "select uuid, name from cities where country_code = '" + req.params(":code") + "' and city like '" + req.params(":text") + "%' order by name asc limit 10";
                 logger.info("Query " + query);
                 data = queryToJson(query);
                 res.header("Content-Type", "application/json");
