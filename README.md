@@ -9,7 +9,7 @@ The application is built using these technologies:
 - Golang
 - MongoDB
 - Redis
-- MySQL
+- MySQL ([Maxmind](http://www.maxmind.com) data)
 - RabbitMQ
 - AngularJS (1.x) 
 
@@ -32,9 +32,9 @@ You can run it locally for testing
 If you are running it locally on a Linux host you can also run the Instana [agent](https://docs.instana.io/quick_start/agent_setup/container/docker/) locally, unfortunately the agent is currently not supported on Mac.
 
 ## Kubernetes
-The Docker container images are all available on [Docker Hub](https://hub.docker.com/u/steveww/). The deployment and service definition files using these images are in the K8s directory, use these to deploy to a Kubernetes cluster. If you pushed your own images to your own registry the deployment files will need to be updated to pull from your registry; using [kompose](https://github.com/kubernetes/kompose) may be of assistance here.
+The Docker container images are all available on [Docker Hub](https://hub.docker.com/u/steveww/). The deployment and service definition files using these images are in the *K8s* directory, use these to deploy to a Kubernetes cluster. If you pushed your own images to your registry the deployment files will need to be updated to pull from your registry; using [kompose](https://github.com/kubernetes/kompose) may be of assistance here.
 
-If you want to deploy Stan's Robot Shop to Google Compute you will need to edit the K8s/web-service.yaml file and change the type from NodePort to LoadBalancer.
+If you want to deploy Stan's Robot Shop to Google Compute you will need to edit the *K8s/web-service.yaml* file and change the type from NodePort to LoadBalancer. This can also be done in the Google Compute console.
 
 *NOTE* I have found some issues with kompose reading the *.env* correctly, just export the variables in the shell environment to work around this.
 
@@ -51,9 +51,11 @@ Deploy the agent
 
     $ kubectl create -f instana/instana-agent.yaml
 
-The agent configuration only runs the agent on nodes with the appropriate label.
+The agent configuration only runs the agent on nodes with the appropriate label. For minikube.
 
     $ kubectl label node minikube agent=instana
+
+There is also a handy script *instana/label.sh* which labels all the nodes.
 
 ## Acessing the Store
 If you are running the store locally via *docker-compose up* then, the store front is available on localhost port 8080 [http://localhost:8080](http://localhost:8080/)
@@ -62,7 +64,11 @@ If you are running the store on Kubernetes via minikube then, the store front is
 
     $ minikube ip
 
+If you are using a cloud Kubernetes / Openshift / Mesosphere then it will be available on the load balancer of that system. There will be specific blog posts on the Instana site covering these scenarios.
+
+## Load Generation
+A separate load generation utility is provided in the *load-gen* directory. This is not automatically run when the application is started. The load generator is built with Python and [Locust](https://locust.io). The *build.sh* script builds the Docker image, optionally taking *push* as the first argument to also push the image to the registry. The registry and tag settings are loaded from the *.env* file in the parent directory. The script *load-gen.sh* runs the image, edit this and set the HOST environment variable to point the load at where you are running the application. You could run this inside an orchestration system (K8s) as well if you want to, how to do this is left as an exercise for the reader.
+
 ## TO DO
 
 - End User Monitoring
-- Load generation script
