@@ -51,6 +51,24 @@
             console.log('>>> clearing cache');
             $templateCache.removeAll();
         });
+
+        // Instana EUM
+        // may not be loaded so check for ineum object
+        $rootScope.$on('$routeChangeStart', (event, next, current) => {
+            if(typeof ineum !== 'undefined') {
+                ineum('startSpaPageTransition');
+            }
+        });
+        $rootScope.$on('$routeChangeSuccess', (event, next, current) => {
+            if(typeof ineum !== 'undefined') {
+                ineum('endSpaPageTransition', {'status': 'completed', 'url': window.location.href});
+            }
+        });
+        $rootScope.$on('$routeChangeError', (event, next, current) => {
+            if(typeof ineum !== 'undefined') {
+                ineum('endSpaPageTransition', {'status': 'error'});
+            }
+        });
     });
 
     robotshop.controller('shopform', function($scope, $http, $location, currentUser) {

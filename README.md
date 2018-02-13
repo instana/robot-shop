@@ -69,6 +69,5 @@ If you are using a cloud Kubernetes / Openshift / Mesosphere then it will be ava
 ## Load Generation
 A separate load generation utility is provided in the *load-gen* directory. This is not automatically run when the application is started. The load generator is built with Python and [Locust](https://locust.io). The *build.sh* script builds the Docker image, optionally taking *push* as the first argument to also push the image to the registry. The registry and tag settings are loaded from the *.env* file in the parent directory. The script *load-gen.sh* runs the image, edit this and set the HOST environment variable to point the load at where you are running the application. You could run this inside an orchestration system (K8s) as well if you want to, how to do this is left as an exercise for the reader.
 
-## TO DO
-
-- End User Monitoring
+## End User Monitoring
+To enable End User Monitoring (EUM) see the official [documentation](https://docs.instana.io/products/website_monitoring/) for how to create a configuration. There is no need to inject the javascript fragment into the page, this will be handled automatically. Just make a note of the unique key and set the environment variable INSTANA_EUM_KEY for the *web* image, see *docker-compose.yaml* for an example.

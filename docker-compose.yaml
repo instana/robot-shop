@@ -103,6 +103,9 @@ services:
       - "8080:8080"
     networks:
       - robot-shop
+    # Uncomment to enable Instana EUM
+    # environment:
+      # INSTANA_EUM_KEY: <your eum key here>
 
 networks:
   robot-shop:
