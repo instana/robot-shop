@@ -54,9 +54,6 @@ class UserBehavior(TaskSet):
         order = self.client.post('/api/payment/pay/{}'.format(uniqueid), json=cart).json()
         print('Order {}'.format(order))
 
-        # delete cart
-        self.client.delete('/api/cart/cart/{}'.format(uniqueid))
-
 
 class WebsiteUser(HttpLocust):
     task_set = UserBehavior

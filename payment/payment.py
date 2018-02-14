@@ -38,7 +38,9 @@ def pay(id):
             headers={'Content-Type': 'application/json'})
     app.logger.info('order history returned {}'.format(req.status_code))
 
-    # TDOD - order history
+    # delete cart
+    req = requests.delete('http://cart:8080/cart/' + id);
+    app.logger.info('cart delete returned {}'.format(req.status_code))
 
     return jsonify({ 'orderid': orderid })
 

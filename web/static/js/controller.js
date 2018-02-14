@@ -406,14 +406,6 @@
                 };
                 currentUser.cart = $scope.data.cart;
                 $scope.data.cont = true;
-                $http({
-                    url: '/api/cart/cart/' + $scope.data.uniqueid,
-                    method: 'DELETE'
-                }).then((res) => {
-                    console.log('cart deleted ok');
-                }).catch((e) => {
-                    console.log('ERROR cart delete', e);
-                });
             }).catch((e) => {
                 console.log('ERROR', e);
                 $scope.data.message = 'ERROR placing order';
