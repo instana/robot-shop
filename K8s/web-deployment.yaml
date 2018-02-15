@@ -20,6 +20,9 @@ spec:
       containers:
       - image: steveww/rs-web
         name: web
+        # env:
+          # - name: INSTANA_EUM_KEY
+          # value: <your key here>
         ports:
         - containerPort: 8080
         resources: {}
