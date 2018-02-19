@@ -6,7 +6,7 @@ then
     exit 1
 fi
 
-TEST=$(echo "$HOST" | egrep '^http://[a-z]+')
+TEST=$(echo "$HOST" | egrep '^http://[a-z0-9]+')
 if [ -z "$TEST" ]
 then
     echo "Host must start with http://"
