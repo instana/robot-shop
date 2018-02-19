@@ -1,19 +1,22 @@
 # STAN'S ROBOT SHOP
 
-This is a simple example microservices application for use with Instana tutorials. It is not a reference example of how to write a microservices application, the error handling is patchy and the security is pretty much nonexistent.
+This is a simple example microservices application for use as a sandbox for playing with orchestration and/or monitoring/observability techniques. It is not a reference example of how to write a microservices application, the error handling is patchy and the security is pretty much nonexistent.
 
 The application is built using these technologies:
-- NodeJS (Express)
-- Java (Spark Java)
-- Python (Flask)
+- NodeJS ([Express](http://expressjs.com/))
+- Java ([Spark Java](http://sparkjava.com/))
+- Python ([Flask](http://flask.pocoo.org))
 - Golang
 - MongoDB
 - Redis
 - MySQL ([Maxmind](http://www.maxmind.com) data)
 - RabbitMQ
-- AngularJS (1.x) 
+- Nginx
+- AngularJS (1.x)
 
-You will need an Instana account to see the results in the Instana dashboard. If you do not already have an account, sign up for a [free trail](https://instana.com).
+The various services in this application already have any required Instana components installed and configured. These provide automatic instrumentation of the code for complete end to end [tracing](https://docs.instana.io/core_concepts/tracing/), as well as time series metrics for their runtimes.
+
+You will need an account to see the results in the Instana dashboard. If you do not already have an account, sign up for a [free trail](https://instana.com).
 
 ## Build from Source
 To build from source use Docker Compose. Optionally edit the *.env* file to specify an alternative image registry and version tag; see the official [documentation](https://docs.docker.com/compose/env-file/) for more information.
@@ -36,7 +39,8 @@ The Docker container images are all available on [Docker Hub](https://hub.docker
 
 If you want to deploy Stan's Robot Shop to Google Compute you will need to edit the *K8s/web-service.yaml* file and change the type from NodePort to LoadBalancer. This can also be done in the Google Compute console.
 
-*NOTE* I have found some issues with kompose reading the *.env* correctly, just export the variables in the shell environment to work around this.
+#### NOTE
+I have found some issues with kompose reading the *.env* correctly, just export the variables in the shell environment to work around this.
 
 You can also run Kubernetes locally using [minikube](https://github.com/kubernetes/minikube).
 
@@ -60,7 +64,7 @@ There is also a handy script *instana/label.sh* which labels all the nodes.
 ## Acessing the Store
 If you are running the store locally via *docker-compose up* then, the store front is available on localhost port 8080 [http://localhost:8080](http://localhost:8080/)
 
-If you are running the store on Kubernetes via minikube then, the store front is available on the IP address of minikube port 8080. To find the IP address of your minikube instance.
+If you are running the store on Kubernetes via minikube then, the store front is available on the IP address of minikube port 30080. To find the IP address of your minikube instance.
 
     $ minikube ip
 
