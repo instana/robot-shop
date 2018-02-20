@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   annotations:
     kompose.cmd: kompose convert -f ../docker-compose.yaml
-    kompose.version: 1.7.0 (767ab4b)
+    kompose.version: 1.8.0 (0c0c027)
   creationTimestamp: null
   labels:
     io.kompose.service: web
@@ -18,7 +18,7 @@ spec:
         io.kompose.service: web
     spec:
       containers:
-      - image: steveww/rs-web
+      - image: robotshop/rs-web:0.2.0
         name: web
         # env:
           # - name: INSTANA_EUM_KEY

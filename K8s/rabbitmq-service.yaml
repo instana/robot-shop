@@ -3,7 +3,7 @@ kind: Service
 metadata:
   annotations:
     kompose.cmd: kompose convert -f ../docker-compose.yaml
-    kompose.version: 1.7.0 (767ab4b)
+    kompose.version: 1.8.0 (0c0c027)
   creationTimestamp: null
   labels:
     io.kompose.service: rabbitmq
@@ -13,6 +13,9 @@ spec:
   - name: "5672"
     port: 5672
     targetPort: 5672
+  - name: "15672"
+    port: 15672
+    targetPort: 15672
   selector:
     io.kompose.service: rabbitmq
 status:
