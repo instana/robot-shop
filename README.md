@@ -2,6 +2,8 @@
 
 This is a simple example microservices application for use as a sandbox for playing with orchestration and/or monitoring/observability techniques. It is not a reference example of how to write a microservices application, the error handling is patchy and the security is pretty much nonexistent.
 
+See the related announcement [blog post](https://www.instana.com/blog/stans-robot-shop-sample-microservice-application/).
+
 The application is built using these technologies:
 - NodeJS ([Express](http://expressjs.com/))
 - Java ([Spark Java](http://sparkjava.com/))
