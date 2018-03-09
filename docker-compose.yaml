@@ -8,12 +8,20 @@ services:
       - "27017"
     networks:
       - robot-shop
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
   redis:
     image: redis:4.0.6
     ports:
       - "6379"
     networks:
       - robot-shop
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
   rabbitmq:
     image: rabbitmq:3.7-management-alpine
     ports:
@@ -21,6 +29,10 @@ services:
       - "15672"
     networks:
       - robot-shop
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
   catalogue:
     build:
       context: catalogue
@@ -31,6 +43,10 @@ services:
       - "8080"
     networks:
       - robot-shop
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
   user:
     build:
       context: user
@@ -42,6 +58,10 @@ services:
       - "8080"
     networks:
       - robot-shop
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
   cart:
     build:
       context: cart
@@ -52,6 +72,10 @@ services:
       - "8080"
     networks:
       - robot-shop
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
   mysql:
     build:
       context: shipping/database
@@ -60,6 +84,10 @@ services:
       - "3306"
     networks:
       - robot-shop
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
   shipping:
     build:
       context: shipping/service
@@ -70,6 +98,10 @@ services:
       - "8080"
     networks:
       - robot-shop
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
   payment:
     build:
       context: payment
@@ -82,6 +114,10 @@ services:
       - "8080"
     networks:
       - robot-shop
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
   dispatch:
     build:
       context: dispatch
@@ -90,6 +126,10 @@ services:
       - rabbitmq
     networks:
       - robot-shop
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
   web:
     build:
       context: web
@@ -103,6 +143,10 @@ services:
       - "8080:8080"
     networks:
       - robot-shop
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
     # Uncomment to enable Instana EUM
     # environment:
       # INSTANA_EUM_KEY: <your eum key here>
