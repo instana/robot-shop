@@ -2,8 +2,8 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert -f ../docker-compose.yaml
-    kompose.version: 1.8.0 (0c0c027)
+    kompose.cmd: kompose -f docker-compose.yaml convert
+    kompose.version: 1.10.0 (8bb0907)
   creationTimestamp: null
   labels:
     io.kompose.service: shipping
@@ -18,7 +18,7 @@ spec:
         io.kompose.service: shipping
     spec:
       containers:
-      - image: robotshop/rs-shipping:0.2.0
+      - image: robotshop/rs-shipping:0.2.1
         name: shipping
         ports:
         - containerPort: 8080

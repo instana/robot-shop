@@ -2,8 +2,8 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert -f ../docker-compose.yaml
-    kompose.version: 1.8.0 (0c0c027)
+    kompose.cmd: kompose -f docker-compose.yaml convert
+    kompose.version: 1.10.0 (8bb0907)
   creationTimestamp: null
   labels:
     io.kompose.service: web
@@ -18,11 +18,11 @@ spec:
         io.kompose.service: web
     spec:
       containers:
-      - image: robotshop/rs-web:0.2.0
+      - image: robotshop/rs-web:0.2.1
         name: web
-        # env:
-          # - name: INSTANA_EUM_KEY
-          # value: <your key here>
+        #env:
+          #- name: INSTANA_EUM_KEY
+          #value: <your key here>
         ports:
         - containerPort: 8080
         resources: {}
