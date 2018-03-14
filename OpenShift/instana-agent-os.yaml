@@ -1,0 +1,114 @@
+apiVersion: v1
+kind: List
+items:
+  - kind: Namespace
+    apiVersion: v1
+    metadata:
+      name: instana-agent
+      labels:
+        name: instana-agent
+ 
+  - apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+        name: instana-admin
+        namespace: instana-agent
+
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: instana-agent-secret
+      namespace: instana-agent
+    data:
+      key: <your base64 encoded key here>
+ 
+  - apiVersion: extensions/v1beta1
+    kind: DaemonSet
+    metadata:
+      labels:
+        app: instana-agent
+      name: instana-agent
+      namespace: instana-agent
+    spec:
+      selector:
+        matchLabels:
+          app: instana-agent
+      template:
+        metadata:
+          labels:
+            app: instana-agent
+        spec:
+          nodeSelector:
+            agent: instana
+          hostIPC: true
+          hostNetwork: true
+          hostPID: true
+          containers:
+            - name: instana-agent
+              image: instana/agent
+              imagePullPolicy: Always
+              env:
+                - name: INSTANA_ZONE
+                  value: Stans-Robot-Shop
+                - name: INSTANA_AGENT_ENDPOINT
+                  value: saas-us-west-2.instana.io
+                - name: INSTANA_AGENT_ENDPOINT_PORT
+                  value: '443'
+                - name: INSTANA_AGENT_HTTP_LISTEN
+                  value: '*'
+                - name: INSTANA_AGENT_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: instana-agent-secret
+                      key: key
+              securityContext:
+                privileged: true
+              volumeMounts:
+                - name: dev
+                  mountPath: /dev
+                - name: run
+                  mountPath: /var/run/docker.sock
+                - name: sys
+                  mountPath: /sys
+                - name: log
+                  mountPath: /var/log
+              livenessProbe:
+                exec:
+                  command:
+                    - echo
+                    - noop
+                initialDelaySeconds: 60
+                periodSeconds: 10
+                timeoutSeconds: 5
+                failureThreshold: 5
+              readinessProbe:
+                exec:
+                  command:
+                    - echo
+                    - noop
+                initialDelaySeconds: 60
+                periodSeconds: 10
+                timeoutSeconds: 5
+                failureThreshold: 5
+              resources:
+                requests:
+                  memory: "256Mi"
+                  cpu: "0.2"
+                limits:
+                  memory: "512Mi"
+                  cpu: "0.5"
+          volumes:
+            - name: dev
+              hostPath:
+                  path: /dev
+            - name: run
+              hostPath:
+                  path: /var/run/docker.sock
+            - name: sys
+              hostPath:
+                  path: /sys
+            - name: log
+              hostPath:
+                  path: /var/log
+          serviceAccount: instana-admin
+
