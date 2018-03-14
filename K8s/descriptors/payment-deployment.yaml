@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose -f docker-compose.yaml convert
+    kompose.cmd: kompose -f ../docker-compose.yaml convert
     kompose.version: 1.10.0 (8bb0907)
   creationTimestamp: null
   labels:
@@ -18,10 +18,7 @@ spec:
         io.kompose.service: payment
     spec:
       containers:
-      - env:
-        - name: AUTOWRAPT_BOOTSTRAP
-          value: flask
-        image: robotshop/rs-payment:0.2.1
+      - image: robotshop/rs-payment:0.2.2
         name: payment
         ports:
         - containerPort: 8080
