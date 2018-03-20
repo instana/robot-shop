@@ -1,10 +1,10 @@
-# STAN'S ROBOT SHOP
+# Sample Microservice Application
 
-This is a simple example microservices application for use as a sandbox for playing with orchestration and/or monitoring/observability techniques. It is not a reference example of how to write a microservices application, the error handling is patchy and the security is pretty much nonexistent.
+Stan's Robot Shop is a sample microservice application you can use as a sandbox to test and learn containerised application orchestration and monitoring techniques. It is not intended to be a comprehensive reference example of how to write a microservices application, although you will better understand some of those concepts by playing with Stan's Robot Shop. To be clear, the error handling is patchy and there is not any security built into the application.
 
-See the related announcement [blog post](https://www.instana.com/blog/stans-robot-shop-sample-microservice-application/).
+You can get more detailed information from my [blog post](https://www.instana.com/blog/stans-robot-shop-sample-microservice-application/) about this sample microservice application.
 
-The application is built using these technologies:
+This sample microservice application has been built using these technologies:
 - NodeJS ([Express](http://expressjs.com/))
 - Java ([Spark Java](http://sparkjava.com/))
 - Python ([Flask](http://flask.pocoo.org))
@@ -16,9 +16,9 @@ The application is built using these technologies:
 - Nginx
 - AngularJS (1.x)
 
-The various services in this application already have any required Instana components installed and configured. These provide automatic instrumentation of the code for complete end to end [tracing](https://docs.instana.io/core_concepts/tracing/), as well as time series metrics for their runtimes.
+The various services in the sample application already include all required Instana components installed and configured. The Instana components provide automatic instrumentation for complete end to end [tracing](https://docs.instana.io/core_concepts/tracing/), as well as complete visibility into time series metrics for all the technologies.
 
-You will need an account to see the results in the Instana dashboard. If you do not already have an account, sign up for a [free trail](https://instana.com).
+To see the application performance results in the Instana dashboard, you will first need an Instana account. Don't worry a [trial account](https://instana.com/) is free.
 
 ## Build from Source
 To build from source use Docker Compose. Optionally edit the *.env* file to specify an alternative image registry and version tag; see the official [documentation](https://docs.docker.com/compose/env-file/) for more information.
