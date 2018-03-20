@@ -66,7 +66,25 @@ There is also a handy script *instana/label.sh* which labels all the nodes.
 ## Acessing the Store
 If you are running the store locally via *docker-compose up* then, the store front is available on localhost port 8080 [http://localhost:8080](http://localhost:8080/)
 
-If you are running the store on Kubernetes via minikube then, the store front is available on the IP address of minikube port 30080. To find the IP address of your minikube instance.
+If you are running the store on Kubernetes via minikube then, to make the store front accessible edit the *web* service definition and change the type to *NodePort* and add a port entry *nodePort: 30080*.
+
+    $ kubectl -n robot-shop edit service web
+
+Snippet
+
+    spec:
+      ports:
+      - name: "8080"
+        port: 8080
+        protocol: TCP
+        targetPort: 8080
+        nodePort: 30080
+      selector:
+        io.kompose.service: web
+      sessionAffinity: None
+      type: NodePort
+
+The store front is then available on the IP address of minikube port 30080. To find the IP address of your minikube instance.
 
     $ minikube ip
 
