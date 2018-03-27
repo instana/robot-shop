@@ -29,5 +29,8 @@ else
     cp $BASE_DIR/empty.html $BASE_DIR/eum.html
 fi
 
+# make sure nginx can access the eum file
+chmod 644 $BASE_DIR/eum.html
+
 exec nginx -g "daemon off;"
 
