@@ -19,7 +19,7 @@ then
     if [ -n "$INSTANA_EUM_REPORTING_URL" ]
     then
         echo "Setting reporting url $INSTANA_EUM_REPORTING_URL"
-        sed -e "/<\/script>/ i inuem('reportingUrl', '$INSTANA_EUM_REPORTING_URL');" $TMP_FILE > $BASE_DIR/eum.html
+        sed -e "/<\/script>/ i ineum('reportingUrl', '$INSTANA_EUM_REPORTING_URL');" $TMP_FILE > $BASE_DIR/eum.html
     else
         cp $TMP_FILE $BASE_DIR/eum.html
     fi
