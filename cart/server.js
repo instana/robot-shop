@@ -14,6 +14,9 @@ const express = require('express');
 
 var redisConnected = false;
 
+var redisHost = process.env.REDIS_HOST || 'redis'
+var catalogueHost = process.env.CATALOGUE_HOST || 'catalogue'
+
 const app = express();
 
 app.use((req, res, next) => {
@@ -284,7 +287,7 @@ function calcTax(total) {
 
 function getProduct(sku) {
     return new Promise((resolve, reject) => {
-        request('http://catalogue:8080/product/' + sku, (err, res, body) => {
+        request('http://' + catalogueHost + ':8080/product/' + sku, (err, res, body) => {
             if(err) {
                 reject(err);
             } else if(res.statusCode != 200) {
@@ -308,7 +311,7 @@ function saveCart(id, cart) {
 
 // connect to Redis
 var redisClient = redis.createClient({
-    host: 'redis'
+    host: redisHost
 });
 
 redisClient.on('error', (e) => {
