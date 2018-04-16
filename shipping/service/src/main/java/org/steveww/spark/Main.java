@@ -30,11 +30,17 @@ import java.util.List;
 import java.util.Map;
 
 public class Main {
-    private static String CART_URL = "http://cart:8080/shipping/";
+    private static String CART_URL = null;
+    private static String JDBC_URL = null;
     private static Logger logger = LoggerFactory.getLogger(Main.class);
     private static ComboPooledDataSource cpds = null;
 
     public static void main(String[] args) {
+        // Get ENV configuration values
+        Map<String, String> env = System.getenv();
+        CART_URL = String.format("http://%s/shipping/", env.get("CART_ENDPOINT"));
+        JDBC_URL = String.format("jdbc:mysql://%s/cities?useSSL=false&autoReconnect=true", env.get("DB_HOST"));
+
         //
         // Create database connector
         // TODO - might need a retry loop here
@@ -42,7 +48,7 @@ public class Main {
         try {
             cpds = new ComboPooledDataSource();
             cpds.setDriverClass( "com.mysql.jdbc.Driver" ); //loads the jdbc driver            
-            cpds.setJdbcUrl( "jdbc:mysql://mysql/cities?useSSL=false&autoReconnect=true" );
+            cpds.setJdbcUrl( JDBC_URL );
             cpds.setUser("shipping");                                  
             cpds.setPassword("secret");
             // some config

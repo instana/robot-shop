@@ -4,6 +4,7 @@ import (
     "fmt"
     "log"
     "time"
+    "os"
 
     "github.com/streadway/amqp"
     "github.com/instana/golang-sensor"
@@ -15,9 +16,8 @@ const (
     Service = "Dispatch"
 )
 
-var amqpUri string = "amqp://guest:guest@rabbitmq:5672/"
-
 var (
+    amqpUri string
     rabbitChan *amqp.Channel
     rabbitCloseError chan *amqp.Error
     rabbitReady chan bool
@@ -110,6 +110,9 @@ func main() {
     ot.InitGlobalTracer(instana.NewTracerWithOptions(&instana.Options{
         Service: Service,
         LogLevel: instana.Info}))
+
+    // Init amqpUri
+    amqpUri = fmt.Sprintf("amqp://guest:guest@%s:5672/", os.Getenv("AMQP_HOST"))
 
     // MQ error channel
     rabbitCloseError = make(chan *amqp.Error)

@@ -32,5 +32,8 @@ fi
 # make sure nginx can access the eum file
 chmod 644 $BASE_DIR/eum.html
 
+# apply environment variables to default.conf
+envsubst < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
+
 exec nginx -g "daemon off;"
 
