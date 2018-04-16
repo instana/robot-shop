@@ -14,6 +14,9 @@ from rabbitmq import Publisher
 
 app = Flask(__name__)
 
+CART = os.getenv('CART_HOST', 'cart')
+USER = os.getenv('USER_HOST', 'user')
+
 @app.route('/health', methods=['GET'])
 def health():
     return 'OK'
@@ -33,13 +36,13 @@ def pay(id):
     queueOrder({ 'orderid': orderid, 'user': id, 'cart': cart })
 
     # add to history
-    req = requests.post('http://user:8080/order/' + id,
+    req = requests.post('http://{user}:8080/order/{id}'.format(user=USER, id=id),
             data=json.dumps({'orderid': orderid, 'cart': cart}),
             headers={'Content-Type': 'application/json'})
     app.logger.info('order history returned {}'.format(req.status_code))
 
     # delete cart
-    req = requests.delete('http://cart:8080/cart/' + id);
+    req = requests.delete('http://{cart}:8080/cart/{id}'.format(cart=CART, id=id));
     app.logger.info('cart delete returned {}'.format(req.status_code))
 
     return jsonify({ 'orderid': orderid })

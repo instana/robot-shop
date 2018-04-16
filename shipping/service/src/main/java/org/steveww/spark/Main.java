@@ -37,9 +37,8 @@ public class Main {
 
     public static void main(String[] args) {
         // Get ENV configuration values
-        Map<String, String> env = System.getenv();
-        CART_URL = String.format("http://%s/shipping/", env.get("CART_ENDPOINT"));
-        JDBC_URL = String.format("jdbc:mysql://%s/cities?useSSL=false&autoReconnect=true", env.get("DB_HOST"));
+        CART_URL = String.format("http://%s/shipping/", System.getenv("CART_ENDPOINT") != null ? System.getenv("CART_ENDPOINT") : "cart");
+        JDBC_URL = String.format("jdbc:mysql://%s/cities?useSSL=false&autoReconnect=true", System.getenv("DB_HOST") != null ? System.getenv("DB_HOST") : "mysql");
 
         //
         // Create database connector

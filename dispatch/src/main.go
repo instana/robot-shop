@@ -112,7 +112,12 @@ func main() {
         LogLevel: instana.Info}))
 
     // Init amqpUri
-    amqpUri = fmt.Sprintf("amqp://guest:guest@%s:5672/", os.Getenv("AMQP_HOST"))
+    // get host from environment
+    amqpHost, ok := os.LookupEnv("AMQP_HOST")
+    if !ok {
+        amqpHost = "rabbitmq"
+    }
+    amqpUri = fmt.Sprintf("amqp://guest:guest@%s:5672/", amqpHost)
 
     // MQ error channel
     rabbitCloseError = make(chan *amqp.Error)
