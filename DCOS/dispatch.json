@@ -7,7 +7,7 @@
       "type": "DOCKER",
       "volumes": [],
       "docker": {
-        "image": "robotshop/rs-dispatch:0.2.4",
+        "image": "robotshop/rs-dispatch:latest",
         "forcePullImage": false,
         "privileged": false,
         "parameters": []

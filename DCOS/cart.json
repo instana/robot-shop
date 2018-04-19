@@ -15,7 +15,7 @@
       "type": "DOCKER",
       "volumes": [],
       "docker": {
-        "image": "robotshop/rs-cart:0.2.4",
+        "image": "robotshop/rs-cart:latest",
         "forcePullImage": false,
         "privileged": false,
         "parameters": []

@@ -15,7 +15,7 @@
       "type": "DOCKER",
       "volumes": [],
       "docker": {
-        "image": "robotshop/rs-payment:0.2.4",
+        "image": "robotshop/rs-payment:latest",
         "forcePullImage": false,
         "privileged": false,
         "parameters": []

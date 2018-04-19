@@ -15,7 +15,7 @@
       "type": "DOCKER",
       "volumes": [],
       "docker": {
-        "image": "robotshop/rs-shipping-db:0.2.4",
+        "image": "robotshop/rs-shipping-db:latest",
         "forcePullImage": false,
         "privileged": false,
         "parameters": []
