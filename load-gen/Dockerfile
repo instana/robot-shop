@@ -6,8 +6,8 @@ COPY requirements.txt /load/
 
 RUN pip install -r requirements.txt
 
-COPY run.sh /load/
+COPY entrypoint.sh /load/
 COPY robot-shop.py /load/
 
-CMD ["./run.sh"]
+CMD ["./entrypoint.sh"]
 
