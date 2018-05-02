@@ -18,10 +18,16 @@ spec:
         io.kompose.service: user
     spec:
       containers:
-      - image: robotshop/rs-user:0.2.2
+      - image: robotshop/rs-user:latest
         name: user
         ports:
         - containerPort: 8080
-        resources: {}
+        resources:
+          limits:
+            cpu: 200m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 50Mi
       restartPolicy: Always
 status: {}

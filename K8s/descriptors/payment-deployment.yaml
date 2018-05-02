@@ -18,10 +18,16 @@ spec:
         io.kompose.service: payment
     spec:
       containers:
-      - image: robotshop/rs-payment:0.2.2
+      - image: robotshop/rs-payment:latest
         name: payment
         ports:
         - containerPort: 8080
-        resources: {}
+        resources:
+          limits:
+            cpu: 200m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 50Mi
       restartPolicy: Always
 status: {}

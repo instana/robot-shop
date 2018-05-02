@@ -18,10 +18,16 @@ spec:
         io.kompose.service: shipping
     spec:
       containers:
-      - image: robotshop/rs-shipping:0.2.2
+      - image: robotshop/rs-shipping:latest
         name: shipping
         ports:
         - containerPort: 8080
-        resources: {}
+        resources:
+          limits:
+            cpu: 200m
+            memory: 1000Mi
+          requests:
+            cpu: 100m
+            memory: 500Mi
       restartPolicy: Always
 status: {}

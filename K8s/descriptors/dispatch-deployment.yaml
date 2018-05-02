@@ -18,8 +18,14 @@ spec:
         io.kompose.service: dispatch
     spec:
       containers:
-      - image: robotshop/rs-dispatch:0.2.2
+      - image: robotshop/rs-dispatch:latest
         name: dispatch
-        resources: {}
+        resources:
+          limits:
+            cpu: 200m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 50Mi
       restartPolicy: Always
 status: {}

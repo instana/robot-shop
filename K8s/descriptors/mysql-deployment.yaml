@@ -18,10 +18,16 @@ spec:
         io.kompose.service: mysql
     spec:
       containers:
-      - image: robotshop/rs-shipping-db:0.2.2
+      - image: robotshop/rs-shipping-db:latest
         name: mysql
         ports:
         - containerPort: 3306
-        resources: {}
+        resources:
+          limits:
+            cpu: 200m
+            memory: 800Mi
+          requests:
+            cpu: 100m
+            memory: 400Mi
       restartPolicy: Always
 status: {}
