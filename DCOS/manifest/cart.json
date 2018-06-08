@@ -1,34 +1,34 @@
 {
-    "id": "/robotshop/user",
+    "id": "/robotshop/cart",
     "backoffFactor": 1.15,
-    "backoffSeconds": 1,
+    "backoffSeconds": 30,
     "container": {
       "portMappings": [
         {
           "containerPort": 0,
           "labels": {
-            "VIP_0": "/robotshop/user:8080"
+            "VIP_0": "/robotshop/cart:8080"
           },
-          "servicePort": 10007
+          "servicePort": 10008
         }
       ],
       "type": "DOCKER",
       "volumes": [],
       "docker": {
-        "image": "robotshop/rs-user:latest",
+        "image": "robotshop/rs-cart:latest",
         "forcePullImage": false,
         "privileged": false,
         "parameters": []
       }
     },
-    "cpus": 0.5,
+    "cpus": 0.2,
     "disk": 0,
     "env": {
       "REDIS_HOST": "robotshopredis.marathon.l4lb.thisdcos.directory",
-      "MONGO_URL": "mongodb://robotshopmongodb.marathon.l4lb.thisdcos.directory:27017/users"
+      "CATALOGUE_HOST": "robotshopcatalogue.marathon.l4lb.thisdcos.directory"
     },
     "instances": 1,
-    "maxLaunchDelaySeconds": 3600,
+    "maxLaunchDelaySeconds": 900,
     "mem": 128,
     "gpus": 0,
     "networks": [

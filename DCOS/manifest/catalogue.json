@@ -1,34 +1,34 @@
 {
-    "id": "/robotshop/payment",
+    "id": "/robotshop/catalogue",
     "backoffFactor": 1.15,
-    "backoffSeconds": 1,
+    "backoffSeconds": 30,
     "container": {
       "portMappings": [
         {
           "containerPort": 0,
           "labels": {
-            "VIP_0": "/robotshop/payment:8080"
+            "VIP_0": "/robotshop/catalogue:8080"
           },
-          "servicePort": 10009
+          "servicePort": 10006
         }
       ],
       "type": "DOCKER",
       "volumes": [],
       "docker": {
-        "image": "robotshop/rs-payment:latest",
+        "image": "robotshop/rs-catalogue:latest",
         "forcePullImage": false,
         "privileged": false,
         "parameters": []
       }
     },
-    "cpus": 0.5,
+    "cpus": 0.2,
     "disk": 0,
     "env": {
-      "AMQP_HOST": "robotshoprabbitmq.marathon.l4lb.thisdcos.directory"
+      "MONGO_URL": "mongodb://robotshopmongodb.marathon.l4lb.thisdcos.directory:27017/catalogue"
     },
     "instances": 1,
-    "maxLaunchDelaySeconds": 3600,
-    "mem": 128,
+    "maxLaunchDelaySeconds": 900,
+    "mem": 256,
     "gpus": 0,
     "networks": [
       {
