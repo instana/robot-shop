@@ -1,31 +1,26 @@
 {
-    "id": "/robotshop/mysql",
+    "id": "/robotshop/dispatch",
     "backoffFactor": 1.15,
-    "backoffSeconds": 1,
+    "backoffSeconds": 30,
     "container": {
-      "portMappings": [
-        {
-          "containerPort": 0,
-          "labels": {
-            "VIP_0": "/robotshop/mysql:3306"
-          },
-          "servicePort": 10000
-        }
-      ],
+      "portMappings": [],
       "type": "DOCKER",
       "volumes": [],
       "docker": {
-        "image": "robotshop/rs-shipping-db:latest",
+        "image": "robotshop/rs-dispatch:latest",
         "forcePullImage": false,
         "privileged": false,
         "parameters": []
       }
     },
-    "cpus": 0.5,
+    "cpus": 0.2,
     "disk": 0,
+    "env": {
+      "AMQP_HOST": "robotshoprabbitmq.marathon.l4lb.thisdcos.directory"
+    },
     "instances": 1,
-    "maxLaunchDelaySeconds": 3600,
-    "mem": 512,
+    "maxLaunchDelaySeconds": 900,
+    "mem": 128,
     "gpus": 0,
     "networks": [
       {
