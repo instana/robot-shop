@@ -98,9 +98,9 @@ public class Main {
         Spark.get("/cities/:code", (req, res) -> {
             String data;
             try {
-                String query = "select uuid, name from cities where country_code = '" + req.params(":code") + "'";
+                String query = "select uuid, name from cities where country_code = ?";
                 logger.info("Query " + query);
-                data = queryToJson(query);
+                data = queryToJson(query, req.params(":code"));
                 res.header("Content-Type", "application/json");
             } catch(Exception e) {
                 logger.error("cities", e);
@@ -114,9 +114,9 @@ public class Main {
         Spark.get("/match/:code/:text", (req, res) -> {
             String data;
             try {
-                String query = "select uuid, name from cities where country_code = '" + req.params(":code") + "' and city like '" + req.params(":text") + "%' order by name asc limit 10";
+                String query = "select uuid, name from cities where country_code = ? and city like ? order by name asc limit 10";
                 logger.info("Query " + query);
-                data = queryToJson(query);
+                data = queryToJson(query, req.params(":code"), req.params(":text") + "%");
                 res.header("Content-Type", "application/json");
             } catch(Exception e) {
                 logger.error("match", e);
@@ -170,11 +170,11 @@ public class Main {
     /**
      * Query to Json - QED
      **/
-    private static String queryToJson(String query) {
+    private static String queryToJson(String query, Object ... args) {
         List<Map<String, Object>> listOfMaps = null;
         try {
             QueryRunner queryRunner = new QueryRunner(cpds);
-            listOfMaps = queryRunner.query(query, new MapListHandler());
+            listOfMaps = queryRunner.query(query, new MapListHandler(), args);
         } catch (SQLException se) {
             throw new RuntimeException("Couldn't query the database.", se);
         }
