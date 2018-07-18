@@ -50,10 +50,6 @@ def pay(id):
 
 def queueOrder(order):
     app.logger.info('queue order')
-    # For screenshot demo requirements optionally add in a bit of delay
-    delay = int(os.getenv('PAYMENT_DELAY_MS', 0))
-    time.sleep(delay / 1000)
-
     # RabbitMQ is not currently traced automatically
     # opentracing tracer is automatically set to Instana tracer
     # start a span
@@ -66,6 +62,10 @@ def queueOrder(order):
                 'message_bus.destination': 'orders'
                 }
             )
+
+    # For screenshot demo requirements optionally add in a bit of delay
+    delay = int(os.getenv('PAYMENT_DELAY_MS', 0))
+    time.sleep(delay / 1000)
 
     headers = {}
     ot.tracer.inject(span.context, ot.Format.HTTP_HEADERS, headers)
