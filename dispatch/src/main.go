@@ -5,11 +5,14 @@ import (
     "log"
     "time"
     "os"
+    "math/rand"
+    "strconv"
 
     "github.com/streadway/amqp"
     "github.com/instana/golang-sensor"
     ot "github.com/opentracing/opentracing-go"
     ext "github.com/opentracing/opentracing-go/ext"
+    otlog "github.com/opentracing/opentracing-go/log"
 )
 
 const (
@@ -21,6 +24,7 @@ var (
     rabbitChan *amqp.Channel
     rabbitCloseError chan *amqp.Error
     rabbitReady chan bool
+    errorPercent int
 )
 
 func connectToRabbitMQ(uri string) *amqp.Connection {
@@ -97,7 +101,14 @@ func createSpan(headers map[string]interface{}) {
         ext.MessageBusDestination.Set(span, "orders")
         ext.Component.Set(span, "dispatch")
         defer span.Finish()
-        time.Sleep(42 * time.Millisecond)
+        time.Sleep(time.Duration(42 + rand.Int63n(42)) * time.Millisecond)
+        if rand.Intn(100) < errorPercent {
+            span.SetTag("error", true)
+            span.LogFields(
+                otlog.String("error.kind", "Exception"),
+                otlog.String("message", "Failed to dispatch to SOP"))
+                log.Println("Span tagged with error")
+        }
     } else {
         log.Println("Failed to get span context")
         log.Println(err)
@@ -118,6 +129,23 @@ func main() {
         amqpHost = "rabbitmq"
     }
     amqpUri = fmt.Sprintf("amqp://guest:guest@%s:5672/", amqpHost)
+
+    // get error threshold from environment
+    errorPercent = 0
+    epct, ok := os.LookupEnv("DISPATCH_ERROR_PERCENT")
+    if ok {
+        epcti, err := strconv.Atoi(epct)
+        if err == nil {
+            if epcti > 100 {
+                epcti = 100
+            }
+            if epcti < 0 {
+                epcti = 0
+            }
+            errorPercent = epcti
+        }
+    }
+    log.Printf("Error Percent is %d\n", errorPercent)
 
     // MQ error channel
     rabbitCloseError = make(chan *amqp.Error)
