@@ -53,21 +53,12 @@ I have found some issues with kompose reading the *.env* correctly, just export 
 You can also run Kubernetes locally using [minikube](https://github.com/kubernetes/minikube).
 
     $ kubectl create namespace robot-shop
-    $ kubectl -n robot-shop create -f K8s
+    $ kubectl -n robot-shop create -f K8s/descriptors
 
-To deploy the Instana agent to Kubernetes, edit the *instana/instana-agent.yaml* file and insert your base64 encoded agent key. Your agent key is available from the Instana dashboard.
+To deploy the Instana agent to Kubernetes, just use the [helm](https://github.com/instana/instana-helm-chart) chart. Edit *values.yaml* and set zone, endpoint and key to your values, see the README file for the helm chart.
 
-    $ echo -n "your agent key" | base64
-
-Deploy the agent
-
-    $ kubectl create -f instana/instana-agent.yaml
-
-The agent configuration only runs the agent on nodes with the appropriate label. For minikube.
-
-    $ kubectl label node minikube agent=instana
-
-There is also a handy script *instana/label.sh* which labels all the nodes.
+    $ cd instana-helm-chart
+    $ helm install --name instana-agent --namespace instana-agent .
 
 ## Acessing the Store
 If you are running the store locally via *docker-compose up* then, the store front is available on localhost port 8080 [http://localhost:8080](http://localhost:8080/)
