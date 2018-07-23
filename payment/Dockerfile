@@ -1,4 +1,4 @@
-FROM python:2
+FROM python:3.6
 # Downgraded to Python 2 due to futures package clash
 # Will update back to Python 3 once depency hell is fixed
 

@@ -53,9 +53,11 @@ def queueOrder(order):
     # RabbitMQ is not currently traced automatically
     # opentracing tracer is automatically set to Instana tracer
     # start a span
-    context = ot.tracer.current_context()
+
+    # context = ot.tracer.current_context()
+    sspan = ot.tracer.active_span
     span = ot.tracer.start_span(operation_name='queue-order',
-            child_of=ot.tracer.current_context(),
+            child_of=sspan,
             tags={
                 tags.SPAN_KIND: 'producer',
                 tags.COMPONENT: 'payment',
