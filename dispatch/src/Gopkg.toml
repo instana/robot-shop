@@ -1,0 +1,11 @@
+[[constraint]]
+    name = "github.com/streadway/amqp"
+    revision = "e5adc2ada8b8efff032bf61173a233d143e9318e"
+
+[[constraint]]
+    name = "github.com/instana/golang-sensor"
+    version = "1.4.10"
+
+[[constraint]]
+    name = "github.com/opentracing/opentracing-go"
+    version = "1.0.2"

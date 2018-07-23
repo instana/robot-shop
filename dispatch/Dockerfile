@@ -1,22 +1,17 @@
 FROM golang:1.9.2
 
-WORKDIR /opt/gorcv
+ENV DEP_URL="https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64"
+ENV GOPATH=/go
 
-ENV GOPATH=/opt/gorcv \
-    GOBIN=/opt/gorcv/bin \
-    AMQP_URI=rabbitmq
+COPY src/ /go/src/github.com/instana/dispatch
 
-# install external components
-# @todo godep
-RUN go get \
-    github.com/streadway/amqp \
-    github.com/instana/golang-sensor
+WORKDIR /go/src/github.com/instana/dispatch
 
-COPY src /opt/gorcv/
-
-RUN go build && go install
+RUN curl -fsSL -o /usr/local/bin/dep ${DEP_URL} && \
+	chmod +x /usr/local/bin/dep && \
+    dep ensure && \
+    go build -o bin/gorcv
 
 # @todo stage this build
 
 CMD bin/gorcv
-
