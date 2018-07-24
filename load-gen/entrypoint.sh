@@ -23,5 +23,10 @@ fi
 
 echo "Starting load with $CLIENTS clients"
 
-locust -f robot-shop.py --host "$HOST" --no-web -c $CLIENTS -r 1
+if [ -n "$SILENT" ]
+then
+    locust -f robot-shop.py --host "$HOST" --no-web -c $CLIENTS -r 1 > /dev/null 2>&1
+else
+    locust -f robot-shop.py --host "$HOST" --no-web -c $CLIENTS -r 1
+fi
 
