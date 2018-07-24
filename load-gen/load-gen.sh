@@ -5,7 +5,7 @@
 
 # Set SILENT to anything to have all output discarded. Useful when running load for
 # a long time to stop the disk filling up with copious log messages
-#SILENT=1
+# -e 'SILENT=1'
 
 # get the tag info
 eval $(egrep '[A-Z]+=' ../.env)
