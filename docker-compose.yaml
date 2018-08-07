@@ -4,8 +4,6 @@ services:
     build:
       context: mongo
     image: ${REPO}/rs-mongodb:${TAG}
-    ports:
-      - "27017"
     networks:
       - robot-shop
     deploy:
@@ -14,8 +12,6 @@ services:
         condition: on-failure
   redis:
     image: redis:4.0.6
-    ports:
-      - "6379"
     networks:
       - robot-shop
     deploy:
@@ -24,9 +20,6 @@ services:
         condition: on-failure
   rabbitmq:
     image: rabbitmq:3.7-management-alpine
-    ports:
-      - "5672"
-      - "15672"
     networks:
       - robot-shop
     deploy:
@@ -39,8 +32,6 @@ services:
     image: ${REPO}/rs-catalogue:${TAG}
     depends_on:
       - mongodb
-    ports:
-      - "8080"
     networks:
       - robot-shop
     deploy:
@@ -54,8 +45,6 @@ services:
     depends_on:
       - mongodb
       - redis
-    ports:
-      - "8080"
     networks:
       - robot-shop
     deploy:
@@ -68,8 +57,6 @@ services:
     image: ${REPO}/rs-cart:${TAG}
     depends_on:
       - redis
-    ports:
-      - "8080"
     networks:
       - robot-shop
     deploy:
@@ -80,8 +67,6 @@ services:
     build:
       context: shipping/database
     image: ${REPO}/rs-shipping-db:${TAG}
-    ports:
-      - "3306"
     networks:
       - robot-shop
     deploy:
@@ -94,8 +79,6 @@ services:
     image: ${REPO}/rs-shipping:${TAG}
     depends_on:
       - mysql
-    ports:
-      - "8080"
     networks:
       - robot-shop
     deploy:
@@ -108,8 +91,6 @@ services:
     image: ${REPO}/rs-payment:${TAG}
     depends_on:
       - rabbitmq
-    ports:
-      - "8080"
     networks:
       - robot-shop
     deploy:
