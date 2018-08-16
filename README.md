@@ -32,6 +32,7 @@ If you modified the *.env* file and changed the image registry, you may need to 
 ## Run Locally
 You can run it locally for testing
 
+    $ docker-compose pull
     $ docker-compose up
 
 If you are running it locally on a Linux host you can also run the Instana [agent](https://docs.instana.io/quick_start/agent_setup/container/docker/) locally, unfortunately the agent is currently not supported on Mac.
