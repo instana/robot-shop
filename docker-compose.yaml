@@ -65,8 +65,8 @@ services:
         condition: on-failure
   mysql:
     build:
-      context: shipping/database
-    image: ${REPO}/rs-shipping-db:${TAG}
+      context: mysql
+    image: ${REPO}/rs-mysql-db:${TAG}
     networks:
       - robot-shop
     deploy:
@@ -75,12 +75,24 @@ services:
         condition: on-failure
   shipping:
     build:
-      context: shipping/service
+      context: shipping
     image: ${REPO}/rs-shipping:${TAG}
     depends_on:
       - mysql
     networks:
       - robot-shop
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+  ratings:
+    build:
+      context: ratings
+    image: ${REPO}/rs-ratings:${TAG}
+    networks:
+      - robot-shop
+    depends_on:
+      - mysql
     deploy:
       replicas: 1
       restart_policy:

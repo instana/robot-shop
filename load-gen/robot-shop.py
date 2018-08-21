@@ -1,5 +1,6 @@
 from locust import HttpLocust, TaskSet, task
 from random import choice
+from random import randint
 
 class UserBehavior(TaskSet):
     def on_start(self):
@@ -33,7 +34,12 @@ class UserBehavior(TaskSet):
                 if item['instock'] != 0:
                     break
 
+            # vote for item
+            if randint(1, 10) <= 3:
+                self.client.put('/api/ratings/api/rate/{}/{}'.format(item['sku'], randint(1, 5)))
+
             self.client.get('/api/catalogue/product/{}'.format(item['sku']))
+            self.client.get('/api/ratings/api/fetch/{}'.format(item['sku']))
             self.client.get('/api/cart/add/{}/{}/1'.format(uniqueid, item['sku']))
 
         cart = self.client.get('/api/cart/cart/{}'.format(uniqueid)).json()

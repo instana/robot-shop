@@ -6,8 +6,8 @@ metadata:
     kompose.version: 1.10.0 (8bb0907)
   creationTimestamp: null
   labels:
-    io.kompose.service: mysql
-  name: mysql
+    io.kompose.service: ratings
+  name: ratings
 spec:
   replicas: 1
   strategy: {}
@@ -15,19 +15,19 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        io.kompose.service: mysql
+        io.kompose.service: ratings
     spec:
       containers:
-      - image: robotshop/rs-mysql-db:latest
+      - image: robotshop/rs-ratings:latest
         name: mysql
         ports:
         - containerPort: 3306
         resources:
           limits:
             cpu: 200m
-            memory: 800Mi
+            memory: 100Mi
           requests:
             cpu: 100m
-            memory: 400Mi
+            memory: 50Mi
       restartPolicy: Always
 status: {}
