@@ -6,7 +6,8 @@ ENV CATALOGUE_HOST=catalogue \
     USER_HOST=user \
     CART_HOST=cart \
     SHIPPING_HOST=shipping \
-    PAYMENT_HOST=payment
+    PAYMENT_HOST=payment \
+    RATINGS_HOST=ratings
 
 COPY entrypoint.sh /root/
 ENTRYPOINT ["/root/entrypoint.sh"]

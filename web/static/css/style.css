@@ -132,6 +132,17 @@ a.product:hover {
     width: 300px;
 }
 
+.rating {
+    margin: 10px;
+}
+
+.vote-star {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    opacity: 0.5;
+}
+
 /* login register */
 table.credentials {
     border: 2px solid cyan;
