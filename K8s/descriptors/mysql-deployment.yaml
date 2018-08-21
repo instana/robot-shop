@@ -18,7 +18,7 @@ spec:
         io.kompose.service: mysql
     spec:
       containers:
-      - image: robotshop/rs-shipping-db:latest
+      - image: robotshop/rs-mysql-db:latest
         name: mysql
         ports:
         - containerPort: 3306
