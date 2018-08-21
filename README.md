@@ -9,6 +9,7 @@ This sample microservice application has been built using these technologies:
 - Java ([Spark Java](http://sparkjava.com/))
 - Python ([Flask](http://flask.pocoo.org))
 - Golang
+- PHP (Apache)
 - MongoDB
 - Redis
 - MySQL ([Maxmind](http://www.maxmind.com) data)
@@ -21,7 +22,7 @@ The various services in the sample application already include all required Inst
 To see the application performance results in the Instana dashboard, you will first need an Instana account. Don't worry a [trial account](https://instana.com/trial?utm_source=github&utm_medium=robot_shop) is free.
 
 ## Build from Source
-To build from source use Docker Compose. Optionally edit the *.env* file to specify an alternative image registry and version tag; see the official [documentation](https://docs.docker.com/compose/env-file/) for more information.
+To optionally build from source (you will need a newish version of Docker to do this) use Docker Compose. Optionally edit the *.env* file to specify an alternative image registry and version tag; see the official [documentation](https://docs.docker.com/compose/env-file/) for more information. 
 
     $ docker-compose build
 
@@ -30,9 +31,14 @@ If you modified the *.env* file and changed the image registry, you may need to 
     $ docker-compose push
 
 ## Run Locally
-You can run it locally for testing
+You can run it locally for testing.
+
+If you did not build from source, don't worry all the images are on Docker Hub. Just pull down those images first using:
 
     $ docker-compose pull
+
+Fire up Stan's Robot Shop with:
+
     $ docker-compose up
 
 If you are running it locally on a Linux host you can also run the Instana [agent](https://docs.instana.io/quick_start/agent_setup/container/docker/) locally, unfortunately the agent is currently not supported on Mac.
