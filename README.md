@@ -67,6 +67,8 @@ To deploy the Instana agent to Kubernetes, just use the [helm](https://github.co
     $ cd instana-helm-chart
     $ helm install --name instana-agent --namespace instana-agent .
 
+If you are having difficulties get helm running with your K8s install it is most likely due to RBAC, most K8s now have RBAC enabled by default. Therefore helm requires a [service account](https://github.com/helm/helm/blob/master/docs/rbac.md) to have permission to do stuff.
+
 ## Acessing the Store
 If you are running the store locally via *docker-compose up* then, the store front is available on localhost port 8080 [http://localhost:8080](http://localhost:8080/)
 
