@@ -67,6 +67,8 @@ services:
     build:
       context: mysql
     image: ${REPO}/rs-mysql-db:${TAG}
+    cap_add:
+      - NET_ADMIN
     networks:
       - robot-shop
     deploy:

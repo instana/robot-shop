@@ -20,6 +20,9 @@ spec:
       containers:
       - image: robotshop/rs-mysql-db:latest
         name: mysql
+        securityContext:
+          capabilities:
+            add: ["NET_ADMIN"]
         ports:
         - containerPort: 3306
         resources:
