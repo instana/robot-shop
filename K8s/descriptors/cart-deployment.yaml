@@ -20,6 +20,11 @@ spec:
       containers:
       - image: robotshop/rs-cart:latest
         name: cart
+        env:
+          - name: INSTANA_AGENT_HOST
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
         ports:
         - containerPort: 8080
         resources:

@@ -20,6 +20,11 @@ spec:
       containers:
       - image: robotshop/rs-dispatch:latest
         name: dispatch
+        env:
+          - name: INSTANA_AGENT_HOST
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
         resources:
           limits:
             cpu: 200m
