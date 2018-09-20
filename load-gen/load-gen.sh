@@ -13,11 +13,24 @@ eval $(egrep '[A-Z]+=' ../.env)
 echo "Repo $REPO"
 echo "Tag $TAG"
 
-docker run \
-    -it \
-    --rm \
-    --network=host \
-    -e 'HOST=http://localhost:8080' \
-    -e 'NUM_CLIENTS=1' \
-    ${REPO}/rs-load:${TAG}
+if [ "$1" = "-d" ]
+then
+    echo "running in background"
+    docker run \
+        -d \
+        --rm \
+        --network=host \
+        -e 'HOST=http://localhost:8080' \
+        -e 'NUM_CLIENTS=1' \
+        -e 'SILENT=1'
+        ${REPO}/rs-load:${TAG}
+else
+    docker run \
+        -it \
+        --rm \
+        --network=host \
+        -e 'HOST=http://localhost:8080' \
+        -e 'NUM_CLIENTS=1' \
+        ${REPO}/rs-load:${TAG}
+fi
 
