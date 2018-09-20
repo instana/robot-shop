@@ -22,7 +22,7 @@ then
         --network=host \
         -e 'HOST=http://localhost:8080' \
         -e 'NUM_CLIENTS=1' \
-        -e 'SILENT=1'
+        -e 'SILENT=1' \
         ${REPO}/rs-load:${TAG}
 else
     docker run \
