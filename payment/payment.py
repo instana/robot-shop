@@ -55,27 +55,24 @@ def queueOrder(order):
     # start a span
 
     # context = ot.tracer.current_context()
-    sspan = ot.tracer.active_span
-    span = ot.tracer.start_span(operation_name='queue-order',
-            child_of=sspan,
+    parent_span = ot.tracer.active_span
+    with ot.tracer.start_active_span('queue-order', child_of=parent_span,
             tags={
                 tags.SPAN_KIND: 'producer',
                 tags.COMPONENT: 'payment',
                 'message_bus.destination': 'orders'
                 }
-            )
+            ) as scope:
 
-    # For screenshot demo requirements optionally add in a bit of delay
-    delay = int(os.getenv('PAYMENT_DELAY_MS', 0))
-    time.sleep(delay / 1000)
+        # For screenshot demo requirements optionally add in a bit of delay
+        delay = int(os.getenv('PAYMENT_DELAY_MS', 0))
+        time.sleep(delay / 1000)
 
-    headers = {}
-    ot.tracer.inject(span.context, ot.Format.HTTP_HEADERS, headers)
-    app.logger.info('msg headers {}'.format(headers))
-    
-    publisher.publish(order, headers)
+        headers = {}
+        ot.tracer.inject(scope.span.context, ot.Format.HTTP_HEADERS, headers)
+        app.logger.info('msg headers {}'.format(headers))
 
-    span.finish()
+        publisher.publish(order, headers)
 
 # RabbitMQ
 publisher = Publisher(app.logger)
