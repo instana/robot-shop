@@ -18,7 +18,7 @@ spec:
         io.kompose.service: ratings
     spec:
       containers:
-      - image: robotshop/rs-ratings:latest
+      - image: linuxacademy/rs-ratings:latest
         name: ratings
         ports:
         - containerPort: 3306

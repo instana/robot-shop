@@ -18,7 +18,7 @@ spec:
         io.kompose.service: shipping
     spec:
       containers:
-      - image: robotshop/rs-shipping:latest
+      - image: linuxacademy/rs-shipping:latest
         name: shipping
         ports:
         - containerPort: 8080
