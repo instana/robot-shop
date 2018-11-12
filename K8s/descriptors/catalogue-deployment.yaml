@@ -18,7 +18,7 @@ spec:
         io.kompose.service: catalogue
     spec:
       containers:
-      - image: linuxacademy/rs-catalogue:latest
+      - image: linuxacademycontent/rs-catalogue:latest
         name: catalogue
         env:
           - name: INSTANA_AGENT_HOST

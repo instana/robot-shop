@@ -18,7 +18,7 @@ spec:
         io.kompose.service: web
     spec:
       containers:
-      - image: linuxacademy/rs-web:latest
+      - image: linuxacademycontent/rs-web:latest
         name: web
         ports:
         - containerPort: 8080

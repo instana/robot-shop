@@ -18,7 +18,7 @@ spec:
         io.kompose.service: mongodb
     spec:
       containers:
-      - image: linuxacademy/rs-mongodb:latest
+      - image: linuxacademycontent/rs-mongodb:latest
         name: mongodb
         ports:
         - containerPort: 27017
