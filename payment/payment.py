@@ -16,6 +16,7 @@ app = Flask(__name__)
 
 CART = os.getenv('CART_HOST', 'cart')
 USER = os.getenv('USER_HOST', 'user')
+PAYMENT_GATEWAY = os.getenv('PAYMENT_GATEWAY', 'https://paypal.com/')
 
 @app.route('/health', methods=['GET'])
 def health():
@@ -28,8 +29,8 @@ def pay(id):
     app.logger.info(cart)
 
     # dummy call to Paypal, hope they dont object
-    req = requests.get('https://paypal.com/')
-    app.logger.info('paypal returned {}'.format(req.status_code))
+    req = requests.get(PAYMENT_GATEWAY)
+    app.logger.info('{} returned {}'.format(PAYMENT_GATEWAY, req.status_code))
 
     # Generate order id
     orderid = str(uuid.uuid4())
@@ -82,5 +83,6 @@ if __name__ == "__main__":
     sh.setLevel(logging.INFO)
     app.logger.addHandler(sh)
     app.logger.setLevel(logging.INFO)
+    app.logger.info('Payment gateway {}'.format(PAYMENT_GATEWAY))
     port = int(os.getenv("SHOP_PAYMENT_PORT", "8080"))
     app.run(host='0.0.0.0', port=port)

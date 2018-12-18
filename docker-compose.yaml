@@ -107,6 +107,9 @@ services:
       - rabbitmq
     networks:
       - robot-shop
+    # Uncomment to change payment gateway
+    #environment:
+      #PAYMENT_GATEWAY: "https://www.worldpay.com"
     deploy:
       replicas: 1
       restart_policy:
