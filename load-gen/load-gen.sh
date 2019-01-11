@@ -21,6 +21,8 @@ eval $(egrep '[A-Z]+=' ../.env)
 echo "Repo $REPO"
 echo "Tag $TAG"
 
+docker pull ${REPO}/rs-load:${TAG} | cat
+
 if [ "$1" = "-d" ]
 then
     echo "running in background"
