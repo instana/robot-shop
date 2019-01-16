@@ -28,6 +28,7 @@ then
     echo "running in background"
     docker run \
         -d \
+        --name loadgen \
         --rm \
         --network=host \
         -e "HOST=$HOST" \
