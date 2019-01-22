@@ -13,6 +13,8 @@
       "express": "^4.15.4",
       "redis": "^2.8.0",
       "request": "^2.83.0",
+      "express-pino-logger": "^4.0.0",
+      "pino-pretty": "^2.5.0",
       "instana-nodejs-sensor": "^1.28.0"
   }
 }

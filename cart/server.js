@@ -11,13 +11,21 @@ const redis = require('redis');
 const request = require('request');
 const bodyParser = require('body-parser');
 const express = require('express');
+const pino = require('express-pino-logger');
 
 var redisConnected = false;
 
 var redisHost = process.env.REDIS_HOST || 'redis'
 var catalogueHost = process.env.CATALOGUE_HOST || 'catalogue'
 
+const logger = pino({
+    level: 'info',
+    prettyPrint: true,
+    useLevelLabels: true
+});
 const app = express();
+
+app.use(logger);
 
 app.use((req, res, next) => {
     res.set('Timing-Allow-Origin', '*');
@@ -29,6 +37,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.get('/health', (req, res) => {
+    req.log.info('Health check');
     var stat = {
         app: 'OK',
         redis: redisConnected
@@ -41,7 +50,7 @@ app.get('/health', (req, res) => {
 app.get('/cart/:id', (req, res) => {
     redisClient.get(req.params.id, (err, data) => {
         if(err) {
-            console.log('ERROR', err);
+            req.log.error('ERROR', err);
             res.status(500).send(err);
         } else {
             if(data == null) {
@@ -315,15 +324,15 @@ var redisClient = redis.createClient({
 });
 
 redisClient.on('error', (e) => {
-    console.log('Redis ERROR', e);
+    console.error('Redis ERROR', e);
 });
 redisClient.on('ready', (r) => {
-    console.log('Redis READY', r);
+    console.info('Redis READY', r);
     redisConnected = true;
 });
 
 // fire it up!
 const port = process.env.CART_SERVER_PORT || '8080';
 app.listen(port, () => {
-    console.log('Started on port', port);
+    console.info('Started on port', port);
 });
