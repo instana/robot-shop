@@ -12,6 +12,9 @@
       "body-parser": "^1.18.1",
       "express": "^4.15.4",
       "mongodb": "^2.2.33",
+      "pino": "^5.10.8",
+      "express-pino-logger": "^4.0.0",
+      "pino-pretty": "^2.5.0",
       "instana-nodejs-sensor": "^1.28.0"
   }
 }
