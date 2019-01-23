@@ -28,23 +28,60 @@ def pay(id):
     cart = request.get_json()
     app.logger.info(cart)
 
-    # dummy call to Paypal, hope they dont object
-    req = requests.get(PAYMENT_GATEWAY)
-    app.logger.info('{} returned {}'.format(PAYMENT_GATEWAY, req.status_code))
+    anonymous_user = True
+
+    # check user exists
+    try:
+        req = requests.get('http://{user}:8080/check/{id}'.format(user=USER, id=id))
+    except requests.exceptions.RequestException as err:
+        app.logger.error(err)
+        return str(err), 500
+    if req.status_code == 200:
+        anonymous_user = False
+
+    # check that the cart is valid
+    has_shipping = False
+    for item in cart.get('items'):
+        if item.get('sku') == 'SHIP':
+            has_shipping = True
+
+    if int(cart.get('total')) == 0 or has_shipping == False:
+        return 'cart not valid', 400
+
+    # dummy call to payment gateway, hope they dont object
+    try:
+        req = requests.get(PAYMENT_GATEWAY)
+        app.logger.info('{} returned {}'.format(PAYMENT_GATEWAY, req.status_code))
+    except requests.exceptions.RequestException as err:
+        app.logger.error(err)
+        return str(err), 500
+    if req.status_code != 200:
+        return 'payment error', req.status_code
 
     # Generate order id
     orderid = str(uuid.uuid4())
     queueOrder({ 'orderid': orderid, 'user': id, 'cart': cart })
 
-    # add to history
-    req = requests.post('http://{user}:8080/order/{id}'.format(user=USER, id=id),
-            data=json.dumps({'orderid': orderid, 'cart': cart}),
-            headers={'Content-Type': 'application/json'})
-    app.logger.info('order history returned {}'.format(req.status_code))
+    # add to order history
+    if not anonymous_user:
+        try:
+            req = requests.post('http://{user}:8080/order/{id}'.format(user=USER, id=id),
+                    data=json.dumps({'orderid': orderid, 'cart': cart}),
+                    headers={'Content-Type': 'application/json'})
+            app.logger.info('order history returned {}'.format(req.status_code))
+        except requests.exceptions.RequestException as err:
+            app.logger.error(err)
+            return str(err), 500
 
     # delete cart
-    req = requests.delete('http://{cart}:8080/cart/{id}'.format(cart=CART, id=id));
-    app.logger.info('cart delete returned {}'.format(req.status_code))
+    try:
+        req = requests.delete('http://{cart}:8080/cart/{id}'.format(cart=CART, id=id));
+        app.logger.info('cart delete returned {}'.format(req.status_code))
+    except requests.exceptions.RequestException as err:
+        app.logger.error(err)
+        return str(err), 500
+    if req.status_code != 200:
+        return 'order history update error', req.status_code
 
     return jsonify({ 'orderid': orderid })
 
@@ -75,6 +112,7 @@ def queueOrder(order):
 
         publisher.publish(order, headers)
 
+
 # RabbitMQ
 publisher = Publisher(app.logger)
 
@@ -85,4 +123,5 @@ if __name__ == "__main__":
     app.logger.setLevel(logging.INFO)
     app.logger.info('Payment gateway {}'.format(PAYMENT_GATEWAY))
     port = int(os.getenv("SHOP_PAYMENT_PORT", "8080"))
+    app.logger.info('Starting on port {}'.format(port))
     app.run(host='0.0.0.0', port=port)

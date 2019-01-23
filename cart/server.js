@@ -21,7 +21,7 @@ var catalogueHost = process.env.CATALOGUE_HOST || 'catalogue'
 
 const logger = pino({
     level: 'info',
-    prettyPrint: false,
+    prettyPrint: true,
     useLevelLabels: true
 });
 const expLogger = expPino({
@@ -94,8 +94,12 @@ app.get('/rename/:from/:to', (req, res) => {
                 res.status(404).send('cart not found');
             } else {
                 var cart = JSON.parse(data);
-                saveCart(req.params.to, cart);
-                res.json(cart);
+                saveCart(req.params.to, cart).then((data) => {
+                    res.json(cart);
+                }).catch((err) => {
+                    req.log.error(err);
+                    res.status(500).send(err);
+                });
             }
         }
     });
@@ -154,8 +158,12 @@ app.get('/add/:id/:sku/:qty', (req, res) => {
                 cart.tax = calcTax(cart.total);
 
                 // save the new cart
-                saveCart(req.params.id, cart);
-                res.json(cart);
+                saveCart(req.params.id, cart).then((data) => {
+                    res.json(cart);
+                }).catch((err) => {
+                    req.log.error(err);
+                    res.status(500).send(err);
+                });
             }
         });
     }).catch((err) => {
@@ -206,8 +214,12 @@ app.get('/update/:id/:sku/:qty', (req, res) => {
                     cart.total = calcTotal(cart.items);
                     // work out tax
                     cart.tax = calcTax(cart.total);
-                    saveCart(req.params.id, cart);
-                    res.json(cart);
+                    saveCart(req.params.id, cart).then((data) => {
+                        res.json(cart);
+                    }).catch((err) => {
+                        req.log.error(err);
+                        res.status(500).send(err);
+                    });
                 }
             }
         }
@@ -258,8 +270,12 @@ app.post('/shipping/:id', (req, res) => {
                     cart.tax = calcTax(cart.total);
 
                     // save the updated cart
-                    saveCart(req.params.id, cart);
-                    res.json(cart);
+                    saveCart(req.params.id, cart).then((data) => {
+                        res.json(cart);
+                    }).catch((err) => {
+                        req.log.error(err);
+                        res.status(500).send(err);
+                    });
                 }
             }
         });
@@ -319,10 +335,14 @@ function getProduct(sku) {
 
 function saveCart(id, cart) {
     logger.info('saving cart', cart);
-    redisClient.setex(id, 3600, JSON.stringify(cart), (err, data) => {
-        if(err) {
-            logger.error('saveCart ERROR', err);
-        }
+    return new Promise((resolve, reject) => {
+        redisClient.setex(id, 3600, JSON.stringify(cart), (err, data) => {
+            if(err) {
+                reject(err);
+            } else {
+                resolve(data);
+            }
+        });
     });
 }
 

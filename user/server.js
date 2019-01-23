@@ -54,6 +54,7 @@ app.get('/health', (req, res) => {
 
 // use REDIS INCR to track anonymous users
 app.get('/uniqueid', (req, res) => {
+    req.log.error('Unique ID test');
     // get number from Redis
     redisClient.incr('anonymous-counter', (err, r) => {
         if(!err) {
@@ -65,6 +66,25 @@ app.get('/uniqueid', (req, res) => {
             res.status(500).send(err);
         }
     });
+});
+
+// check user exists
+app.get('/check/:id', (req, res) => {
+    if(mongoConnected) {
+        usersCollection.findOne({name: req.params.id}).then((user) => {
+            if(user) {
+                res.send('OK');
+            } else {
+                res.status(404).send('user not found');
+            }
+        }).catch((e) => {
+            req.log.error(e);
+            res.send(500).send(e);
+        });
+    } else {
+        req.log.error('database not available');
+        res.status(500).send('database not available');
+    }
 });
 
 // return all users for debugging only
