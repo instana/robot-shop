@@ -113,13 +113,17 @@ app.get('/add/:id/:sku/:qty', (req, res) => {
         res.status(400).send('quantity must be a number');
         return;
     } else if(qty < 1) {
-        res.status(400).send('negative quantity not allowed');
+        res.status(400).send('quantity has to be greater than zero');
         return;
     }
 
     // look up product details
     getProduct(req.params.sku).then((product) => {
         req.log.info('got product', product);
+        if(!product) {
+            res.status(404).send('product not found');
+            return;
+        }
         // is the product in stock?
         if(product.instock == 0) {
             res.status(404).send('out of stock');
@@ -324,9 +328,10 @@ function getProduct(sku) {
             if(err) {
                 reject(err);
             } else if(res.statusCode != 200) {
-                reject(res.statusCode);
+                resolve(null);
             } else {
                 // return object - body is a string
+                // TODO - catch parse error
                 resolve(JSON.parse(body));
             }
         });
