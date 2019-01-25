@@ -5,6 +5,7 @@ import logging
 import uuid
 import json
 import requests
+import traceback
 import opentracing as ot
 import opentracing.ext.tags as tags
 from flask import Flask
@@ -17,6 +18,19 @@ app = Flask(__name__)
 CART = os.getenv('CART_HOST', 'cart')
 USER = os.getenv('USER_HOST', 'user')
 PAYMENT_GATEWAY = os.getenv('PAYMENT_GATEWAY', 'https://paypal.com/')
+
+@app.errorhandler(Exception)
+def exception_handler(err):
+    # python instrumentation currently does not pick up error message
+    logkv = {'message': str(err)}
+    tblines = traceback.format_exc().splitlines()
+    count = 1
+    for line in tblines:
+        logkv['stack{}'.format(count)] = line
+        count += 1
+    ot.tracer.active_span.log_kv(logkv)
+    app.logger.error(str(err))
+    return str(err), 500
 
 @app.route('/health', methods=['GET'])
 def health():
@@ -40,12 +54,14 @@ def pay(id):
         anonymous_user = False
 
     # check that the cart is valid
+    # this will blow up if the cart is not valid
     has_shipping = False
     for item in cart.get('items'):
         if item.get('sku') == 'SHIP':
             has_shipping = True
 
-    if int(cart.get('total')) == 0 or has_shipping == False:
+    if not cart.get('total') or int(cart.get('total')) == 0 or has_shipping == False:
+        app.logger.warn('cart not valid')
         return 'cart not valid', 400
 
     # dummy call to payment gateway, hope they dont object
