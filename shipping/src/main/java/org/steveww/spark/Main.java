@@ -21,7 +21,7 @@ import com.google.gson.Gson;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.sql.Connection;
-import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Types;
@@ -130,8 +130,8 @@ public class Main {
         Spark.get("/calc/:uuid", (req, res) -> {
             double homeLat = 51.164896;
             double homeLong = 7.068792;
+            String data;
 
-            res.header("Content-Type", "application/json");
             Location location = getLocation(req.params(":uuid"));
             Ship ship = new Ship();
             if(location != null) {
@@ -141,11 +141,15 @@ public class Main {
                 double cost = Math.rint(distance * 5) / 100.0;
                 ship.setDistance(distance);
                 ship.setCost(cost);
+                res.header("Content-Type", "application/json");
+                data = new Gson().toJson(ship);
             } else {
-                res.status(500);
+                data = "no location";
+                logger.warn(data);
+                res.status(400);
             }
 
-            return new Gson().toJson(ship);
+            return data;
         });
 
         Spark.post("/confirm/:id", (req, res) -> {
@@ -188,20 +192,21 @@ public class Main {
     private static Location getLocation(String uuid) {
         Location location = null;
         Connection conn = null;
-        Statement stmt = null;
+        PreparedStatement stmt = null;
         ResultSet rs = null;
-        String query = "select latitude, longitude from cities where uuid = " + uuid;
+        String query = "select latitude, longitude from cities where uuid = ?";
 
         try {
             conn = cpds.getConnection();
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(query);
+            stmt = conn.prepareStatement(query);
+            stmt.setInt(1, Integer.parseInt(uuid));
+            rs = stmt.executeQuery();
             while(rs.next()) {
                 location = new Location(rs.getDouble(1), rs.getDouble(2));
                 break;
             }
         } catch(Exception e) {
-            logger.error("Query exception", e);
+            logger.error("Location exception", e);
         } finally {
             DbUtils.closeQuietly(conn, stmt, rs);
         }
