@@ -1,6 +1,6 @@
 FROM golang:1.9.2
 
-ENV DEP_URL="https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64"
+ENV DEP_URL="https://github.com/golang/dep/releases/download/v0.5.0/dep-linux-amd64"
 ENV GOPATH=/go
 
 COPY src/ /go/src/github.com/instana/dispatch
