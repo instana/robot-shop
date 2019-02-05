@@ -1,5 +1,8 @@
 <?php
-require_once('log4php/Logger.php');
+// load composer installed files
+require_once(__DIR__.'/vendor/autoload.php');
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 
 abstract class API {
     protected $method = '';
@@ -12,9 +15,13 @@ abstract class API {
 
     protected $file = Null;
 
+    protected $logger = Null;
+
+    protected $logHandler = Null;
+
     public function __construct($request) {
-        // Log4PHP
-        Logger::configure('log4php.xml');
+        // Logging
+        $this->logHandler = new StreamHandler('php://stdout', Logger::INFO);
 
         // CORS
         header('Access-Control-Allow-Origin: *');
