@@ -105,6 +105,7 @@ app.get('/users', (req, res) => {
 app.post('/login', (req, res) => {
     req.log.info('login', req.body);
     if(req.body.name === undefined || req.body.password === undefined) {
+        req.log.warn('credentails not complete');
         res.status(400).send('name or passowrd not supplied');
     } else if(mongoConnected) {
         usersCollection.findOne({
@@ -134,11 +135,13 @@ app.post('/login', (req, res) => {
 app.post('/register', (req, res) => {
     req.log.info('register', req.body);
     if(req.body.name === undefined || req.body.password === undefined || req.body.email === undefined) {
+        req.log.warn('insufficient data');
         res.status(400).send('insufficient data');
     } else if(mongoConnected) {
         // check if name already exists
         usersCollection.findOne({name: req.body.name}).then((user) => {
             if(user) {
+                req.log.warn('user already exists');
                 res.status(400).send('name already exists');
             } else {
                 // create new user

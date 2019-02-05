@@ -110,9 +110,11 @@ app.get('/add/:id/:sku/:qty', (req, res) => {
     // check quantity
     var qty = parseInt(req.params.qty);
     if(isNaN(qty)) {
+        req.log.warn('quantity not a number');
         res.status(400).send('quantity must be a number');
         return;
     } else if(qty < 1) {
+        req.log.warn('quantity less than one');
         res.status(400).send('quantity has to be greater than zero');
         return;
     }
@@ -181,9 +183,11 @@ app.get('/update/:id/:sku/:qty', (req, res) => {
     // check quantity
     var qty = parseInt(req.params.qty);
     if(isNaN(qty)) {
+        req.log.warn('quanity not a number');
         res.status(400).send('quantity must be a number');
         return;
     } else if(qty < 0) {
+        req.log.warn('quantity less than zero');
         res.status(400).send('negative quantity not allowed');
         return;
     }
@@ -234,7 +238,7 @@ app.get('/update/:id/:sku/:qty', (req, res) => {
 app.post('/shipping/:id', (req, res) => {
     var shipping = req.body;
     if(shipping.distance === undefined || shipping.cost === undefined || shipping.location == undefined) {
-        req.log.warn('bad shipping data', shipping);
+        req.log.warn('shipping data missing', shipping);
         res.status(400).send('shipping data missing');
     } else {
         // get the cart

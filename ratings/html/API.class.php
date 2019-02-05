@@ -1,4 +1,6 @@
 <?php
+require_once('log4php/Logger.php');
+
 abstract class API {
     protected $method = '';
 
@@ -11,6 +13,9 @@ abstract class API {
     protected $file = Null;
 
     public function __construct($request) {
+        // Log4PHP
+        Logger::configure('log4php.xml');
+
         // CORS
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Methods: *');

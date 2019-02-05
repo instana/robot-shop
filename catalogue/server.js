@@ -88,7 +88,11 @@ app.get('/product/:sku', (req, res) => {
 app.get('/products/:cat', (req, res) => {
     if(mongoConnected) {
         collection.find({ categories: req.params.cat }).sort({ name: 1 }).toArray().then((products) => {
-            res.json(products);
+            if(products) {
+                res.json(products);
+            } else {
+                res.status(404).send('No products for ' + req.params.cat);
+            }
         }).catch((e) => {
             req.log.error('ERROR', e);
             res.status(500).send(e);
