@@ -108,25 +108,30 @@ def queueOrder(order):
     # opentracing tracer is automatically set to Instana tracer
     # start a span
 
-    # context = ot.tracer.current_context()
     parent_span = ot.tracer.active_span
-    with ot.tracer.start_active_span('queue-order', child_of=parent_span,
+    with ot.tracer.start_active_span('queueOrder', child_of=parent_span,
             tags={
-                tags.SPAN_KIND: 'producer',
-                tags.COMPONENT: 'payment',
-                'message_bus.destination': 'orders'
-                }
-            ) as scope:
+                    'exchange': Publisher.EXCHANGE,
+                    'key': Publisher.ROUTING_KEY
+                }) as tscope:
+        with ot.tracer.start_active_span('rabbitmq', child_of=tscope.span,
+                tags={
+                    'exchange': Publisher.EXCHANGE,
+                    'sort': 'publish',
+                    'address': Publisher.HOST,
+                    'key': Publisher.ROUTING_KEY
+                    }
+                ) as scope:
 
-        # For screenshot demo requirements optionally add in a bit of delay
-        delay = int(os.getenv('PAYMENT_DELAY_MS', 0))
-        time.sleep(delay / 1000)
+            # For screenshot demo requirements optionally add in a bit of delay
+            delay = int(os.getenv('PAYMENT_DELAY_MS', 0))
+            time.sleep(delay / 1000)
 
-        headers = {}
-        ot.tracer.inject(scope.span.context, ot.Format.HTTP_HEADERS, headers)
-        app.logger.info('msg headers {}'.format(headers))
+            headers = {}
+            ot.tracer.inject(scope.span.context, ot.Format.HTTP_HEADERS, headers)
+            app.logger.info('msg headers {}'.format(headers))
 
-        publisher.publish(order, headers)
+            publisher.publish(order, headers)
 
 
 # RabbitMQ

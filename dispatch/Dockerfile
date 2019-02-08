@@ -8,10 +8,10 @@ COPY src/ /go/src/github.com/instana/dispatch
 WORKDIR /go/src/github.com/instana/dispatch
 
 RUN curl -fsSL -o /usr/local/bin/dep ${DEP_URL} && \
-	chmod +x /usr/local/bin/dep && \
-    dep ensure && \
-    go build -o bin/gorcv
+	chmod +x /usr/local/bin/dep
 
-# @todo stage this build
+RUN dep ensure && go build -o bin/gorcv
+
+# TODO stage this build
 
 CMD bin/gorcv
