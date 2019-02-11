@@ -44,6 +44,11 @@ def pay(id):
 
     anonymous_user = True
 
+    # add some log info to the active trace
+    span = ot.tracer.active_span
+    span.log_kv({'id': id})
+    span.log_kv({'cart': cart})
+
     # check user exists
     try:
         req = requests.get('http://{user}:8080/check/{id}'.format(user=USER, id=id))
@@ -60,7 +65,7 @@ def pay(id):
         if item.get('sku') == 'SHIP':
             has_shipping = True
 
-    if not cart.get('total') or int(cart.get('total')) == 0 or has_shipping == False:
+    if cart.get('total', 0) == 0 or has_shipping == False:
         app.logger.warn('cart not valid')
         return 'cart not valid', 400
 
@@ -104,7 +109,7 @@ def pay(id):
 
 def queueOrder(order):
     app.logger.info('queue order')
-    # RabbitMQ is not currently traced automatically
+    # RabbitMQ pika is not currently traced automatically
     # opentracing tracer is automatically set to Instana tracer
     # start a span
 
@@ -114,6 +119,7 @@ def queueOrder(order):
                     'exchange': Publisher.EXCHANGE,
                     'key': Publisher.ROUTING_KEY
                 }) as tscope:
+        tscope.span.log_kv({'orderid': order.get('orderid')})
         with ot.tracer.start_active_span('rabbitmq', child_of=tscope.span,
                 tags={
                     'exchange': Publisher.EXCHANGE,
