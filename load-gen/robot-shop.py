@@ -1,3 +1,4 @@
+import os
 from locust import HttpLocust, TaskSet, task
 from random import choice
 from random import randint
@@ -59,6 +60,13 @@ class UserBehavior(TaskSet):
 
         order = self.client.post('/api/payment/pay/{}'.format(uniqueid), json=cart).json()
         print('Order {}'.format(order))
+
+    @task
+    def error(self):
+        if os.environ['ERROR'] == '1':
+            print('Error request')
+            cart = {'total': 0, 'tax': 0}
+            self.client.post('/api/payment/pay/partner-57', json=cart)
 
 
 class WebsiteUser(HttpLocust):

@@ -9,6 +9,15 @@ NUM_CLIENTS=1
 # HOST where Stan's Robot Shop web UI is running
 HOST="http://localhost:8080"
 
+# Error flag
+ERROR=0
+
+# Daemon flag
+DAEMON="-it"
+SILENT=0
+
+USAGE="\nloadgen.sh\n\te - error flag\n\td - run in background\n\tn - number of clients\n\th - target host\n"
+
 if [ ! -f ../.env ]
 then
     echo "Please run this script from the load-gen directory"
@@ -21,27 +30,37 @@ eval $(egrep '[A-Z]+=' ../.env)
 echo "Repo $REPO"
 echo "Tag $TAG"
 
-docker pull ${REPO}/rs-load:${TAG} | cat
+while getopts 'edn:h:' OPT
+do
+    case $OPT in
+        e)
+            ERROR=1
+            ;;
+        d)
+            DAEMON="-d"
+            SILENT=1
+            ;;
+        n)
+            NUM_CLIENTS=$OPTARG
+            ;;
+        h)
+            HOST=$OPTARG
+            ;;
+        *)
+            echo "$USAGE"
+            exit 1
+            ;;
+    esac
+done
 
-if [ "$1" = "-d" ]
-then
-    echo "running in background"
-    docker run \
-        -d \
-        --name loadgen \
-        --rm \
-        --network=host \
-        -e "HOST=$HOST" \
-        -e "NUM_CLIENTS=$NUM_CLIENTS" \
-        -e 'SILENT=1' \
-        ${REPO}/rs-load:${TAG}
-else
-    docker run \
-        -it \
-        --rm \
-        --network=host \
-        -e "HOST=$HOST" \
-        -e "NUM_CLIENTS=$NUM_CLIENTS" \
-        ${REPO}/rs-load:${TAG}
-fi
+docker run \
+    $DAEMON \
+    --name loadgen \
+    --rm \
+    --network=host \
+    -e "HOST=$HOST" \
+    -e "NUM_CLIENTS=$NUM_CLIENTS" \
+    -e "SILENT=$SILENT" \
+    -e "ERROR=$ERROR" \
+    ${REPO}/rs-load:${TAG}
 

@@ -22,8 +22,9 @@ else
 fi
 
 echo "Starting load with $CLIENTS clients"
+echo "ERROR $ERROR"
 
-if [ -n "$SILENT" ]
+if [ "$SILENT" -eq 1 ]
 then
     locust -f robot-shop.py --host "$HOST" --no-web -c $CLIENTS -r 1 > /dev/null 2>&1
 else
