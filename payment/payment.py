@@ -21,14 +21,6 @@ PAYMENT_GATEWAY = os.getenv('PAYMENT_GATEWAY', 'https://paypal.com/')
 
 @app.errorhandler(Exception)
 def exception_handler(err):
-    # python instrumentation currently does not pick up error message
-    logkv = {'message': str(err)}
-    tblines = traceback.format_exc().splitlines()
-    count = 1
-    for line in tblines:
-        logkv['stack{}'.format(count)] = line
-        count += 1
-    ot.tracer.active_span.log_kv(logkv)
     app.logger.error(str(err))
     return str(err), 500
 
@@ -119,6 +111,7 @@ def queueOrder(order):
                     'exchange': Publisher.EXCHANGE,
                     'key': Publisher.ROUTING_KEY
                 }) as tscope:
+        tscope.span.set_tag('span.kind', 'intermediate')
         tscope.span.log_kv({'orderid': order.get('orderid')})
         with ot.tracer.start_active_span('rabbitmq', child_of=tscope.span,
                 tags={
