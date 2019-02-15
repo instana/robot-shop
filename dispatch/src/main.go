@@ -10,9 +10,9 @@ import (
     "encoding/json"
 
     "github.com/streadway/amqp"
-    "github.com/instana/golang-sensor"
+    "github.com/instana/go-sensor"
     ot "github.com/opentracing/opentracing-go"
-    // ext "github.com/opentracing/opentracing-go/ext"
+    ext "github.com/opentracing/opentracing-go/ext"
     otlog "github.com/opentracing/opentracing-go/log"
 )
 
@@ -114,6 +114,8 @@ func createSpan(headers map[string]interface{}, order string) {
         log.Println("Creating span")
         // create span
         span = tracer.StartSpan("getOrder", ot.ChildOf(spanContext))
+        span.SetTag(string(ext.SpanKind), ext.SpanKindConsumerEnum)
+        span.SetTag(string(ext.MessageBusDestination), "robot-shop")
         span.SetTag("exchange", "robot-shop")
         span.SetTag("sort", "consume")
         span.SetTag("address", "rabbitmq")
@@ -140,6 +142,7 @@ func processSale(parentSpan ot.Span) {
     tracer := ot.GlobalTracer()
     span := tracer.StartSpan("processSale", ot.ChildOf(parentSpan.Context()))
     defer span.Finish()
+    span.SetTag(string(ext.SpanKind), "intermediate")
     span.LogFields(otlog.String("info", "Order sent for processing"))
     time.Sleep(time.Duration(42 + rand.Int63n(42)) * time.Millisecond)
 }

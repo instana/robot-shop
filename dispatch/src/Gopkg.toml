@@ -3,8 +3,8 @@
     branch = "master"
 
 [[constraint]]
-    name = "github.com/instana/golang-sensor"
-    version = "~1.4.11"
+    name = "github.com/instana/go-sensor"
+    version = "~1.4.12"
 
 [[constraint]]
     name = "github.com/opentracing/opentracing-go"
