@@ -63,7 +63,7 @@ class UserBehavior(TaskSet):
 
     @task
     def error(self):
-        if os.environ['ERROR'] == '1':
+        if os.environ.get('ERROR') == '1':
             print('Error request')
             cart = {'total': 0, 'tax': 0}
             self.client.post('/api/payment/pay/partner-57', json=cart)
