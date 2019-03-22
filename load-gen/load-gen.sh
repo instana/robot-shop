@@ -47,7 +47,7 @@ do
             HOST=$OPTARG
             ;;
         *)
-            echo "$USAGE"
+            echo -e "$USAGE"
             exit 1
             ;;
     esac
