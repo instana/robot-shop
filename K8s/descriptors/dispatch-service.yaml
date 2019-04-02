@@ -1,12 +1,8 @@
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kompose.cmd: kompose -f ../docker-compose.yaml convert
-    kompose.version: 1.10.0 (8bb0907)
-  creationTimestamp: null
   labels:
-    io.kompose.service: dispatch
+    service: dispatch
   name: dispatch
 spec:
   clusterIP: None
@@ -15,6 +11,4 @@ spec:
     port: 55555
     targetPort: 0
   selector:
-    io.kompose.service: dispatch
-status:
-  loadBalancer: {}
+    service: dispatch
