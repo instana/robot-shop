@@ -1,33 +1,27 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose -f ../docker-compose.yaml convert
-    kompose.version: 1.10.0 (8bb0907)
-  creationTimestamp: null
   labels:
-    io.kompose.service: web
+    service: web
   name: web
 spec:
   replicas: 1
   strategy: {}
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        io.kompose.service: web
+        service: web
     spec:
       containers:
       - image: robotshop/rs-web:latest
         name: web
         ports:
         - containerPort: 8080
-        resources:
-          limits:
-            cpu: 200m
-            memory: 100Mi
-          requests:
-            cpu: 100m
-            memory: 50Mi
+        # resources:
+        #   limits:
+        #     cpu: 200m
+        #     memory: 100Mi
+        #   requests:
+        #     cpu: 100m
+        #     memory: 50Mi
       restartPolicy: Always
-status: {}

@@ -1,25 +1,20 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose -f ../docker-compose.yaml convert
-    kompose.version: 1.10.0 (8bb0907)
-  creationTimestamp: null
-  labels:
-    io.kompose.service: cart
   name: cart
+  labels:
+    service: cart
 spec:
   replicas: 1
-  strategy: {}
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        io.kompose.service: cart
+        service: cart
     spec:
       containers:
       - image: robotshop/rs-cart:latest
         name: cart
+        # agent networking access 
         env:
           - name: INSTANA_AGENT_HOST
             valueFrom:
@@ -27,12 +22,10 @@ spec:
                 fieldPath: status.hostIP
         ports:
         - containerPort: 8080
-        resources:
-          limits:
-            cpu: 200m
-            memory: 100Mi
-          requests:
-            cpu: 100m
-            memory: 50Mi
-      restartPolicy: Always
-status: {}
+        # resources:
+        #   limits:
+        #     cpu: 200m
+        #     memory: 100Mi
+        #   requests:
+        #     cpu: 100m
+        #     memory: 50Mi
