@@ -1,13 +1,11 @@
+# dispatch just listens to a message queue
+# it does not expose any ports
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kompose.cmd: kompose -f ../docker-compose.yaml convert
-    kompose.version: 1.10.0 (8bb0907)
-  creationTimestamp: null
-  labels:
-    io.kompose.service: dispatch
   name: dispatch
+  labels:
+    service: dispatch
 spec:
   clusterIP: None
   ports:
@@ -15,6 +13,4 @@ spec:
     port: 55555
     targetPort: 0
   selector:
-    io.kompose.service: dispatch
-status:
-  loadBalancer: {}
+    service: dispatch

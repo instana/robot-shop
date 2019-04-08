@@ -1,26 +1,24 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose -f ../docker-compose.yaml convert
-    kompose.version: 1.10.0 (8bb0907)
-  creationTimestamp: null
-  labels:
-    io.kompose.service: user
   name: user
+  labels:
+    service: user
 spec:
   replicas: 1
-  strategy: {}
+  selector:
+    matchLabels:
+      service: user
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        io.kompose.service: user
+        service: user
     spec:
       containers:
-      - image: robotshop/rs-user:latest
-        name: user
+      - name: user
+        image: robotshop/rs-user:latest
         env:
+          # agent networking access
           - name: INSTANA_AGENT_HOST
             valueFrom:
               fieldRef:
@@ -35,4 +33,3 @@ spec:
             cpu: 100m
             memory: 50Mi
       restartPolicy: Always
-status: {}

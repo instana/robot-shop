@@ -1,25 +1,23 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose -f ../docker-compose.yaml convert
-    kompose.version: 1.10.0 (8bb0907)
-  creationTimestamp: null
-  labels:
-    io.kompose.service: payment
   name: payment
+  labels:
+    service: payment
 spec:
   replicas: 1
-  strategy: {}
+  selector:
+    matchLabels:
+      service: payment
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        io.kompose.service: payment
+        service: payment
     spec:
       containers:
-      - image: robotshop/rs-payment:latest
-        name: payment
+      - name: payment
+        image: robotshop/rs-payment:latest
+        # agent networking access
         env:
           - name: INSTANA_AGENT_HOST
             valueFrom:
@@ -35,4 +33,3 @@ spec:
             cpu: 100m
             memory: 50Mi
       restartPolicy: Always
-status: {}

@@ -1,27 +1,25 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose -f ../docker-compose.yaml convert
-    kompose.version: 1.10.0 (8bb0907)
-  creationTimestamp: null
-  labels:
-    io.kompose.service: shipping
   name: shipping
+  labels:
+    service: shipping
 spec:
   replicas: 1
-  strategy: {}
+  selector:
+    matchLabels:
+      service: shipping
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        io.kompose.service: shipping
+        service: shipping
     spec:
       containers:
-      - image: robotshop/rs-shipping:latest
-        name: shipping
+      - name: shipping
+        image: robotshop/rs-shipping:latest
         ports:
         - containerPort: 8080
+        # it's Java it needs lots of memory
         resources:
           limits:
             cpu: 200m
@@ -30,4 +28,3 @@ spec:
             cpu: 100m
             memory: 500Mi
       restartPolicy: Always
-status: {}

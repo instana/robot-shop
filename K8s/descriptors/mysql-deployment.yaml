@@ -1,25 +1,23 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose -f ../docker-compose.yaml convert
-    kompose.version: 1.10.0 (8bb0907)
-  creationTimestamp: null
-  labels:
-    io.kompose.service: mysql
   name: mysql
+  labels:
+    service: mysql
 spec:
   replicas: 1
-  strategy: {}
+  selector:
+    matchLabels:
+      service: mysql
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        io.kompose.service: mysql
+        service: mysql
     spec:
       containers:
-      - image: robotshop/rs-mysql-db:latest
-        name: mysql
+      - name: mysql
+        image: robotshop/rs-mysql-db:latest
+        # added for Istio
         securityContext:
           capabilities:
             add: ["NET_ADMIN"]
@@ -33,4 +31,3 @@ spec:
             cpu: 100m
             memory: 400Mi
       restartPolicy: Always
-status: {}

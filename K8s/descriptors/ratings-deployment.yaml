@@ -1,27 +1,24 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose -f ../docker-compose.yaml convert
-    kompose.version: 1.10.0 (8bb0907)
-  creationTimestamp: null
-  labels:
-    io.kompose.service: ratings
   name: ratings
+  labels:
+    service: ratings
 spec:
   replicas: 1
-  strategy: {}
+  selector:
+    matchLabels:
+      service: ratings
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        io.kompose.service: ratings
+        service: ratings
     spec:
       containers:
-      - image: robotshop/rs-ratings:latest
-        name: ratings
+      - name: ratings
+        image: robotshop/rs-ratings:latest
         ports:
-        - containerPort: 3306
+        - containerPort: 80
         resources:
           limits:
             cpu: 200m
@@ -30,4 +27,3 @@ spec:
             cpu: 100m
             memory: 50Mi
       restartPolicy: Always
-status: {}

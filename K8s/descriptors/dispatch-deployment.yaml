@@ -1,26 +1,24 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose -f ../docker-compose.yaml convert
-    kompose.version: 1.10.0 (8bb0907)
-  creationTimestamp: null
-  labels:
-    io.kompose.service: dispatch
   name: dispatch
+  labels:
+    service: dispatch
 spec:
   replicas: 1
-  strategy: {}
+  selector:
+    matchLabels:
+      service: dispatch
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        io.kompose.service: dispatch
+        service: dispatch
     spec:
       containers:
-      - image: robotshop/rs-dispatch:latest
-        name: dispatch
+      - name: dispatch
+        image: robotshop/rs-dispatch:latest
         env:
+          # agent networking access
           - name: INSTANA_AGENT_HOST
             valueFrom:
               fieldRef:
@@ -33,4 +31,3 @@ spec:
             cpu: 100m
             memory: 50Mi
       restartPolicy: Always
-status: {}
