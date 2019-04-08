@@ -22,7 +22,7 @@ The various services in the sample application already include all required Inst
 To see the application performance results in the Instana dashboard, you will first need an Instana account. Don't worry a [trial account](https://instana.com/trial?utm_source=github&utm_medium=robot_shop) is free.
 
 ## Build from Source
-To optionally build from source (you will need a newish version of Docker to do this) use Docker Compose. Optionally edit the *.env* file to specify an alternative image registry and version tag; see the official [documentation](https://docs.docker.com/compose/env-file/) for more information. 
+To optionally build from source (you will need a newish version of Docker to do this) use Docker Compose. Optionally edit the *.env* file to specify an alternative image registry and version tag; see the official [documentation](https://docs.docker.com/compose/env-file/) for more information.
 
     $ docker-compose build
 
@@ -62,14 +62,14 @@ You can also run Kubernetes locally using [minikube](https://github.com/kubernet
     $ kubectl create namespace robot-shop
     $ kubectl -n robot-shop create -f K8s/descriptors
 
-To deploy the Instana agent to Kubernetes, just use the [helm](https://github.com/instana/instana-helm-chart) chart. Edit *values.yaml* and set zone, endpoint and key to your values, see the README file for the helm chart.
+To deploy the Instana agent to Kubernetes, just use the [helm](https://github.com/instana/instana-agent-helm-chart) chart. Edit *values.yaml* and set zone, endpoint host, endpoint port and key to your values, see the README file for the helm chart.
 
-    $ cd instana-helm-chart
+    $ cd instana-agent-helm-chart
     $ helm install --name instana-agent --namespace instana-agent .
 
 If you are having difficulties get helm running with your K8s install it is most likely due to RBAC, most K8s now have RBAC enabled by default. Therefore helm requires a [service account](https://github.com/helm/helm/blob/master/docs/rbac.md) to have permission to do stuff.
 
-## Acessing the Store
+## Accessing the Store
 If you are running the store locally via *docker-compose up* then, the store front is available on localhost port 8080 [http://localhost:8080](http://localhost:8080/)
 
 If you are running the store on Kubernetes via minikube then, to make the store front accessible edit the *web* service definition and change the type to *NodePort* and add a port entry *nodePort: 30080*.
