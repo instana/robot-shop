@@ -16,11 +16,11 @@ spec:
         name: redis
         ports:
         - containerPort: 6379
-        # resources:
-        #   limits:
-        #     cpu: 200m
-        #     memory: 100Mi
-        #   requests:
-        #     cpu: 100m
-        #     memory: 50Mi
+        resources:
+          limits:
+            cpu: 200m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 50Mi
       restartPolicy: Always
