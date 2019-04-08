@@ -1,19 +1,23 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: mysql
   labels:
     service: mysql
-  name: mysql
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      service: mysql
   template:
     metadata:
       labels:
         service: mysql
     spec:
       containers:
-      - image: robotshop/rs-mysql-db:latest
-        name: mysql
+      - name: mysql
+        image: robotshop/rs-mysql-db:latest
+        # added for Istio
         securityContext:
           capabilities:
             add: ["NET_ADMIN"]

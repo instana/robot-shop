@@ -1,19 +1,22 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: catalogue
   labels:
     service: catalogue
-  name: catalogue
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      service: catalogue
   template:
     metadata:
       labels:
         service: catalogue
     spec:
       containers:
-      - image: robotshop/rs-catalogue:latest
-        name: catalogue
+      - name: catalogue
+        image: robotshop/rs-catalogue:latest
         env:
           - name: INSTANA_AGENT_HOST
             valueFrom:

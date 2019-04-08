@@ -1,9 +1,11 @@
+# dispatch just listens to a message queue
+# it does not expose any ports
 apiVersion: v1
 kind: Service
 metadata:
+  name: dispatch
   labels:
     service: dispatch
-  name: dispatch
 spec:
   clusterIP: None
   ports:

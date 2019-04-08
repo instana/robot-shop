@@ -1,21 +1,24 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: ratings
   labels:
     service: ratings
-  name: ratings
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      service: ratings
   template:
     metadata:
       labels:
         service: ratings
     spec:
       containers:
-      - image: robotshop/rs-ratings:latest
-        name: ratings
+      - name: ratings
+        image: robotshop/rs-ratings:latest
         ports:
-        - containerPort: 3306
+        - containerPort: 80
         resources:
           limits:
             cpu: 200m

@@ -1,21 +1,25 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: shipping
   labels:
     service: shipping
-  name: shipping
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      service: shipping
   template:
     metadata:
       labels:
         service: shipping
     spec:
       containers:
-      - image: robotshop/rs-shipping:latest
-        name: shipping
+      - name: shipping
+        image: robotshop/rs-shipping:latest
         ports:
         - containerPort: 8080
+        # it's Java it needs lots of memory
         resources:
           limits:
             cpu: 200m

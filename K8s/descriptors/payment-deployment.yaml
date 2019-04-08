@@ -1,19 +1,23 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: payment
   labels:
     service: payment
-  name: payment
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      service: payment
   template:
     metadata:
       labels:
         service: payment
     spec:
       containers:
-      - image: robotshop/rs-payment:latest
-        name: payment
+      - name: payment
+        image: robotshop/rs-payment:latest
+        # agent networking access
         env:
           - name: INSTANA_AGENT_HOST
             valueFrom:

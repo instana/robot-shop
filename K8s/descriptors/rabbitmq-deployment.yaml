@@ -1,19 +1,22 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: rabbitmq
   labels:
     service: rabbitmq
-  name: rabbitmq
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      service: rabbitmq
   template:
     metadata:
       labels:
         service: rabbitmq
     spec:
       containers:
-      - image: rabbitmq:3.7-management-alpine
-        name: rabbitmq
+      - name: rabbitmq
+        image: rabbitmq:3.7-management-alpine
         ports:
         - containerPort: 5672
         - containerPort: 15672

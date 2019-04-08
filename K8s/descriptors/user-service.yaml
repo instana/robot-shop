@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
+  name: user
   labels:
     service: user
-  name: user
 spec:
   ports:
-  - name: "8080"
+  - name: http
     port: 8080
     targetPort: 8080
   selector:

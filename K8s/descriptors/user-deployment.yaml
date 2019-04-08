@@ -1,20 +1,24 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: user
   labels:
     service: user
-  name: user
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      service: user
   template:
     metadata:
       labels:
         service: user
     spec:
       containers:
-      - image: robotshop/rs-user:latest
-        name: user
+      - name: user
+        image: robotshop/rs-user:latest
         env:
+          # agent networking access
           - name: INSTANA_AGENT_HOST
             valueFrom:
               fieldRef:
