@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# set -x
+#set -x
 
 # echo "arg 1 $1"
 
@@ -11,21 +11,15 @@ then
     exec "$@"
 fi
 
-if [ -n "$INSTANA_EUM_KEY" ]
+if [ -n "$INSTANA_EUM_KEY" -a -n "$INSTANA_EUM_REPORTING_URL" ]
 then
     echo "Enabling Instana EUM"
-    TMP_FILE=$(mktemp)
-    sed -e "/ineum/s/INSTANA_EUM_KEY/$INSTANA_EUM_KEY/" $BASE_DIR/eum-tmpl.html > $TMP_FILE
-    if [ -n "$INSTANA_EUM_REPORTING_URL" ]
-    then
-        echo "Setting reporting url $INSTANA_EUM_REPORTING_URL"
-        sed -e "/<\/script>/ i ineum('reportingUrl', '$INSTANA_EUM_REPORTING_URL');" $TMP_FILE > $BASE_DIR/eum.html
-    else
-        cp $TMP_FILE $BASE_DIR/eum.html
-    fi
-
-    rm $TMP_FILE
+    # use | instead of / as command delimiter to avoid eacaping the url
+    sed -i "s|INSTANA_EUM_KEY|$INSTANA_EUM_KEY|" $BASE_DIR/eum-tmpl.html
+    sed -i "s|INSTANA_EUM_REPORTING_URL|$INSTANA_EUM_REPORTING_URL|" $BASE_DIR/eum-tmpl.html
+    cp $BASE_DIR/eum-tmpl.html $BASE_DIR/eum.html
 else
+    echo "EUM not enabled"
     cp $BASE_DIR/empty.html $BASE_DIR/eum.html
 fi
 
