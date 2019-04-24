@@ -38,7 +38,7 @@ class Publisher:
             self._connect()
         try:
             self._publish(msg, headers)
-        except pika.exceptions.ConnectionClosed:
+        except (pika.exceptions.ConnectionClosed, pika.exceptions.StreamLostError):
             self._logger.info('reconnecting to queue')
             self._connect()
             self._publish(msg, headers)
