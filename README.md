@@ -62,10 +62,16 @@ You can also run Kubernetes locally using [minikube](https://github.com/kubernet
     $ kubectl create namespace robot-shop
     $ kubectl -n robot-shop create -f K8s/descriptors
 
-To deploy the Instana agent to Kubernetes, just use the [helm](https://github.com/instana/instana-agent-helm-chart) chart. Edit *values.yaml* and set zone, endpoint host, endpoint port and key to your values, see the README file for the helm chart.
+To deploy the Instana agent to Kubernetes, just use the [helm](https://hub.helm.sh/charts/stable/instana-agent) chart.
 
-    $ cd instana-agent-helm-chart
-    $ helm install --name instana-agent --namespace instana-agent .
+```shell
+$ helm install --name instana-agent --namespace instana-agent \
+--set agent.key=INSTANA_AGENT_KEY \
+--set agent.endpointHost=HOST \
+--set agent.endpointPort=PORT \
+--set zone.name=CLUSTER_NAME \
+stable/instana-agent
+```
 
 If you are having difficulties get helm running with your K8s install it is most likely due to RBAC, most K8s now have RBAC enabled by default. Therefore helm requires a [service account](https://github.com/helm/helm/blob/master/docs/rbac.md) to have permission to do stuff.
 
