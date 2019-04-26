@@ -1,4 +1,4 @@
-const instana = require('instana-nodejs-sensor');
+const instana = require('@instana/collector');
 // init tracing
 // MUST be done before loading anything else!
 instana({
