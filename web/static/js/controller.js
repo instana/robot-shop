@@ -54,19 +54,10 @@
 
         // Instana EUM
         // may not be loaded so check for ineum object
-        $rootScope.$on('$routeChangeStart', (event, next, current) => {
-            if(typeof ineum !== 'undefined') {
-                ineum('startSpaPageTransition');
-            }
-        });
         $rootScope.$on('$routeChangeSuccess', (event, next, current) => {
             if(typeof ineum !== 'undefined') {
-                ineum('endSpaPageTransition', {'status': 'completed', 'url': window.location.href});
-            }
-        });
-        $rootScope.$on('$routeChangeError', (event, next, current) => {
-            if(typeof ineum !== 'undefined') {
-                ineum('endSpaPageTransition', {'status': 'error'});
+                //console.log('route change', event, next, current);
+                ineum('page', next.loadedTemplateUrl);
             }
         });
     });
