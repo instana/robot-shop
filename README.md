@@ -50,17 +50,12 @@ The manifests for robotshop are in the *DCOS/* directory. These manifests were b
 You may install Instana via the DCOS package manager, instructions are here: https://github.com/dcos/examples/tree/master/instana-agent/1.9
 
 ## Kubernetes
-The Docker container images are all available on [Docker Hub](https://hub.docker.com/u/robotshop/). The deployment and service definition files using these images are in the *K8s* directory, use these to deploy to a Kubernetes cluster. If you pushed your own images to your registry the deployment files will need to be updated to pull from your registry; using [kompose](https://github.com/kubernetes/kompose) may be of assistance here.
+You can run Kubernetes locally using [minikube](https://github.com/kubernetes/minikube) or on one of the many cloud providers.
 
-If you want to deploy Stan's Robot Shop to Google Compute you will need to edit the *K8s/web-service.yaml* file and change the type from NodePort to LoadBalancer. This can also be done in the Google Compute console.
-
-#### NOTE
-I have found some issues with kompose reading the *.env* correctly, just export the variables in the shell environment to work around this.
-
-You can also run Kubernetes locally using [minikube](https://github.com/kubernetes/minikube).
+The Docker container images are all available on [Docker Hub](https://hub.docker.com/u/robotshop/). The deployment and service definition files using these images are in the *K8s* directory, use these to deploy to a Kubernetes cluster. If you pushed your own images to your registry the deployment files will need to be updated to pull from your registry.
 
     $ kubectl create namespace robot-shop
-    $ kubectl -n robot-shop create -f K8s/descriptors
+    $ kubectl -n robot-shop apply -f K8s/descriptors
 
 To deploy the Instana agent to Kubernetes, just use the [helm](https://hub.helm.sh/charts/stable/instana-agent) chart.
 
@@ -73,7 +68,7 @@ $ helm install --name instana-agent --namespace instana-agent \
 stable/instana-agent
 ```
 
-If you are having difficulties get helm running with your K8s install it is most likely due to RBAC, most K8s now have RBAC enabled by default. Therefore helm requires a [service account](https://github.com/helm/helm/blob/master/docs/rbac.md) to have permission to do stuff.
+If you are having difficulties getting helm running with your K8s install, it is most likely due to RBAC, most K8s now have RBAC enabled by default. Therefore helm requires a [service account](https://github.com/helm/helm/blob/master/docs/rbac.md) to have permission to do stuff.
 
 ## Accessing the Store
 If you are running the store locally via *docker-compose up* then, the store front is available on localhost port 8080 [http://localhost:8080](http://localhost:8080/)
@@ -100,10 +95,10 @@ The store front is then available on the IP address of minikube port 30080. To f
 
     $ minikube ip
 
-If you are using a cloud Kubernetes / Openshift / Mesosphere then it will be available on the load balancer of that system. There will be specific blog posts on the Instana site covering these scenarios.
+If you are using a cloud Kubernetes / Openshift / Mesosphere then it will be available on the load balancer of that system.
 
 ## Load Generation
-A separate load generation utility is provided in the *load-gen* directory. This is not automatically run when the application is started. The load generator is built with Python and [Locust](https://locust.io). The *build.sh* script builds the Docker image, optionally taking *push* as the first argument to also push the image to the registry. The registry and tag settings are loaded from the *.env* file in the parent directory. The script *load-gen.sh* runs the image, edit this and set the HOST environment variable to point the load at where you are running the application. You could run this inside an orchestration system (K8s) as well if you want to, how to do this is left as an exercise for the reader.
+A separate load generation utility is provided in the *load-gen* directory. This is not automatically run when the application is started. The load generator is built with Python and [Locust](https://locust.io). The *build.sh* script builds the Docker image, optionally taking *push* as the first argument to also push the image to the registry. The registry and tag settings are loaded from the *.env* file in the parent directory. The script *load-gen.sh* runs the image, it takes a number of command line arguments. You could run the container inside an orchestration system (K8s) as well if you want to, an example descriptor is provided in K8s/autoscaling. For more details see the [README](loadgen/README.md) in the loadgen directory.
 
 ## End User Monitoring
 To enable End User Monitoring (EUM) see the official [documentation](https://docs.instana.io/products/website_monitoring/) for how to create a configuration. There is no need to inject the javascript fragment into the page, this will be handled automatically. Just make a note of the unique key and set the environment variable INSTANA_EUM_KEY for the *web* image, see *docker-compose.yaml* for an example.

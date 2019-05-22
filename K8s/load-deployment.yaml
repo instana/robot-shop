@@ -18,11 +18,11 @@ spec:
       - name: load
         env:
           - name: HOST
-            value: "http://web:8080"
+            value: "http://web:8080/"
           - name: NUM_CLIENTS
             value: "15"
           - name: SILENT
-            value: "0"
+            value: "1"
           - name: ERROR
             value: "1"
         image: robotshop/rs-load:latest
