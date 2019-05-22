@@ -34,7 +34,7 @@ Set the following environment variables to configure the load:
 
 ## Kubernetes
 
-To run the load test in Kubernetes, apply the `K8s/autoscaling/load-deployment.yaml` configuration in your Kubernetes cluster. This will deploy the load generation, check the settings in the file first.
+To run the load test in Kubernetes, apply the `K8s/load-deployment.yaml` configuration in your Kubernetes cluster. This will deploy the load generation, check the settings in the file first.
 
 ```shell
 $ kubectl -n robot-shop apply -f K8s/load-deployment.yaml
