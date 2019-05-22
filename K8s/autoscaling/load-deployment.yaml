@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: load
+  labels:
+    service: load
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: load
+  template:
+    metadata:
+      labels:
+        service: load
+    spec:
+      containers:
+      - name: load
+        env:
+          - name: HOST
+            value: "http://web:8080"
+          - name: NUM_CLIENTS
+            value: "15"
+          - name: SILENT
+            value: "0"
+          - name: ERROR
+            value: "1"
+        image: robotshop/rs-load:latest
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi

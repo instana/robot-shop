@@ -11,3 +11,4 @@ spec:
     targetPort: 8080
   selector:
     service: web
+  type: LoadBalancer

@@ -14,6 +14,13 @@ Alternatively, you can run the Container from Dockerhub directly on one of the n
 
 `docker run -e 'HOST=$webnodeIP:8080' -e 'NUM_CLIENTS=3' -d --rm --name="loadgen" robotshop/rs-load`
 
-## To Do
+## Kubernetes
 
-Kubernetes deployment
+To run the load test in Kubernetes, apply the `K8s/autoscaling/load-deployment.yaml` configuration in your Kubernetes cluster. This will a replica of the above load test
+
+    kubectl -n robot-shop apply -f K8s/autoscaling/load-deployment.yaml
+
+If you want to enable auto-scaling on relevant components (non-databases), you can apply everything in that directory. However you will first need to run a `metrics-server` in your cluster so the Horizontal Pod Autoscaler can know about the CPU usage of the pods.
+
+    kubectl -n robot-shop apply -f K8s/autoscaling/
+
