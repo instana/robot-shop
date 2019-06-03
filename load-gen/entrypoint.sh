@@ -1,33 +1,41 @@
 #!/bin/sh
 
+# set -x
+
 if [ -z "$HOST" ]
 then
     echo "HOST env not set"
     exit 1
 fi
 
-TEST=$(echo "$HOST" | egrep '^http://[a-z0-9]+')
-if [ -z "$TEST" ]
+if [ $RUN_TIME -eq 0  -o $NUM_CLIENTS -eq 1 ]
 then
-    echo "Host must start with http://"
-    exit 1
+    unset RUN_TIME
 fi
 
-if echo "$NUM_CLIENTS" | egrep -q '^[0-9]+$'
+echo "Starting load with $NUM_CLIENTS clients"
+if [ $NUM_CLIENTS -gt 1 -a -n "$RUN_TIME" ]
 then
-    CLIENTS=${NUM_CLIENTS:-1}
-else
-    echo "$NUM_CLIENTS is not a number falling back to 1"
-    CLIENTS=1
+    echo "Looping every $RUN_TIME"
 fi
 
-echo "Starting load with $CLIENTS clients"
-echo "ERROR $ERROR"
-
-if [ "$SILENT" -eq 1 ]
-then
-    locust -f robot-shop.py --host "$HOST" --no-web -c $CLIENTS -r 1 > /dev/null 2>&1
-else
-    locust -f robot-shop.py --host "$HOST" --no-web -c $CLIENTS -r 1
-fi
+while true
+do
+    for CLIENTS in $NUM_CLIENTS 1
+    do
+        if [ -n "$RUN_TIME" ]
+        then
+            TIME="-t $RUN_TIME"
+        else
+            unset TIME
+        fi
+        echo "Starting $CLIENTS clients for ${RUN_TIME:-ever}"
+        if [ "$SILENT" -eq 1 ]
+        then
+            locust -f robot-shop.py --host "$HOST" --no-web -r 1 -c $CLIENTS $TIME > /dev/null 2>&1
+        else
+            locust -f robot-shop.py --host "$HOST" --no-web -r 1 -c $CLIENTS $TIME
+        fi
+    done
+done
 
