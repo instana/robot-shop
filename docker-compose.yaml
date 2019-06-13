@@ -6,26 +6,14 @@ services:
     image: ${REPO}/rs-mongodb:${TAG}
     networks:
       - robot-shop
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
   redis:
     image: redis:4.0.6
     networks:
       - robot-shop
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
   rabbitmq:
     image: rabbitmq:3.7-management-alpine
     networks:
       - robot-shop
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
   catalogue:
     build:
       context: catalogue
@@ -34,10 +22,6 @@ services:
       - mongodb
     networks:
       - robot-shop
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
   user:
     build:
       context: user
@@ -47,10 +31,6 @@ services:
       - redis
     networks:
       - robot-shop
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
   cart:
     build:
       context: cart
@@ -59,10 +39,6 @@ services:
       - redis
     networks:
       - robot-shop
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
   mysql:
     build:
       context: mysql
@@ -71,10 +47,6 @@ services:
       - NET_ADMIN
     networks:
       - robot-shop
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
   shipping:
     build:
       context: shipping
@@ -83,10 +55,6 @@ services:
       - mysql
     networks:
       - robot-shop
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
   ratings:
     build:
       context: ratings
@@ -95,10 +63,6 @@ services:
       - robot-shop
     depends_on:
       - mysql
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
   payment:
     build:
       context: payment
@@ -110,10 +74,6 @@ services:
     # Uncomment to change payment gateway
     #environment:
       #PAYMENT_GATEWAY: "https://www.worldpay.com"
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
   dispatch:
     build:
       context: dispatch
@@ -122,10 +82,6 @@ services:
       - rabbitmq
     networks:
       - robot-shop
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
   web:
     build:
       context: web
@@ -139,10 +95,6 @@ services:
       - "8080:8080"
     networks:
       - robot-shop
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
     # Uncomment to enable Instana EUM
     # environment:
       # INSTANA_EUM_KEY: <your eum key>
