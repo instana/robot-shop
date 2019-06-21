@@ -43,6 +43,8 @@ Fire up Stan's Robot Shop with:
 
 If you are running it locally on a Linux host you can also run the Instana [agent](https://docs.instana.io/quick_start/agent_setup/container/docker/) locally, unfortunately the agent is currently not supported on Mac.
 
+There is also limited support on ARM architectures at the moment.
+
 ## Marathon / DCOS
 
 The manifests for robotshop are in the *DCOS/* directory. These manifests were built using a fresh install of DCOS 1.11.0. They should work on a vanilla HA or single instance install.
