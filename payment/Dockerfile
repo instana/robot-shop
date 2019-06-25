@@ -1,6 +1,7 @@
 FROM python:3.6
 
 EXPOSE 8080
+USER root
 
 ENV INSTANA_SERVICE_NAME=Payment
 
