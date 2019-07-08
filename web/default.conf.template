@@ -2,6 +2,8 @@ server {
     listen       8080;
     server_name  localhost;
 
+    proxy_http_version 1.1;
+
     #charset koi8-r;
     #access_log  /var/log/nginx/host.access.log  main;
 

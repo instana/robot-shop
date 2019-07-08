@@ -12,5 +12,8 @@ spec:
   - name: "http-management"
     port: 15672
     targetPort: 15672
+  - name: "tcp-epmd"
+    port: 4369
+    targetPort: 4369
   selector:
     service: rabbitmq
