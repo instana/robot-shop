@@ -14,7 +14,7 @@ spec:
     hosts:
     - "*"
 ---
-apiVersion: networking.istio.io/v1aplha3
+apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
   name: robotshop
@@ -24,11 +24,9 @@ spec:
   gateways:
   - robotshop-gateway
   http:
-  - match:
-    - uri:
-      prefix: /
-    route:
+  # default route
+  - route:
     - destination:
-      host: web.robot-shop.svc.cluster.local
-      port:
-        number: 8080
+        host: web.robot-shop.svc.cluster.local
+        port:
+          number: 8080
