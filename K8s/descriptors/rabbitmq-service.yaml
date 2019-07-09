@@ -6,13 +6,13 @@ metadata:
     service: rabbitmq
 spec:
   ports:
-  - name: "tcp-amqp"
+  - name: tcp-amqp
     port: 5672
     targetPort: 5672
-  - name: "http-management"
+  - name: http-management
     port: 15672
     targetPort: 15672
-  - name: "tcp-epmd"
+  - name: tcp-epmd
     port: 4369
     targetPort: 4369
   selector:
