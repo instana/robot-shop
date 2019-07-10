@@ -24,22 +24,30 @@ To see the application performance results in the Instana dashboard, you will fi
 ## Build from Source
 To optionally build from source (you will need a newish version of Docker to do this) use Docker Compose. Optionally edit the *.env* file to specify an alternative image registry and version tag; see the official [documentation](https://docs.docker.com/compose/env-file/) for more information.
 
-    $ docker-compose build
+```shell
+$ docker-compose build
+```
 
 If you modified the *.env* file and changed the image registry, you may need to push the images to that registry
 
-    $ docker-compose push
+```shell
+$ docker-compose push
+```
 
 ## Run Locally
 You can run it locally for testing.
 
 If you did not build from source, don't worry all the images are on Docker Hub. Just pull down those images first using:
 
-    $ docker-compose pull
+```shell
+$ docker-compose pull
+```
 
 Fire up Stan's Robot Shop with:
 
-    $ docker-compose up
+```shell
+$ docker-compose up
+```
 
 If you are running it locally on a Linux host you can also run the Instana [agent](https://docs.instana.io/quick_start/agent_setup/container/docker/) locally, unfortunately the agent is currently not supported on Mac.
 
@@ -54,10 +62,12 @@ You may install Instana via the DCOS package manager, instructions are here: htt
 ## Kubernetes
 You can run Kubernetes locally using [minikube](https://github.com/kubernetes/minikube) or on one of the many cloud providers.
 
-The Docker container images are all available on [Docker Hub](https://hub.docker.com/u/robotshop/). The deployment and service definition files using these images are in the *K8s* directory, use these to deploy to a Kubernetes cluster. If you pushed your own images to your registry the deployment files will need to be updated to pull from your registry.
+The Docker container images are all available on [Docker Hub](https://hub.docker.com/u/robotshop/). The deployment and service definition files using these images are in the [K8s](K8s/README.md) directory, use these to deploy to a Kubernetes cluster. If you pushed your own images to your registry the deployment files will need to be updated to pull from your registry.
 
-    $ kubectl create namespace robot-shop
-    $ kubectl -n robot-shop apply -f K8s/descriptors
+```shell
+$ kubectl create namespace robot-shop
+$ kubectl -n robot-shop apply -f K8s/descriptors
+```
 
 To deploy the Instana agent to Kubernetes, just use the [helm](https://hub.helm.sh/charts/stable/instana-agent) chart.
 
@@ -77,25 +87,31 @@ If you are running the store locally via *docker-compose up* then, the store fro
 
 If you are running the store on Kubernetes via minikube then, to make the store front accessible edit the *web* service definition and change the type to *NodePort* and add a port entry *nodePort: 30080*.
 
-    $ kubectl -n robot-shop edit service web
+```shell
+$ kubectl -n robot-shop edit service web
+```
 
 Snippet
 
-    spec:
-      ports:
-      - name: "8080"
-        port: 8080
-        protocol: TCP
-        targetPort: 8080
-        nodePort: 30080
-      selector:
-        io.kompose.service: web
-      sessionAffinity: None
-      type: NodePort
+```yaml
+spec:
+  ports:
+  - name: "8080"
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+    nodePort: 30080
+  selector:
+    service: web
+  sessionAffinity: None
+  type: NodePort
+```
 
 The store front is then available on the IP address of minikube port 30080. To find the IP address of your minikube instance.
 
-    $ minikube ip
+```shell
+$ minikube ip
+```
 
 If you are using a cloud Kubernetes / Openshift / Mesosphere then it will be available on the load balancer of that system.
 
