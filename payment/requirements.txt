@@ -2,4 +2,4 @@ uwsgi
 Flask
 requests
 pika
-opentracing
+instana

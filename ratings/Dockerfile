@@ -8,7 +8,7 @@ RUN composer install
 #
 # Build the app
 #
-FROM php:7.2-apache
+FROM php:7.3-apache
 
 RUN docker-php-ext-install pdo_mysql
 
