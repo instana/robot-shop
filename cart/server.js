@@ -13,6 +13,9 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const pino = require('pino');
 const expPino = require('express-pino-logger');
+const client = require('prom-client');
+const Registry = client.Registry;
+const register = new Registry();
 
 var redisConnected = false;
 
@@ -49,6 +52,10 @@ app.get('/health', (req, res) => {
     res.json(stat);
 });
 
+// prometheus metrics
+app.get('/metrics', (req, res) => {
+    res.send(register.metrics());
+});
 
 // get cart with id
 app.get('/cart/:id', (req, res) => {
@@ -165,6 +172,7 @@ app.get('/add/:id/:sku/:qty', (req, res) => {
 
                 // save the new cart
                 saveCart(req.params.id, cart).then((data) => {
+                    counter.inc(qty);
                     res.json(cart);
                 }).catch((err) => {
                     req.log.error(err);
