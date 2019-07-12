@@ -31,6 +31,12 @@ const expLogger = expPino({
     logger: logger
 });
 
+const counter = new client.Counter({
+    name: 'cart_items_total',
+    help: 'all items in all carts.',
+    registers: [register]
+});
+
 const app = express();
 
 app.use(expLogger);
