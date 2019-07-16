@@ -122,3 +122,23 @@ A separate load generation utility is provided in the *load-gen* directory. This
 To enable End User Monitoring (EUM) see the official [documentation](https://docs.instana.io/products/website_monitoring/) for how to create a configuration. There is no need to inject the javascript fragment into the page, this will be handled automatically. Just make a note of the unique key and set the environment variable INSTANA_EUM_KEY for the *web* image, see *docker-compose.yaml* for an example.
 
 If you are running the Instana backend on premise, you will also need to set the Reporting URL to your local instance. Set the environment variable INSTANA_EUM_REPORTING_URL as above. See the Instana EUM API [reference](https://docs.instana.io/products/website_monitoring/api/#api-structure)
+
+## Prometheus
+
+The cart and payment services both have Prometheus metric endpoints. These are accessible on `/metrics`. The cart service provides:
+
+* Counter of the number of items added to the cart
+
+The payment services provides:
+
+* Counter of the number of items perchased
+* Histogram of the total number of items in each cart
+* Histogram of the total value of each cart
+
+To test the metrics use:
+
+```shell
+$ curl http://<host>:8080/api/cart/metrics
+$ curl http://<host>:8080/api/payment/metrics
+```
+
