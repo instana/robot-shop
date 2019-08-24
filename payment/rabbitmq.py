@@ -2,19 +2,30 @@ import json
 import pika
 import os
 
+from cfenv import AppEnv
+
 class Publisher:
-    HOST = os.getenv('AMQP_HOST', 'rabbitmq')
-    VIRTUAL_HOST = '/'
     EXCHANGE='robot-shop'
     TYPE='direct'
     ROUTING_KEY = 'orders'
 
     def __init__(self, logger):
         self._logger = logger
-        self._params = pika.connection.ConnectionParameters(
-            host=self.HOST,
-            virtual_host=self.VIRTUAL_HOST,
-            credentials=pika.credentials.PlainCredentials('guest', 'guest'))
+
+        if 'VCAP_SERVICES' in os.environ:
+            env = AppEnv()
+            amqp_service = env.get_service(binding_name='dispatch_queue')
+
+            self._uri = amqp_service.credentials.get('uri')
+        else:
+            self._uri = 'ampq://{user}:{pwd}@{host}:{port}/{vhost}'.format(
+                host=os.getenv('AMQP_HOST', 'rabbitmq'),
+                port=os.getenv('AMQP_PORT', '5672'),
+                vhost='/',
+                user=os.getenv('AMQP_USER', 'guest'),
+                pwd=os.getenv('AMQP_PWD', 'guest'))
+
+        self._params = pika.URLParameters(self._uri)
         self._conn = None
         self._channel = None
 

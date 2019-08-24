@@ -8,12 +8,15 @@ import (
     "math/rand"
     "strconv"
     "encoding/json"
+    "strings"
 
     "github.com/streadway/amqp"
     "github.com/instana/go-sensor"
     ot "github.com/opentracing/opentracing-go"
     ext "github.com/opentracing/opentracing-go/ext"
     otlog "github.com/opentracing/opentracing-go/log"
+
+    "github.com/cloudfoundry-community/go-cfenv"
 )
 
 const (
@@ -160,7 +163,40 @@ func main() {
     if !ok {
         amqpHost = "rabbitmq"
     }
-    amqpUri = fmt.Sprintf("amqp://guest:guest@%s:5672/", amqpHost)
+    amqpUser, ok := os.LookupEnv("AMQP_USER")
+    if !ok {
+        amqpHost = "guest"
+    }
+    amqpPwd, ok := os.LookupEnv("AMQP_PWD")
+    if !ok {
+        amqpPwd = "guest"
+    }
+    amqpPort, ok := os.LookupEnv("AMQP_PORT")
+    if !ok {
+        amqpPort = "5672"
+    }
+
+    amqpUri = fmt.Sprintf("amqp://%s:%s@%s:%s/", amqpUser, amqpPwd , amqpHost, amqpPort)
+
+    if cfenv.IsRunningOnCF() {
+        appEnv, err := cfenv.Current()
+        if err != nil {
+            panic(err)
+        }
+
+        services := appEnv.Services
+        for _, service := range services {
+            for _, serviceBinding := range service {
+                bindingName, ok := serviceBinding.CredentialString("binding_name")
+
+                if ok {
+                    if strings.Compare(bindingName, "dispatch_queue") == 0 {
+                        amqpUri, _ = serviceBinding.CredentialString("uri")
+                    }
+                }
+            }
+        }
+    }
 
     // get error threshold from environment
     errorPercent = 0

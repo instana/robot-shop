@@ -1,4 +1,5 @@
 Flask
 requests
 pika
+cfenv
 instana

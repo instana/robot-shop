@@ -1,0 +1,14 @@
+{
+  "name": "mongodb-init",
+  "version": "1.0.0",
+  "description": "Init RobotShop's MongoDB database",
+  "main": "init-db.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "SteveW",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "mongodb": "^2.2.33"
+  }
+}

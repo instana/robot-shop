@@ -1,7 +1,9 @@
+/*jshint esversion: 6 */
+
 (function(angular) {
     'use strict';
 
-    var robotshop = angular.module('robotshop', ['ngRoute'])
+    var robotshop = angular.module('robotshop', ['ngRoute']);
 
     // Share user between controllers
     robotshop.factory('currentUser', function() {
@@ -211,10 +213,10 @@
 
         $scope.rateProduct = function(score) {
             console.log('rate product', $scope.data.product.sku, score);
-            var url = '/api/ratings/api/rate/' + $scope.data.product.sku + '/' + score;
+            var url = '/api/ratings/rate/' + $scope.data.product.sku + '/' + score;
             $http({
                 url: url,
-                method: 'PUT'
+                method: 'POST'
             }).then((res) => {
                 $scope.data.message = 'Thankyou for your feedback';
                 $timeout(clearMessage, 3000);
@@ -246,7 +248,7 @@
 
         function loadRating(sku) {
             $http({
-                url: '/api/ratings/api/fetch/' + sku,
+                url: '/api/ratings/fetch/' + sku,
                 method: 'GET'
             }).then((res) => {
                 $scope.data.rating = res.data;

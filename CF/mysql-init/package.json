@@ -1,0 +1,14 @@
+{
+  "name": "mysql-init",
+  "version": "1.0.0",
+  "description": "Init RobotShop's MySQL database",
+  "main": "init-db.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "SteveW",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "mysql-import": "^2.0.2"
+  }
+}

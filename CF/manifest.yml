@@ -1,0 +1,113 @@
+---
+applications:
+
+# cf cs p.mysql db-small mysql
+# cf cs mongodb-odb replica_set_small mongodb
+# cf cs p.redis cache-small redis
+# cf cs p.rabbitmq single-node-3.7 rabbitmq
+
+# cf bind-service mongo-init mongodb --binding-name catalogue_database
+# cf run-task mongo-init 'node init-db.js' --name "Init MongoDB"
+
+### DOES NOT WORK, IMPORTED MYSEL BY HAND LOGGING INTO MYSQL INSTANCE CUZ YOLO
+### cf bind-service mysql-init mysql --binding-name shipping_database
+### cf run-task mysql-init 'node init-db.js' --name "Init MySQL"
+
+# cf bind-service ratings mysql --binding-name ratings_database
+# cf scale -i 1 ratings
+
+# cf bind-service catalogue mongodb --binding-name catalog_database
+# cf scale -i 1 catalogue
+
+# cf bind-service cart redis --binding-name cart_cache
+# cf scale -i 1 cart
+
+# cf bind-service shipping mysql --binding-name shipping_database
+# cf scale -i 1 shipping
+
+# cf bind-service user redis --binding-name users_cache
+# cf bind-service user mongodb --binding-name users_database
+# cf scale -i 1 user
+
+# cf bind-service payment rabbitmq --binding-name dispatch_queue
+# cf scale -i 1 payment
+
+# cf bind-service dispatch rabbitmq --binding-name dispatch_queue
+# cf scale -i 1 dispatch
+
+
+###
+### "Task" applications to setup services, see https://docs.cloudfoundry.org/devguide/using-tasks.html
+###
+
+- name: mongo-init
+  path: ../CF/mongo-init
+  memory: 128M
+  no-route: true # It's a CF Task, does not need a route
+  health-check-type: process
+  instances: 0
+
+# - name: mysql-init
+#   path: ../CF/mysql-init
+#   memory: 512M
+#   no-route: true # It's a CF Task, does not need a route
+#   health-check-type: process
+#   instances: 0
+
+###
+### Productive apps
+###
+
+- name: cart
+  path: ../cart/
+  memory: 128M
+  env:
+    CATALOGUE_HTTPS: true
+  instances: 0
+
+- name: catalogue
+  path: ../catalogue/
+  instances: 0
+
+- name: dispatch
+  path: ../dispatch/src
+  memory: 128M
+  health-check-type: process
+  env:
+    GOPACKAGENAME: github.com/instana/robot-shop/dispatch
+  instances: 0
+
+- name: payment
+  path: ../payment/
+  memory: 256M
+  command: python payment.py
+  env:
+    AUTOWRAPT_BOOTSTRAP: instana
+  instances: 0
+
+- name: ratings
+  path: ../ratings/app
+  memory: 128MB
+  env:
+    CATALOGUE_USE_HTTPS: true
+  instances: 0
+
+- name: shipping
+  path: ../shipping/target/shipping-1.0-jar-with-dependencies.jar
+  memory: 1G
+  instances: 0
+
+- name: user
+  path: ../user/
+  memory: 128MB
+  instances: 1
+
+- name: web
+  path: ../web/
+  memory: 128M
+  buildpacks:
+    - https://github.com/cloudfoundry/nginx-buildpack.git
+  env:
+    INSTANA_EUM_KEY: OT8yjQ_eSPm84a4owlq5Hw
+    INSTANA_EUM_REPORTING_URL: https://eum-release-fullstack-0-us-west-2.instana.io
+  instances: 0

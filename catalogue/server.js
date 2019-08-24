@@ -1,4 +1,6 @@
-const instana = require('instana-nodejs-sensor');
+/*jshint esversion: 6 */
+
+const instana = require('@instana/collector');
 // init tracing
 // MUST be done before loading anything else!
 instana({
@@ -8,7 +10,6 @@ instana({
 });
 
 const mongoClient = require('mongodb').MongoClient;
-const mongoObjectID = require('mongodb').ObjectID;
 const bodyParser = require('body-parser');
 const express = require('express');
 const pino = require('pino');
@@ -24,8 +25,7 @@ const expLogger = expPino({
 });
 
 // MongoDB
-var db;
-var collection;
+var productsCollection;
 var mongoConnected = false;
 
 const app = express();
@@ -52,7 +52,7 @@ app.get('/health', (req, res) => {
 // all products
 app.get('/products', (req, res) => {
     if(mongoConnected) {
-        collection.find({}).toArray().then((products) => {
+        productsCollection.find({}).toArray().then((products) => {
             res.json(products);
         }).catch((e) => {
             req.log.error('ERROR', e);
@@ -67,7 +67,7 @@ app.get('/products', (req, res) => {
 // product by SKU
 app.get('/product/:sku', (req, res) => {
     if(mongoConnected) {
-        collection.findOne({sku: req.params.sku}).then((product) => {
+        productsCollection.findOne({sku: req.params.sku}).then((product) => {
             req.log.info('product', product);
             if(product) {
                 res.json(product);
@@ -87,7 +87,7 @@ app.get('/product/:sku', (req, res) => {
 // products in a category
 app.get('/products/:cat', (req, res) => {
     if(mongoConnected) {
-        collection.find({ categories: req.params.cat }).sort({ name: 1 }).toArray().then((products) => {
+        productsCollection.find({ categories: req.params.cat }).sort({ name: 1 }).toArray().then((products) => {
             if(products) {
                 res.json(products);
             } else {
@@ -106,7 +106,7 @@ app.get('/products/:cat', (req, res) => {
 // all categories
 app.get('/categories', (req, res) => {
     if(mongoConnected) {
-        collection.distinct('categories').then((categories) => {
+        productsCollection.distinct('categories').then((categories) => {
             res.json(categories);
         }).catch((e) => {
             req.log.error('ERROR', e);
@@ -121,7 +121,7 @@ app.get('/categories', (req, res) => {
 // search name and description
 app.get('/search/:text', (req, res) => {
     if(mongoConnected) {
-        collection.find({ '$text': { '$search': req.params.text }}).toArray().then((hits) => {
+        productsCollection.find({ '$text': { '$search': req.params.text }}).toArray().then((hits) => {
             res.json(hits);
         }).catch((e) => {
             req.log.error('ERROR', e);
@@ -136,13 +136,56 @@ app.get('/search/:text', (req, res) => {
 // set up Mongo
 function mongoConnect() {
     return new Promise((resolve, reject) => {
-        var mongoURL = process.env.MONGO_URL || 'mongodb://mongodb:27017/catalogue';
-        mongoClient.connect(mongoURL, (error, _db) => {
+        var mongoURL;
+
+        if (process.env.VCAP_SERVICES) {
+            connectionDetails = null;
+
+            console.log('Env var \'VCAP_SERVICES\' found, scanning for \'catalogue_database\' service binding');
+
+            for (let [key, value] of Object.entries(JSON.parse(process.env.VCAP_SERVICES))) {
+                try {
+                    binding = value.find(function(binding) {
+                        return 'catalogue_database' == binding.binding_name && binding.credentials;
+                    });
+
+                    if (!binding) {
+                        continue;
+                    }
+
+                    connectionDetails = binding.credentials;
+
+                    if (connectionDetails) {
+                        mongoURL = connectionDetails.uri;
+
+                        console.log('MongoDB URI for \'catalogue_database\' service binding found in \'VCAP_SERVICES\'');
+
+                        break;
+                    }
+                } catch (err) {
+                    console.log('Cannot process key \'' + key + '\' of \'VCAP_SERVICES\'', err);
+                    throw err;
+                }
+            }
+        } else if (process.env.MONGO_URL) {
+            mongoURL = process.env.MONGO_URL;
+
+            console.log('MongoDB URI found in \'MONGO_URL\': ' + mongoURL);
+        } else {
+            mongoURL = 'mongodb://mongodb:27017/catalogue';
+
+            console.log('Using default MongoDB URI');
+        }
+
+        if (!mongoURL) {
+            throw new Error('MongoDB connection data missing');
+        }
+
+        mongoClient.connect(mongoURL, (error, db) => {
             if(error) {
                 reject(error);
             } else {
-                db = _db;
-                collection = db.collection('products');
+                productsCollection = db.collection('products');
                 resolve('connected');
             }
         });
@@ -155,7 +198,7 @@ function mongoLoop() {
         mongoConnected = true;
         logger.info('MongoDB connected');
     }).catch((e) => {
-        logger.error('ERROR', e);
+        logger.error('An error occurred', e);
         setTimeout(mongoLoop, 2000);
     });
 }

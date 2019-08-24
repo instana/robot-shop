@@ -6,12 +6,14 @@ import uuid
 import json
 import requests
 import traceback
+import re
 import opentracing as ot
 import opentracing.ext.tags as tags
 from flask import Flask
 from flask import request
 from flask import jsonify
 from rabbitmq import Publisher
+from cfenv import AppEnv
 
 app = Flask(__name__)
 
@@ -41,9 +43,20 @@ def pay(id):
     span.log_kv({'id': id})
     span.log_kv({'cart': cart})
 
+    user_service_uri = 'http://user:8080'
+    cart_service_uri = 'http://cart:8080'
+    if 'VCAP_SERVICES' in os.environ:
+        env = AppEnv()
+        application_name = env.app['application_name'] 
+        application_uri = env.app['application_uris'][0]
+        hostname = re.sub(r'^\w+\.', '', application_uri)
+
+        user_service_uri = 'https://user.{hostname}'.format(hostname=hostname)
+        cart_service_uri = 'https://cart.{hostname}'.format(hostname=hostname)
+
     # check user exists
     try:
-        req = requests.get('http://{user}:8080/check/{id}'.format(user=USER, id=id))
+        req = requests.get('{uri}/check/{id}'.format(uri=user_service_uri, id=id), verify=False)
     except requests.exceptions.RequestException as err:
         app.logger.error(err)
         return str(err), 500
@@ -78,9 +91,10 @@ def pay(id):
     # add to order history
     if not anonymous_user:
         try:
-            req = requests.post('http://{user}:8080/order/{id}'.format(user=USER, id=id),
+            req = requests.post('{user_uri}/order/{id}'.format(user_uri=user_service_uri, id=id),
                     data=json.dumps({'orderid': orderid, 'cart': cart}),
-                    headers={'Content-Type': 'application/json'})
+                    headers={'Content-Type': 'application/json'},
+                    verify=False)
             app.logger.info('order history returned {}'.format(req.status_code))
         except requests.exceptions.RequestException as err:
             app.logger.error(err)
@@ -88,7 +102,7 @@ def pay(id):
 
     # delete cart
     try:
-        req = requests.delete('http://{cart}:8080/cart/{id}'.format(cart=CART, id=id));
+        req = requests.delete('{cart_uri}/cart/{id}'.format(cart_uri=cart_service_uri, id=id), verify=False);
         app.logger.info('cart delete returned {}'.format(req.status_code))
     except requests.exceptions.RequestException as err:
         app.logger.error(err)
@@ -115,9 +129,10 @@ def queueOrder(order):
         tscope.span.log_kv({'orderid': order.get('orderid')})
         with ot.tracer.start_active_span('rabbitmq', child_of=tscope.span,
                 tags={
+#                    'address': Publisher.HOST,
+                    'messaging_bus.address': publisher._uri,
                     'exchange': Publisher.EXCHANGE,
                     'sort': 'publish',
-                    'address': Publisher.HOST,
                     'key': Publisher.ROUTING_KEY
                     }
                 ) as scope:

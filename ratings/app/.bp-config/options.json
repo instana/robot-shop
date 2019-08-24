@@ -1,0 +1,5 @@
+{
+    "PHP_VERSION": "{PHP_72_LATEST}",
+    "LIBDIR": "htdocs/vendor",
+    "COMPOSER_VENDOR_DIR": "htdocs/vendor"
+}

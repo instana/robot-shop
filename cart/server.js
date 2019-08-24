@@ -1,4 +1,6 @@
-const instana = require('instana-nodejs-sensor');
+/*jshint esversion: 6 */
+
+const instana = require('@instana/collector');
 // init tracing
 // MUST be done before loading anything else!
 instana({
@@ -16,8 +18,63 @@ const expPino = require('express-pino-logger');
 
 var redisConnected = false;
 
-var redisHost = process.env.REDIS_HOST || 'redis'
-var catalogueHost = process.env.CATALOGUE_HOST || 'catalogue'
+var redisHost;
+var redisPassword;
+var redisPort;
+
+if (process.env.VCAP_SERVICES) {
+    connectionDetails = null;
+
+    console.log('Env var \'VCAP_SERVICES\' found, scanning for \'cart_cache\' service binding');
+
+    for (let [key, value] of Object.entries(JSON.parse(process.env.VCAP_SERVICES))) {
+        try {
+            binding = value.find(function(binding) {
+                return 'cart_cache' == binding.binding_name && binding.credentials;
+            });
+
+            if (!binding) {
+                continue;
+            }
+
+            connectionDetails = binding.credentials;
+
+            if (connectionDetails) {
+                redisHost = connectionDetails.host;
+                redisPassword = connectionDetails.password;
+                redisPort = connectionDetails.port;
+
+                console.log('Redis URI for \'cart_cache\' service binding found in \'VCAP_SERVICES\'');
+
+                break;
+            }
+        } catch (err) {
+            console.log('Cannot process key \'' + key + '\' of \'VCAP_SERVICES\'', err);
+            throw err;
+        }
+    }
+} else if (process.env.REDIS_HOST) {
+    redisHost = process.env.REDIS_HOST;
+    redisPort = 6379;
+
+    console.log('Redis host found in \'REDIS_HOST\': ' + redisHost);
+} else {
+    redisHost = 'redis';
+    redisPort = 6379;
+
+    console.log('Using default Redis host and port');
+}
+
+var catalogueHost = process.env.CATALOGUE_HOST || 'catalogue';
+if (process.env.VCAP_APPLICATION) {
+    vcapApplication = JSON.parse(process.env.VCAP_APPLICATION);
+
+    applicationName = vcapApplication.application_name; 
+    applicationUri = vcapApplication.application_uris[0];
+    catalogueHost = 'catalogue' + applicationUri.substring(applicationUri.indexOf('.'));
+}
+
+const catalogueUrl = (process.env.CATALOGUE_HTTPS ? 'https' : 'http') + '://' + catalogueHost;
 
 const logger = pino({
     level: 'info',
@@ -183,7 +240,7 @@ app.get('/update/:id/:sku/:qty', (req, res) => {
     // check quantity
     var qty = parseInt(req.params.qty);
     if(isNaN(qty)) {
-        req.log.warn('quanity not a number');
+        req.log.warn('quantity not a number');
         res.status(400).send('quantity must be a number');
         return;
     } else if(qty < 0) {
@@ -328,7 +385,7 @@ function calcTax(total) {
 
 function getProduct(sku) {
     return new Promise((resolve, reject) => {
-        request('http://' + catalogueHost + ':8080/product/' + sku, (err, res, body) => {
+        request(catalogueUrl + '/product/' + sku, (err, res, body) => {
             if(err) {
                 reject(err);
             } else if(res.statusCode != 200) {
@@ -355,9 +412,15 @@ function saveCart(id, cart) {
     });
 }
 
+if (!redisHost) {
+    throw new Error('Redis connection data missing');
+}
+
 // connect to Redis
 var redisClient = redis.createClient({
-    host: redisHost
+    host: redisHost,
+    password: redisPassword,
+    port: redisPort
 });
 
 redisClient.on('error', (e) => {
@@ -369,7 +432,7 @@ redisClient.on('ready', (r) => {
 });
 
 // fire it up!
-const port = process.env.CART_SERVER_PORT || '8080';
+const port = process.env.SERVER_PORT || '8080';
 app.listen(port, () => {
     logger.info('Started on port', port);
 });

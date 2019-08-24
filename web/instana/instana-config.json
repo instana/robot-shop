@@ -1,0 +1,5 @@
+{
+  "service": "web",
+  "agent_host": "instana-agent",
+  "agent_port": 42699
+}

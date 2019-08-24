@@ -1,5 +1,6 @@
 package org.steveww.spark;
 
+import com.google.gson.*;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import spark.Spark;
 
@@ -16,48 +17,75 @@ import org.apache.http.params.HttpParams;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.apache.commons.dbutils.DbUtils;
-import com.google.gson.Gson;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.Types;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
 public class Main {
-    private static String CART_URL = null;
-    private static String JDBC_URL = null;
-    private static Logger logger = LoggerFactory.getLogger(Main.class);
-    private static ComboPooledDataSource cpds = null;
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+    private static final ComboPooledDataSource CPDS = new ComboPooledDataSource();
 
     public static void main(String[] args) {
         // Get ENV configuration values
-        CART_URL = String.format("http://%s/shipping/", System.getenv("CART_ENDPOINT") != null ? System.getenv("CART_ENDPOINT") : "cart");
-        JDBC_URL = String.format("jdbc:mysql://%s/cities?useSSL=false&autoReconnect=true", System.getenv("DB_HOST") != null ? System.getenv("DB_HOST") : "mysql");
+        final String cartUrl;
+        final String jdbcUrl;
+
+        final boolean isCloudFoundry = System.getenv("VCAP_APPLICATION") != null;
+
+        if (isCloudFoundry) {
+            // Cloud Foundry
+            final JsonParser jsonParser = new JsonParser();
+
+            jdbcUrl = getJdbcURLFromVCAPServices(jsonParser);
+
+            if (System.getenv("CART_ENDPOINT") != null) {
+                cartUrl = System.getenv("CART_ENDPOINT");
+            } else {
+                final JsonObject vcapApplication = jsonParser.parse(System.getenv("VCAP_APPLICATION")).getAsJsonObject();
+
+                final JsonArray appUris = vcapApplication.get("application_uris").getAsJsonArray();
+                if (appUris == null || appUris.size() == 0) {
+                    throw new IllegalStateException("Cannot retrieve application URIs from 'VCAP_APPLICATION'");
+                }
+
+                final String applicationName = vcapApplication.get("application_name").getAsString();
+                final String applicationURI = appUris.get(0).getAsString();
+
+                cartUrl = "https://" + applicationURI.replace(applicationName, "cart") + "/shipping/";
+            }
+        } else {
+            cartUrl = String.format("http://%s/shipping/", System.getenv("CART_ENDPOINT") != null ? System.getenv("CART_ENDPOINT") : "cart");
+            jdbcUrl = String.format("jdbc:mysql://%s/cities?useSSL=false&autoReconnect=true", System.getenv("DB_HOST") != null ? System.getenv("DB_HOST") : "mysql");
+        }
+
 
         //
         // Create database connector
         // TODO - might need a retry loop here
         //
         try {
-            cpds = new ComboPooledDataSource();
-            cpds.setDriverClass( "com.mysql.jdbc.Driver" ); //loads the jdbc driver            
-            cpds.setJdbcUrl( JDBC_URL );
-            cpds.setUser("shipping");                                  
-            cpds.setPassword("secret");
+            CPDS.setDriverClass( "com.mysql.jdbc.Driver" ); //loads the jdbc driver            
+            CPDS.setJdbcUrl( jdbcUrl );
+
+            if (!isCloudFoundry) {
+                CPDS.setUser("shipping");
+                CPDS.setPassword("secret");
+            }
+
             // some config
-            cpds.setMinPoolSize(5);
-            cpds.setAcquireIncrement(5);
-            cpds.setMaxPoolSize(20);
-            cpds.setMaxStatements(180);
+            CPDS.setMinPoolSize(5);
+            CPDS.setAcquireIncrement(5);
+            CPDS.setMaxPoolSize(20);
+            CPDS.setMaxStatements(180);
         }
         catch(Exception e) {
-            logger.error("Database Exception", e);
+            LOGGER.error("Database Exception", e);
         }
 
         // Spark
@@ -71,7 +99,7 @@ public class Main {
                 data = queryToJson("select count(*) as count from cities");
                 res.header("Content-Type", "application/json");
             } catch(Exception e) {
-                logger.error("count", e);
+                LOGGER.error("count", e);
                 res.status(500);
                 data = "ERROR";
             }
@@ -86,7 +114,7 @@ public class Main {
                 data = queryToJson(query);
                 res.header("Content-Type", "application/json");
             } catch(Exception e) {
-                logger.error("codes", e);
+                LOGGER.error("codes", e);
                 res.status(500);
                 data = "ERROR";
             }
@@ -99,11 +127,11 @@ public class Main {
             String data;
             try {
                 String query = "select uuid, name from cities where country_code = ?";
-                logger.info("Query " + query);
+                LOGGER.info("Query " + query);
                 data = queryToJson(query, req.params(":code"));
                 res.header("Content-Type", "application/json");
             } catch(Exception e) {
-                logger.error("cities", e);
+                LOGGER.error("cities", e);
                 res.status(500);
                 data = "ERROR";
             }
@@ -115,11 +143,11 @@ public class Main {
             String data;
             try {
                 String query = "select uuid, name from cities where country_code = ? and city like ? order by name asc limit 10";
-                logger.info("Query " + query);
+                LOGGER.info("Query " + query);
                 data = queryToJson(query, req.params(":code"), req.params(":text") + "%");
                 res.header("Content-Type", "application/json");
             } catch(Exception e) {
-                logger.error("match", e);
+                LOGGER.error("match", e);
                 res.status(500);
                 data = "ERROR";
             }
@@ -145,7 +173,7 @@ public class Main {
                 data = new Gson().toJson(ship);
             } else {
                 data = "no location";
-                logger.warn(data);
+                LOGGER.warn(data);
                 res.status(400);
             }
 
@@ -153,9 +181,9 @@ public class Main {
         });
 
         Spark.post("/confirm/:id", (req, res) -> {
-            logger.info("confirm " + req.params(":id") + " - " + req.body());
-            String cart = addToCart(req.params(":id"), req.body());
-            logger.info("new cart " + cart);
+            LOGGER.info("confirm " + req.params(":id") + " - " + req.body());
+            String cart = addToCart(cartUrl, req.params(":id"), req.body());
+            LOGGER.info("new cart " + cart);
 
             if(cart.equals("")) {
                 res.status(404);
@@ -166,18 +194,35 @@ public class Main {
             return cart;
         });
 
-        logger.info("Ready");
+        LOGGER.info("Ready");
     }
 
+    private static String getJdbcURLFromVCAPServices(final JsonParser jsonParser) {
+        final JsonObject vcapServices = jsonParser.parse(System.getenv("VCAP_SERVICES")).getAsJsonObject();
+
+        for (Map.Entry<String, JsonElement> boundServices : vcapServices.entrySet()) {
+            final JsonArray bindings = boundServices.getValue().getAsJsonArray();
+
+            for (JsonElement boundService : bindings) {
+                final JsonObject bindingDetails = boundService.getAsJsonObject();
+                if (bindingDetails.has("binding_name") && "shipping_database".equals(bindingDetails.get("binding_name").getAsString())) {
+                    final JsonObject credentials = bindingDetails.get("credentials").getAsJsonObject();
+                    return credentials.get("jdbcUrl").getAsString();
+                }
+            }
+        }
+
+        throw new IllegalStateException("Cannot retrieve the 'shipping_database' service binding.");
+    }
 
 
     /**
      * Query to Json - QED
      **/
     private static String queryToJson(String query, Object ... args) {
-        List<Map<String, Object>> listOfMaps = null;
+        List<Map<String, Object>> listOfMaps;
         try {
-            QueryRunner queryRunner = new QueryRunner(cpds);
+            QueryRunner queryRunner = new QueryRunner(CPDS);
             listOfMaps = queryRunner.query(query, new MapListHandler(), args);
         } catch (SQLException se) {
             throw new RuntimeException("Couldn't query the database.", se);
@@ -197,7 +242,7 @@ public class Main {
         String query = "select latitude, longitude from cities where uuid = ?";
 
         try {
-            conn = cpds.getConnection();
+            conn = CPDS.getConnection();
             stmt = conn.prepareStatement(query);
             stmt.setInt(1, Integer.parseInt(uuid));
             rs = stmt.executeQuery();
@@ -206,7 +251,7 @@ public class Main {
                 break;
             }
         } catch(Exception e) {
-            logger.error("Location exception", e);
+            LOGGER.error("Location exception", e);
         } finally {
             DbUtils.closeQuietly(conn, stmt, rs);
         }
@@ -214,7 +259,7 @@ public class Main {
         return location;
     }
 
-    private static String addToCart(String id, String data) {
+    private static String addToCart(String cartUrl, String id, String data) {
         StringBuilder buffer = new StringBuilder();
 
         DefaultHttpClient httpClient = null;
@@ -224,7 +269,7 @@ public class Main {
             HttpConnectionParams.setConnectionTimeout(httpParams, 5000);
 
             httpClient = new DefaultHttpClient(httpParams);
-            HttpPost postRequest = new HttpPost(CART_URL + id);
+            HttpPost postRequest = new HttpPost(cartUrl + id);
             StringEntity payload = new StringEntity(data);
             payload.setContentType("application/json");
             postRequest.setEntity(payload);
@@ -237,10 +282,10 @@ public class Main {
                     buffer.append(line);
                 }
             } else {
-                logger.warn("Failed with code: " + res.getStatusLine().getStatusCode());
+                LOGGER.warn("Failed with code: " + res.getStatusLine().getStatusCode());
             }
         } catch(Exception e) {
-            logger.error("http client exception", e);
+            LOGGER.error("http client exception", e);
         } finally {
             if(httpClient != null) {
                 httpClient.getConnectionManager().shutdown();
