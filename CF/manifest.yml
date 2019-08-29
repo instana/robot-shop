@@ -106,7 +106,7 @@ applications:
   path: ../web/
   memory: 128M
   buildpacks:
-    - https://github.com/cloudfoundry/nginx-buildpack.git
+    - https://github.com/mmanciop/nginx-buildpack.git#nginx-1.17.2
   env:
     INSTANA_EUM_KEY: OT8yjQ_eSPm84a4owlq5Hw
     INSTANA_EUM_REPORTING_URL: https://eum-release-fullstack-0-us-west-2.instana.io
