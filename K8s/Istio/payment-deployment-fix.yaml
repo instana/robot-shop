@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: payment
+  name: payment-fix
   labels:
     service: payment
-    stage: prod
+    stage: test
 spec:
   replicas: 1
   selector:
     matchLabels:
       service: payment
-      stage: prod
+      stage: test
   template:
     metadata:
       labels:
         service: payment
-        stage: prod
+        stage: test
     spec:
       containers:
-      - name: payment
-        image: robotshop/rs-payment:latest
+      - name: payment-fix
+        image: robotshop/rs-payment-fix:latest
         # agent networking access
         env:
           - name: INSTANA_AGENT_HOST
