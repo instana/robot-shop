@@ -1,3 +1,5 @@
+# Canary testing using Istio
+# The DestinationRule defines the subsets by Deployment label
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
@@ -13,7 +15,7 @@ spec:
     labels:
       stage: test
 ---
-# VirtualService subset references DestinationRule subsets.name
+# VirtualService subset references DestinationRule spec.subsets.name
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
