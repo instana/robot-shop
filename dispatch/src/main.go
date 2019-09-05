@@ -9,6 +9,7 @@ import (
     "strconv"
     "encoding/json"
     "strings"
+    "errors"
 
     "github.com/streadway/amqp"
     "github.com/instana/go-sensor"
@@ -184,17 +185,27 @@ func main() {
             panic(err)
         }
 
+        log.Printf("Cloud Foundry detected")
+
+        bindingFound := false
+
         services := appEnv.Services
         for _, service := range services {
             for _, serviceBinding := range service {
-                bindingName, ok := serviceBinding.CredentialString("binding_name")
+                bindingName := serviceBinding.Name
 
-                if ok {
-                    if strings.Compare(bindingName, "dispatch_queue") == 0 {
-                        amqpUri, _ = serviceBinding.CredentialString("uri")
-                    }
+                if strings.Compare(bindingName, "dispatch_queue") == 0 {
+                    bindingFound = true
+
+                    log.Printf("RabbitMQ service binding '%s' found", bindingName)
+
+                    amqpUri, _ = serviceBinding.CredentialString("uri")
                 }
             }
+        }
+
+        if !bindingFound {
+            panic(errors.New("Service binding 'dispatch_queue' not found!"))
         }
     }
 
