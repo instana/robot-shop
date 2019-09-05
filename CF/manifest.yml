@@ -80,7 +80,6 @@ applications:
 - name: payment
   path: ../payment/
   memory: 256M
-  command: python payment.py
   env:
     AUTOWRAPT_BOOTSTRAP: instana
   instances: 0
@@ -100,7 +99,7 @@ applications:
 - name: user
   path: ../user/
   memory: 128MB
-  instances: 1
+  instances: 0
 
 - name: web
   path: ../web/
@@ -108,3 +107,15 @@ applications:
   buildpacks:
     - https://github.com/mmanciop/nginx-buildpack.git#nginx-1.17.2
   instances: 0
+
+- name: loadgeneration
+  path: ../load-gen
+  buildpacks:
+    - https://github.com/cloudfoundry/python-buildpack.git#v1.6.36
+  no-route: true
+  health-check-type: process
+  memory: 1GB
+  env:
+    HOST: http://web.apps.pcf264.qainfra.instana.io
+    CLIENTS: 5
+  instances: 5
