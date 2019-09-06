@@ -108,8 +108,8 @@ Edit the `web/static/eum.html` file accordingly, specifically replacing the valu
 ## Spin up the containers
 
 ```sh
-cf cart -i 1 web
-cf cart -i 1 ratings
+cf scale -i 1 web
+cf scale -i 1 ratings
 cf scale -i 1 cart
 cf scale -i 1 catalogue
 cf scale -i 1 shipping
