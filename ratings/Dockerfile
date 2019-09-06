@@ -22,4 +22,4 @@ WORKDIR /var/www/html
 # copy dependencies from previous step
 COPY --from=build /app/vendor/ /var/www/html/vendor/
 
-COPY app/html/*.php /var/www/html
+COPY html/ /var/www/html
