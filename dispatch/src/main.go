@@ -98,7 +98,7 @@ func getOrderId(order []byte) string {
     return id
 }
 
-func createSpan(headers map[string]interface{}, order string) {
+func createSpan(headers map[string]interface{}, amqpUri string, order string) {
     // headers is map[string]interface{}
     // carrier is map[string]string
     carrier := make(ot.TextMapCarrier)
@@ -120,9 +120,10 @@ func createSpan(headers map[string]interface{}, order string) {
         span = tracer.StartSpan("getOrder", ot.ChildOf(spanContext))
         span.SetTag(string(ext.SpanKind), ext.SpanKindConsumerEnum)
         span.SetTag(string(ext.MessageBusDestination), "robot-shop")
+        span.SetTag("messaging_bus.address", amqpUri)
         span.SetTag("exchange", "robot-shop")
         span.SetTag("sort", "consume")
-        span.SetTag("address", "rabbitmq")
+        //span.SetTag("address", "rabbitmq")
         span.SetTag("key", "orders")
         span.LogFields(otlog.String("orderid", order))
         defer span.Finish()
@@ -250,7 +251,7 @@ func main() {
                 log.Printf("Order %s\n", d.Body)
                 log.Printf("Headers %v\n", d.Headers)
                 id := getOrderId(d.Body)
-                go createSpan(d.Headers, id)
+                go createSpan(d.Headers, amqpUri, id)
             }
         }
     }()
