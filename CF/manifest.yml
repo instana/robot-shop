@@ -102,7 +102,7 @@ applications:
 ### MUST IMPORT DATA MANUALLY:
 ### 1) BOSH SSH into the MySQL VM
 ### 2) Find out admin password from /var/vcap/jobs/mysql/config/mylogin.cnf
-### 3) Download init sql
+### 3) Download init sql from https://github.com/mmanciop/robot-shop/raw/master/mysql/scripts/10-dump.sql.gz and gunzip it
 ### 4) /var/vcap/packages/percona-server/bin/mysql -u admin -p<adminpwd> -P 3306 -D service_instance_db < init.sql 
 # cf bind-service mysql-init mysql-ratings --binding-name shipping_database
 # cf run-task mysql-init 'node init-db.js init-cities.sql shipping_database' --name "Init Shipping database"

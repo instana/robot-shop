@@ -35,11 +35,6 @@ The following routes must be available for use:
 
 ```sh
 cf target -o stan -s robotshop
-
-cf cs p.mysql db-small mysql
-cf cs mongodb-odb replica_set_small mongodb
-cf cs p.redis cache-small redis
-cf cs p.rabbitmq single-node-3.7 rabbitmq
 ```
 
 ## First app push
@@ -52,24 +47,16 @@ From the root of the repo:
 cf push -f CF/manifest.yml
 ```
 
-## Bind services
+## Bind the services
+
+Now that we have both apps and services, we can bind the former to the latter:
 
 ```sh
-cf bind-service mongo-init mongodb --binding-name catalogue_database
-cf bind-service ratings mysql --binding-name ratings_database
-
-cf bind-service catalogue mongodb --binding-name catalog_database
-
-cf bind-service cart redis --binding-name cart_cache
-
-cf bind-service shipping mysql --binding-name shipping_database
-
-cf bind-service user redis --binding-name users_cache
-cf bind-service user mongodb --binding-name users_database
-
-cf bind-service payment rabbitmq --binding-name dispatch_queue
-
-cf bind-service dispatch rabbitmq --binding-name dispatch_queue
+cf cs p.mysql db-small mysql-cities
+cf cs p.mysql db-small mysql-ratings
+cf cs mongodb-odb replica_set_small mongodb
+cf cs p.redis cache-small redis
+cf cs p.rabbitmq single-node-3.7 rabbitmq
 ```
 
 ## Init MongoDB
@@ -78,27 +65,24 @@ cf bind-service dispatch rabbitmq --binding-name dispatch_queue
 cf run-task mongo-init 'node init-db.js' --name "Init MongoDB"
 ```
 
-## Init MySQL
+## Init MySQL databases
 
-This one is not automated yet, as the `mysql-init` task app chokes on the `init.sql`.
-Something that "works" is to `bosh ssh` on the MySQL and run the database init via commandline (`mysql` is on the path) using the credentials one finds by doing `cf env shipping`.
-First import `init.sql` and then the following:
+### Ratings database
 
-```sql
-CREATE DATABASE ratings
-DEFAULT CHARACTER SET 'utf8';
-
-USE ratings;
-
-CREATE TABLE ratings (
-    sku varchar(80) NOT NULL,
-    avg_rating DECIMAL(3, 2) NOT NULL,
-    rating_count INT NOT NULL,
-    PRIMARY KEY (sku)
-) ENGINE=InnoDB;
+```sh
+cf bind-service mysql-init mysql-ratings --binding-name ratings_database
+cf run-task mysql-init 'node init-db.js init-ratings.sql ratings_database' --name "Init Ratings database"
 ```
 
-The above is the content of the [ratings sql init script](../mysql/20-ratings.sql) minus the unnecessary user privs.
+### Shipping database
+
+This one is not automated yet, as the `mysql-init` task app chokes on the large SQL init file.
+Something that works is to:
+
+1) `bosh ssh` into the MySQL virtual machine
+2) Find out admin password from `/var/vcap/jobs/mysql/config/mylogin.cnf`
+3) Download the ["cities" init sql file](https://github.com/mmanciop/robot-shop/raw/master/mysql/scripts/10-dump.sql.gz) and `gunzip` it
+4) `/var/vcap/packages/percona-server/bin/mysql -u admin -p<adminpwd> -P 3306 -D service_instance_db < <sql_file>`
 
 ## Configure EUM
 
@@ -106,6 +90,8 @@ Create a website in Instana.
 Edit the `web/static/eum.html` file accordingly, specifically replacing the values of the `reportingUrl` and `key` ienums.
 
 ## Spin up the containers
+
+**Note:** Feel free to replace the value after `-i` with how many container of any one kind you want.
 
 ```sh
 cf scale -i 1 web
