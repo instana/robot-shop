@@ -13,8 +13,12 @@ class Publisher:
         self._logger = logger
 
         if 'VCAP_SERVICES' in os.environ:
+            self._logger.info('Cloud Foundry detected')
+
             env = AppEnv()
             amqp_service = env.get_service(binding_name='dispatch_queue')
+
+            self._logger.info('Service binding \'{binding_name}\' found'.format(binding_name='dispatch_queue'))
 
             self._uri = amqp_service.credentials.get('uri')
         else:
