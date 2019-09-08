@@ -9,6 +9,7 @@
   "author": "SteveW",
   "license": "Apache-2.0",
   "dependencies": {
-    "mysql-import": "^2.0.2"
+    "mysql-import": "^2.0.2",
+    "cfenv": "1.2.2"
   }
 }

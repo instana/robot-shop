@@ -1,41 +1,6 @@
 ---
 applications:
 
-# cf cs p.mysql db-small mysql
-# cf cs mongodb-odb replica_set_small mongodb
-# cf cs p.redis cache-small redis
-# cf cs p.rabbitmq single-node-3.7 rabbitmq
-
-# cf bind-service mongo-init mongodb --binding-name catalogue_database
-# cf run-task mongo-init 'node init-db.js' --name "Init MongoDB"
-
-### DOES NOT WORK, IMPORTED MYSEL BY HAND LOGGING INTO MYSQL INSTANCE CUZ YOLO
-### cf bind-service mysql-init mysql --binding-name shipping_database
-### cf run-task mysql-init 'node init-db.js' --name "Init MySQL"
-
-# cf bind-service ratings mysql --binding-name ratings_database
-# cf scale -i 1 ratings
-
-# cf bind-service catalogue mongodb --binding-name catalog_database
-# cf scale -i 1 catalogue
-
-# cf bind-service cart redis --binding-name cart_cache
-# cf scale -i 1 cart
-
-# cf bind-service shipping mysql --binding-name shipping_database
-# cf scale -i 1 shipping
-
-# cf bind-service user redis --binding-name users_cache
-# cf bind-service user mongodb --binding-name users_database
-# cf scale -i 1 user
-
-# cf bind-service payment rabbitmq --binding-name dispatch_queue
-# cf scale -i 1 payment
-
-# cf bind-service dispatch rabbitmq --binding-name dispatch_queue
-# cf scale -i 1 dispatch
-
-
 ###
 ### "Task" applications to setup services, see https://docs.cloudfoundry.org/devguide/using-tasks.html
 ###
@@ -47,12 +12,12 @@ applications:
   health-check-type: process
   instances: 0
 
-# - name: mysql-init
-#   path: ../CF/mysql-init
-#   memory: 512M
-#   no-route: true # It's a CF Task, does not need a route
-#   health-check-type: process
-#   instances: 0
+- name: mysql-init
+  path: ../CF/mysql-init
+  memory: 512M
+  no-route: true # It's a CF Task, does not need a route
+  health-check-type: process
+  instances: 0
 
 ###
 ### Productive apps
@@ -119,3 +84,56 @@ applications:
     HOST: http://web.apps.pcf264.qainfra.instana.io
     CLIENTS: 5
   instances: 5
+
+# cf cs p.mysql db-small mysql-cities
+# cf cs p.mysql db-small mysql-ratings
+# cf cs mongodb-odb replica_set_small mongodb
+# cf cs p.redis cache-small redis
+# cf cs p.rabbitmq single-node-3.7 rabbitmq
+
+# cf bind-service mongo-init mongodb --binding-name catalogue_database
+# cf run-task mongo-init 'node init-db.js' --name "Init MongoDB"
+
+# cf bind-service mysql-init mysql-ratings --binding-name ratings_database
+# cf run-task mysql-init 'node init-db.js init-ratings.sql ratings_database' --name "Init Ratings database"
+
+###
+### DOES NOT WORK DUE TO THE SIZE OF THE DATABASE TO BE IMPORTED
+### MUST IMPORT DATA MANUALLY:
+### 1) BOSH SSH into the MySQL VM
+### 2) Find out admin password from /var/vcap/jobs/mysql/config/mylogin.cnf
+### 3) Download init sql
+### 4) /var/vcap/packages/percona-server/bin/mysql -u admin -p<adminpwd> -P 3306 -D service_instance_db < init.sql 
+# cf bind-service mysql-init mysql-ratings --binding-name shipping_database
+# cf run-task mysql-init 'node init-db.js init-cities.sql shipping_database' --name "Init Shipping database"
+
+# cf bind-service ratings mysql-ratings --binding-name ratings_database
+# cf scale -i 1 ratings
+# cf restage ratings
+
+# cf bind-service catalogue mongodb --binding-name catalogue_database
+# cf scale -i 1 catalogue
+# cf restage catalogue
+
+# cf bind-service cart redis --binding-name cart_cache
+# cf scale -i 1 cart
+# cf restage cart
+
+# cf bind-service shipping mysql --binding-name shipping_database
+# cf scale -i 1 shipping
+# cf restage shipping
+
+# cf bind-service user redis --binding-name users_cache
+# cf bind-service user mongodb --binding-name users_database
+# cf scale -i 1 user
+# cf restage user
+
+# cf bind-service payment rabbitmq --binding-name dispatch_queue
+# cf scale -i 1 payment
+# cf restage payment
+
+# cf bind-service dispatch rabbitmq --binding-name dispatch_queue
+# cf scale -i 1 dispatch
+# cf restage dispatch
+
+# cf scale -i 1 web
