@@ -1,6 +1,7 @@
-/*jshint esversion: 6 */
+/*jshint esversion: 8 */
 
 const mongoClient = require('mongodb').MongoClient;
+const bindingName = 'catalogue_database';
 
 var mongoURL = 'mongodb://mongodb:27017/catalogue';
 
@@ -9,7 +10,7 @@ if (process.env.VCAP_SERVICES) {
 
     for (let [key, value] of Object.entries(JSON.parse(process.env.VCAP_SERVICES))) {
         connectionDetails = value.find(function(binding) {
-            return 'catalogue_database' == binding.binding_name && binding.credentials;
+            return bindingName == binding.binding_name && binding.credentials;
         }).credentials;
 
         if (connectionDetails) {
@@ -25,15 +26,18 @@ if (!mongoURL) {
     throw new Error('MongoDB connection data missing');
 }
 
-mongoClient.connect(mongoURL, (error, db) => {
-    if(error) {
-        console.log('Cannot connect to MongoDB', error);
-        process.exit(42);
-    } else {
+mongoClient.connect(mongoURL)
+    .catch(function(err) {
+        console.log(`Cannot connect to the MongoDB database: ${err}`);
+        process.exit(4242);
+    })
+    .then(function(db) {
         console.log('Creating products collection');
 
         products = db.collection('products');
 
+        // Delete all old product entries before adding new ones
+        products.deleteMany({});
         products.insertMany([
             {sku: 'HAL-1', name: 'HAL', description: 'Sorry Dave, I cant do that', price: 2001, instock: 2, categories: ['AI']},
             {sku: 'PB-1', name: 'Positronic Brain', description: 'Highly advanced sentient processing unit with the laws of robotics burned in', price: 200, instock: 0, categories: ['AI']},
@@ -57,6 +61,8 @@ mongoClient.connect(mongoURL, (error, db) => {
 
         console.log('Starting users import');
 
+        // Delete all old user entries before adding new ones
+        users.deleteMany({});
         users.insertMany([
             {name: 'user', password: 'password', email: 'user@me.com'},
             {name: 'stan', password: 'bigbrain', email: 'stan@instana.com'}
@@ -76,6 +82,8 @@ mongoClient.connect(mongoURL, (error, db) => {
 
         console.log('Starting catalogue import');
 
+        // Delete all old catalogue entries before adding new ones
+        catalogue.deleteMany({});
         catalogue.insertMany([
             {sku: 'HAL-1', name: 'HAL', description: 'Sorry Dave, I cant do that', price: 2001, instock: 2, categories: ['AI']},
             {sku: 'PB-1', name: 'Positronic Brain', description: 'Highly advanced sentient processing unit with the laws of robotics burned in', price: 200, instock: 0, categories: ['AI']},
@@ -103,7 +111,12 @@ mongoClient.connect(mongoURL, (error, db) => {
         );
 
         console.log('Products imported');
-
+    })
+    .then(function() {
         console.log('All done');
-    }
-});
+        process.exit(0);
+    })
+    .catch(function(err) {
+        console.log(`Error while importing data into the MongoDB '${bindingName}' database: ${err}`);
+        process.exit(42);
+    });
