@@ -108,7 +108,7 @@ def pay(id):
         app.logger.error(err)
         return str(err), 500
     if req.status_code != 200:
-        return 'order history update error', req.status_code
+        return 'Cannot update order history', 500
 
     return jsonify({ 'orderid': orderid })
 
