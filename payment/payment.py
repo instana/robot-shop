@@ -82,7 +82,7 @@ def pay(id):
         app.logger.error(err)
         return str(err), 500
     if req.status_code != 200:
-        return 'payment error', req.status_code
+        return 'Payment error; \'{payment_gateway}\' answered with a status code \'{status_code}\''.format(payment_gateway=PAYMENT_GATEWAY, status_code=req.status_code), 503
 
     # Generate order id
     orderid = str(uuid.uuid4())
