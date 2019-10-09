@@ -31,7 +31,7 @@ var catalogueHost = process.env.CATALOGUE_HOST || 'catalogue'
 
 const logger = pino({
     level: 'info',
-    prettyPrint: true,
+    prettyPrint: false,
     useLevelLabels: true
 });
 const expLogger = expPino({
