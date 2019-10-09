@@ -26,18 +26,6 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: status.hostIP
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 30
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8080
-          initialDelaySeconds: 30
-          periodSeconds: 30
         ports:
         - containerPort: 8080
         resources:
