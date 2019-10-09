@@ -3,4 +3,5 @@ Flask
 requests
 pika
 prometheus_client
-instana
+opentracing
+instana==1.15.3
