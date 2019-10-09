@@ -1,14 +1,12 @@
 FROM golang:1.12.7
 
-ENV DEP_URL="https://github.com/golang/dep/releases/download/v0.5.0/dep-linux-amd64"
 ENV GOPATH=/go
+
+RUN apt-get update && apt-get install -y go-dep
 
 COPY src/ /go/src/github.com/instana/dispatch
 
 WORKDIR /go/src/github.com/instana/dispatch
-
-RUN curl -fsSL -o /usr/local/bin/dep ${DEP_URL} && \
-	chmod +x /usr/local/bin/dep
 
 RUN dep ensure
 RUN go build -o bin/gorcv
