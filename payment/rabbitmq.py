@@ -19,7 +19,7 @@ class Publisher:
         self._channel = None
 
     def _connect(self):
-        if not self._conn or self._conn.is_closed:
+        if not self._conn or self._conn.is_closed or self._channel is None or self._channel.is_closed:
             self._conn = pika.BlockingConnection(self._params)
             self._channel = self._conn.channel()
             self._channel.exchange_declare(exchange=self.EXCHANGE, exchange_type=self.TYPE, durable=True)
@@ -34,7 +34,7 @@ class Publisher:
 
     #Publish msg, reconnecting if necessary.
     def publish(self, msg, headers):
-        if self._channel is None:
+        if self._channel is None or self._channel.is_closed or self._conn is None or self._conn.is_closed:
             self._connect()
         try:
             self._publish(msg, headers)
