@@ -22,7 +22,7 @@ It is recommened to always use the latest version.
 
 ## Payment Gateway
 
-By default the `payment` service uses https://www.paypal.com as the pseudo payment provider. The code only does a HTTP GET against this url. You use a different url.
+By default the `payment` service uses https://www.paypal.com as the pseudo payment provider. The code only does a HTTP GET against this url. You can use a different url.
 
 ```shell
 $ helm install --set payment.gateway=https://foobar.com ...
