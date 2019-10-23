@@ -4,4 +4,3 @@ requests
 pika
 prometheus_client
 opentracing
-instana==1.15.3
