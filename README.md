@@ -69,6 +69,15 @@ $ kubectl create namespace robot-shop
 $ kubectl -n robot-shop apply -f K8s/descriptors
 ```
 
+Alternatively there is a helm chart for Stan's Robot Shop.
+
+```shell
+$ cd K8s/helm
+$ helm install --name robot-shop --namespace robot-shop .
+```
+
+There are some customisations that can be made see the [README](K8s/helm/README.md).
+
 To deploy the Instana agent to Kubernetes, just use the [helm](https://hub.helm.sh/charts/stable/instana-agent) chart.
 
 ```shell
