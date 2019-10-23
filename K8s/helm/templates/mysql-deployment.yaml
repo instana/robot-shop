@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  labels:
+    service: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: mysql
+  template:
+    metadata:
+      labels:
+        service: mysql
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      containers:
+      - name: mysql
+        image: {{ .Values.image.repo }}/rs-mysql-db:{{ .Values.image.version }}
+        # added for Istio
+        securityContext:
+          capabilities:
+            add: ["NET_ADMIN"]
+        ports:
+        - containerPort: 3306
+        resources:
+          limits:
+            cpu: 200m
+            memory: 800Mi
+          requests:
+            cpu: 100m
+            memory: 400Mi
+      restartPolicy: Always

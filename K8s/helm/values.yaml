@@ -1,0 +1,19 @@
+# Registry and rpository for Docker images
+# Default is docker/robotshop/image:latest
+image:
+  repo: robotshop
+  version: latest
+
+# Alternative payment gateway URL
+# Default is https://www.paypal.com
+payment:
+  gateway: null
+  #gateway: https://www.worldpay.com
+
+# EUM configuration
+# Provide your key and set the endpoint
+eum:
+  key: null
+  url: https://eum-eu-west-1.instana.io
+  #url: https://eum-us-west-2.instana.io
+
