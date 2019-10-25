@@ -49,9 +49,15 @@ Fire up Stan's Robot Shop with:
 $ docker-compose up
 ```
 
+If you want to fire up some load as well:
+
+```shell
+$ docker-compose -f docker-compose.yaml -f docker-compose-load.yaml up
+```
+
 If you are running it locally on a Linux host you can also run the Instana [agent](https://docs.instana.io/quick_start/agent_setup/container/docker/) locally, unfortunately the agent is currently not supported on Mac.
 
-There is also limited support on ARM architectures at the moment.
+There is also only limited support on ARM architectures at the moment.
 
 ## Marathon / DCOS
 
