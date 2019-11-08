@@ -2,6 +2,10 @@
 
 Use this helm chart to customise your install of Stan's Robot Shop.
 
+```shell
+$ helm install --name robot-shop --namespace robot-shop .
+```
+
 ## Images
 
 By default the images are pulled from Docker Hub. Setting `image.repo` this can be changed, for example:
