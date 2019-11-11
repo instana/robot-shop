@@ -131,6 +131,13 @@
             getUniqueid().then((id) => {
                 $scope.data.uniqueid = id;
                 currentUser.uniqueid = id;
+                // update metadata
+                if(typeof ineum !== 'undefined') {
+                    ineum('user', id);
+                    ineum('meta', 'environment', 'production');
+                    ineum('meta', 'variant', 'normal price');
+                }
+
             }).catch((e) => {
                 console.log('ERROR', e);
             });
@@ -140,6 +147,10 @@
         $scope.$watch(() => { return currentUser.uniqueid; }, (newVal, oldVal) => {
             if(newVal !== oldVal) {
                 $scope.data.uniqueid = currentUser.uniqueid;
+                if(typeof ineum !== 'undefined') {
+                    console.log('Setting user details', currentUser);
+                    ineum('user', currentUser.uniqueid, currentUser.user.name, currentUser.user.email);
+                }
             }
         });
 
