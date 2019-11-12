@@ -67,6 +67,9 @@ app.get('/products', (req, res) => {
 // product by SKU
 app.get('/product/:sku', (req, res) => {
     if(mongoConnected) {
+        // optionally slow this down
+        const delay = process.env.GO_SLOW || 0;
+        setTimeout(() => {
         collection.findOne({sku: req.params.sku}).then((product) => {
             req.log.info('product', product);
             if(product) {
@@ -78,6 +81,7 @@ app.get('/product/:sku', (req, res) => {
             req.log.error('ERROR', e);
             res.status(500).send(e);
         });
+        }, delay);
     } else {
         req.log.error('database not available');
         res.status(500).send('database not available');
