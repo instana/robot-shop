@@ -38,6 +38,8 @@
         }).when('/payment', {
             templateUrl: 'payment.html',
             controller: 'paymentform'
+        }).otherwise({
+            redirectTo: '/'
         });
 
         // needed for URL rewrite hash

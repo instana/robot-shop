@@ -27,7 +27,7 @@ fi
 chmod 644 $BASE_DIR/eum.html
 
 # apply environment variables to default.conf
-envsubst < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
+envsubst '${CATALOGUE_HOST} ${USER_HOST} ${CART_HOST} ${SHIPPING_HOST} ${PAYMENT_HOST} ${RATINGS_HOST}' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
 
-exec nginx -g "daemon off;"
+exec nginx-debug -g "daemon off;"
 

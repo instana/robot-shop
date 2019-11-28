@@ -6,11 +6,19 @@ server {
 
     #charset koi8-r;
     #access_log  /var/log/nginx/host.access.log  main;
+    error_log /dev/stdout debug;
+    rewrite_log on;
 
     location / {
         root   /usr/share/nginx/html;
         index  index.html index.htm;
         ssi    on;
+    }
+
+    location /images/ {
+        expires 5s;
+        root   /usr/share/nginx/html;
+        try_files $uri /images/placeholder.jpg;
     }
 
     #error_page  404              /404.html;

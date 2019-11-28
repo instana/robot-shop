@@ -6,7 +6,7 @@
 
     <h3>{{ data.product.name }}</h3>
     <div class="productimage">
-        <img src="images/{{ data.product.sku }}.jpg"/>
+        <img src="/images/{{ data.product.sku }}.jpg"/>
     </div>
     <div class="rating">
         Rating
@@ -18,7 +18,7 @@
         </span>
         <div>
             <span ng-repeat="vote in [ 1, 2, 3, 4, 5 ]">
-                <img id="vote-{{ vote }}" class="vote-star" alt="{{ vote }}" ng-mouseover="glowstan(vote, 1.0);" ng-mouseleave="glowstan(vote, 0.5); "src="media/instana_icon_square.png" ng-click="rateProduct(vote);"/>
+                <img id="vote-{{ vote }}" class="vote-star" alt="{{ vote }}" ng-mouseover="glowstan(vote, 1.0);" ng-mouseleave="glowstan(vote, 0.5); "src="/media/instana_icon_square.png" ng-click="rateProduct(vote);"/>
             </span>
         </div>
     </div>
