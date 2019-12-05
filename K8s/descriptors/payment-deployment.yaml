@@ -17,6 +17,7 @@ spec:
         service: payment
         stage: prod
     spec:
+      serviceAccountName: robot-shop
       containers:
       - name: payment
         image: robotshop/rs-payment:latest

@@ -14,6 +14,7 @@ spec:
       labels:
         service: rabbitmq
     spec:
+      serviceAccountName: robot-shop
       containers:
       - name: rabbitmq
         image: rabbitmq:3.7-management-alpine

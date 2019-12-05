@@ -16,6 +16,7 @@ spec:
       annotations:
         sidecar.istio.io/inject: "false"
     spec:
+      serviceAccountName: robot-shop
       containers:
       - name: mysql
         image: robotshop/rs-mysql-db:latest

@@ -14,10 +14,11 @@ spec:
       labels:
         service: cart
     spec:
+      serviceAccountName: robot-shop
       containers:
       - name: cart
         image: robotshop/rs-cart:latest
-        # agent networking access 
+        # agent networking access
         env:
           - name: INSTANA_AGENT_HOST
             valueFrom:

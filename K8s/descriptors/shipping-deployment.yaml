@@ -14,6 +14,7 @@ spec:
       labels:
         service: shipping
     spec:
+      serviceAccountName: robot-shop
       containers:
       - name: shipping
         image: robotshop/rs-shipping:latest
