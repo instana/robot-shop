@@ -14,6 +14,9 @@ spec:
       labels:
         service: mongodb
     spec:
+      {{ if .Values.psp.enabled }}
+      serviceAccountName: robot-shop
+      {{ end }}
       containers:
       - name: mongodb
         image: {{ .Values.image.repo }}/rs-mongodb:{{ .Values.image.version }}

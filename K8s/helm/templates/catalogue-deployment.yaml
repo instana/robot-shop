@@ -14,6 +14,9 @@ spec:
       labels:
         service: catalogue
     spec:
+      {{ if .Values.psp.enabled }}
+      serviceAccountName: robot-shop
+      {{ end }}
       containers:
       - name: catalogue
         image: {{ .Values.image.repo }}/rs-catalogue:{{ .Values.image.version }}

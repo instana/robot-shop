@@ -14,6 +14,9 @@ spec:
       labels:
         service: rabbitmq
     spec:
+      {{ if .Values.psp.enabled }}
+      serviceAccountName: robot-shop
+      {{ end }}
       containers:
       - name: rabbitmq
         image: rabbitmq:3.7-management-alpine

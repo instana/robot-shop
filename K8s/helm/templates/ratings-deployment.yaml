@@ -14,6 +14,9 @@ spec:
       labels:
         service: ratings
     spec:
+      {{ if .Values.psp.enabled }}
+      serviceAccountName: robot-shop
+      {{ end }}
       containers:
       - name: ratings
         image: {{ .Values.image.repo }}/rs-ratings:{{ .Values.image.version }}
