@@ -1,8 +1,17 @@
 # Instana Agent Install
 
-With the new release of Kubernetes support for Instana, the agent install is now available as a helm [chart](https://hub.helm.sh/charts/stable/instana-agent). This is the easiest way to install the agent, however if you really want to do it by hand, template descriptors are available in the official [documentation](https://docs.instana.io/ecosystem/kubernetes/).
+The easiest way to install the Instana agent is with the helm [chart](https://hub.helm.sh/charts/stable/instana-agent). If you really want to do it by hand, template descriptors are available in the official [documentation](https://docs.instana.io/ecosystem/kubernetes/).
 
-# Quotas and Scaling
+# Stan's Robot Shop Install
+
+Install Stan's Robot Shop on to your K8s cluster using the helm chart, see the [README](helm/README.md) for details of the various options.
+
+```shell
+$ cd helm
+$ helm install --name robot-shop --namespace robot-shop .
+```
+
+## Quotas and Scaling
 
 You can apply resource quotas to the namespace where you installed Stan's Robot Shop.
 
@@ -14,7 +23,7 @@ The quotas and usage are shown in the Instana Kubernetes dashboards.
 
 Optinally you can also run the `autoscale.sh` script to configure automatic scaling of the deployments. You will need to edit the script if you did not deploy to the `robot-shop` namespace. Varying the load on the application will cause Kubernetes to scale up/down the various deployments.
 
-# Istio
+## Istio
 
 Stan's Robot Shop will run on Kubernetes with Istio service mesh. Configure Istio ingress.
 

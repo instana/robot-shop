@@ -22,13 +22,13 @@ The various services in the sample application already include all required Inst
 To see the application performance results in the Instana dashboard, you will first need an Instana account. Don't worry a [trial account](https://instana.com/trial?utm_source=github&utm_medium=robot_shop) is free.
 
 ## Build from Source
-To optionally build from source (you will need a newish version of Docker to do this) use Docker Compose. Optionally edit the *.env* file to specify an alternative image registry and version tag; see the official [documentation](https://docs.docker.com/compose/env-file/) for more information.
+To optionally build from source (you will need a newish version of Docker to do this) use Docker Compose. Optionally edit the `.env` file to specify an alternative image registry and version tag; see the official [documentation](https://docs.docker.com/compose/env-file/) for more information.
 
 ```shell
 $ docker-compose build
 ```
 
-If you modified the *.env* file and changed the image registry, you may need to push the images to that registry
+If you modified the `.env` file and changed the image registry, you need to push the images to that registry
 
 ```shell
 $ docker-compose push
@@ -68,14 +68,9 @@ You may install Instana via the DCOS package manager, instructions are here: htt
 ## Kubernetes
 You can run Kubernetes locally using [minikube](https://github.com/kubernetes/minikube) or on one of the many cloud providers.
 
-The Docker container images are all available on [Docker Hub](https://hub.docker.com/u/robotshop/). The deployment and service definition files using these images are in the [K8s](K8s/README.md) directory, use these to deploy to a Kubernetes cluster. If you pushed your own images to your registry the deployment files will need to be updated to pull from your registry.
+The Docker container images are all available on [Docker Hub](https://hub.docker.com/u/robotshop/).
 
-```shell
-$ kubectl create namespace robot-shop
-$ kubectl -n robot-shop apply -f K8s/descriptors
-```
-
-Alternatively there is a helm chart for Stan's Robot Shop.
+Install Stan's Robot Shop to your Kubernetes cluster using the helm chart.
 
 ```shell
 $ cd K8s/helm
@@ -131,12 +126,18 @@ $ minikube ip
 If you are using a cloud Kubernetes / Openshift / Mesosphere then it will be available on the load balancer of that system.
 
 ## Load Generation
-A separate load generation utility is provided in the *load-gen* directory. This is not automatically run when the application is started. The load generator is built with Python and [Locust](https://locust.io). The *build.sh* script builds the Docker image, optionally taking *push* as the first argument to also push the image to the registry. The registry and tag settings are loaded from the *.env* file in the parent directory. The script *load-gen.sh* runs the image, it takes a number of command line arguments. You could run the container inside an orchestration system (K8s) as well if you want to, an example descriptor is provided in K8s/autoscaling. For more details see the [README](load-gen/README.md) in the load-gen directory.
+A separate load generation utility is provided in the `load-gen` directory. This is not automatically run when the application is started. The load generator is built with Python and [Locust](https://locust.io). The `build.sh` script builds the Docker image, optionally taking *push* as the first argument to also push the image to the registry. The registry and tag settings are loaded from the `.env` file in the parent directory. The script `load-gen.sh` runs the image, it takes a number of command line arguments. You could run the container inside an orchestration system (K8s) as well if you want to, an example descriptor is provided in K8s directory. For more details see the [README](load-gen/README.md) in the load-gen directory.
 
 ## End User Monitoring
-To enable End User Monitoring (EUM) see the official [documentation](https://docs.instana.io/products/website_monitoring/) for how to create a configuration. There is no need to inject the javascript fragment into the page, this will be handled automatically. Just make a note of the unique key and set the environment variable INSTANA_EUM_KEY for the *web* image, see *docker-compose.yaml* for an example.
+### Docker Compose
+
+To enable End User Monitoring (EUM) see the official [documentation](https://docs.instana.io/products/website_monitoring/) for how to create a configuration. There is no need to inject the javascript fragment into the page, this will be handled automatically. Just make a note of the unique key and set the environment variable INSTANA_EUM_KEY for the web image, see `docker-compose.yaml` for an example.
 
 If you are running the Instana backend on premise, you will also need to set the Reporting URL to your local instance. Set the environment variable INSTANA_EUM_REPORTING_URL as above. See the Instana EUM API [reference](https://docs.instana.io/products/website_monitoring/api/#api-structure)
+
+### Kubernetes
+
+The Helm chart for installing Stan's Robot Shop supports setting the key and endpoint url for EUM, see the [README](K8s/helm/README.md).
 
 ## Prometheus
 

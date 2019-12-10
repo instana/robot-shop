@@ -24,6 +24,14 @@ $ helm install --set image.version=0.1.2 ...
 
 It is recommened to always use the latest version.
 
+## Pod Security Policy
+
+If you wish to enable [PSP](https://kubernetes.io/docs/concepts/policy/pod-security-policy/)
+
+```shell
+$ helm install --set psp.enabled=true ...
+```
+
 ## Payment Gateway
 
 By default the `payment` service uses https://www.paypal.com as the pseudo payment provider. The code only does a HTTP GET against this url. You can use a different url.
