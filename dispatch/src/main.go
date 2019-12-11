@@ -111,31 +111,36 @@ func createSpan(headers map[string]interface{}, order string) {
     tracer := ot.GlobalTracer()
     spanContext, err := tracer.Extract(ot.HTTPHeaders, carrier)
     if err == nil {
-        log.Println("Creating span")
-        // create span
+        log.Println("Creating child span")
+        // create child span
         span = tracer.StartSpan("getOrder", ot.ChildOf(spanContext))
-        span.SetTag(string(ext.SpanKind), ext.SpanKindConsumerEnum)
-        span.SetTag(string(ext.MessageBusDestination), "robot-shop")
-        span.SetTag("exchange", "robot-shop")
-        span.SetTag("sort", "consume")
-        span.SetTag("address", "rabbitmq")
-        span.SetTag("key", "orders")
-        span.LogFields(otlog.String("orderid", order))
-        defer span.Finish()
-
-        time.Sleep(time.Duration(42 + rand.Int63n(42)) * time.Millisecond)
-        if rand.Intn(100) < errorPercent {
-            span.SetTag("error", true)
-            span.LogFields(
-                otlog.String("error.kind", "Exception"),
-                otlog.String("message", "Failed to dispatch to SOP"))
-            log.Println("Span tagged with error")
-        }
-        processSale(span)
     } else {
-        log.Println("Failed to get span context")
         log.Println(err)
+        log.Println("Failed to get context from headers")
+        log.Println("Creating root span")
+        // create root span
+        span = tracer.StartSpan("getOrder")
     }
+
+    span.SetTag(string(ext.SpanKind), ext.SpanKindConsumerEnum)
+    span.SetTag(string(ext.MessageBusDestination), "robot-shop")
+    span.SetTag("exchange", "robot-shop")
+    span.SetTag("sort", "consume")
+    span.SetTag("address", "rabbitmq")
+    span.SetTag("key", "orders")
+    span.LogFields(otlog.String("orderid", order))
+    defer span.Finish()
+
+    time.Sleep(time.Duration(42 + rand.Int63n(42)) * time.Millisecond)
+    if rand.Intn(100) < errorPercent {
+        span.SetTag("error", true)
+        span.LogFields(
+            otlog.String("error.kind", "Exception"),
+            otlog.String("message", "Failed to dispatch to SOP"))
+        log.Println("Span tagged with error")
+    }
+
+    processSale(span)
 }
 
 func processSale(parentSpan ot.Span) {
