@@ -6,8 +6,8 @@ server {
 
     #charset koi8-r;
     #access_log  /var/log/nginx/host.access.log  main;
-    error_log /dev/stdout debug;
-    rewrite_log on;
+    #error_log /dev/stdout debug;
+    #rewrite_log on;
 
     location / {
         root   /usr/share/nginx/html;
