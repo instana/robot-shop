@@ -8,34 +8,38 @@ then
     exit 1
 fi
 
-if [ $RUN_TIME -eq 0  -o $NUM_CLIENTS -eq 1 ]
+if echo "$NUM_CLIENTS" | egrep -q '^[0-9]+$'
 then
+    if [ $NUM_CLIENTS -eq 0 ]
+    then
+        NUM_CLIENTS=1
+    fi
+    echo "Starting load with $NUM_CLIENTS clients"
+else
+    echo "NUM_CLIENTS $NUM_CLIENTS is not a number"
+    exit 1
+fi
+
+
+if [ "$RUN_TIME" != "0" ]
+then
+    if echo "$RUN_TIME" | egrep -q '^([0-9]+h)?([0-9]+m)?$'
+    then
+        TIME="-t $RUN_TIME"
+    else
+        echo "Wrong time format, use 2h42m"
+        exit 1
+    fi
+else
     unset RUN_TIME
+    unset TIME
 fi
 
-echo "Starting load with $NUM_CLIENTS clients"
-if [ $NUM_CLIENTS -gt 1 -a -n "$RUN_TIME" ]
+echo "Starting $CLIENTS clients for ${RUN_TIME:-ever}"
+if [ "$SILENT" -eq 1 ]
 then
-    echo "Looping every $RUN_TIME"
+    locust -f robot-shop.py --host "$HOST" --no-web -r 1 -c $NUM_CLIENTS $TIME > /dev/null 2>&1
+else
+    locust -f robot-shop.py --host "$HOST" --no-web -r 1 -c $NUM_CLIENTS $TIME
 fi
-
-while true
-do
-    for CLIENTS in $NUM_CLIENTS 1
-    do
-        if [ -n "$RUN_TIME" ]
-        then
-            TIME="-t $RUN_TIME"
-        else
-            unset TIME
-        fi
-        echo "Starting $CLIENTS clients for ${RUN_TIME:-ever}"
-        if [ "$SILENT" -eq 1 ]
-        then
-            locust -f robot-shop.py --host "$HOST" --no-web -r 1 -c $CLIENTS $TIME > /dev/null 2>&1
-        else
-            locust -f robot-shop.py --host "$HOST" --no-web -r 1 -c $CLIENTS $TIME
-        fi
-    done
-done
 
