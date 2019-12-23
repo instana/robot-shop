@@ -17,7 +17,7 @@ import (
 )
 
 const (
-    Service = "Dispatch"
+    Service = "dispatch"
 )
 
 var (
