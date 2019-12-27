@@ -9,21 +9,10 @@ node {
 	npmVersion = "5.6.0"
 }
 
-//declare a build task
-task build
 
-//declare a task to create a zip of the app
-task zip(type: Zip) {
-	from ('.') {
-		include "*"
-	}
-	destinationDir(file("dist"))
-	baseName "robot-shop"
+
+task build {
+    doLast {
+        println 'Hello world!'
+    }
 }
-
-//declare task dependencies
-build.dependsOn zip
-zip.dependsOn npm_build
-npm_build.dependsOn npm_test
-npm_test.dependsOn npmInstall
-npm_build.dependsOn npmInstall
