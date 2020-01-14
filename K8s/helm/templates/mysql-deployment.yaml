@@ -13,8 +13,6 @@ spec:
     metadata:
       labels:
         service: mysql
-      annotations:
-        sidecar.istio.io/inject: "false"
     spec:
       {{ if .Values.psp.enabled }}
       serviceAccountName: robot-shop
