@@ -18,7 +18,7 @@ done
 
 oc adm new-project robot-shop --node-selector='type=infra'
 oc adm policy add-role-to-user admin developer -n robot-shop
-oc adm policy add-scc-to-user anyuid system:serviceaccount:robot-shop:default
+oc adm policy add-scc-to-user anyuid -z default
 
 oc logout
 
