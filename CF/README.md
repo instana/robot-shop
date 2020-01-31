@@ -68,6 +68,7 @@ cf cs p.rabbitmq single-node-3.7 rabbitmq
 ## Init MongoDB
 
 ```sh
+cf bind-service mongo-init mongodb --binding-name catalogue_database
 cf run-task mongo-init 'node init-db.js' --name "Init MongoDB"
 ```
 
