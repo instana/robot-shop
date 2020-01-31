@@ -111,6 +111,12 @@ cf bind-service dispatch rabbitmq --binding-name dispatch_queue
 Create a website in Instana.
 Edit the `web/static/eum.html` file accordingly, specifically replacing the values of the `reportingUrl` and `key` ienums.
 
+Push again the `web` application (or the entire manifest, whatever is easier for you):
+
+```sh
+cf push -f CF/manifest.yml
+```
+
 ## Spin up the containers
 
 **Note:** Feel free to replace the value after `-i` with how many container of any one kind you want.
