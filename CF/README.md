@@ -99,7 +99,7 @@ cf bind-service mysql-init mysql-ratings --binding-name shipping_database
 cf bind-service ratings mysql-ratings --binding-name ratings_database
 cf bind-service catalogue mongodb --binding-name catalogue_database
 cf bind-service cart redis --binding-name cart_cache
-cf bind-service shipping mysql --binding-name shipping_database
+cf bind-service shipping mysql-cities --binding-name shipping_database
 cf bind-service user redis --binding-name users_cache
 cf bind-service user mongodb --binding-name users_database
 cf bind-service payment rabbitmq --binding-name dispatch_queue
