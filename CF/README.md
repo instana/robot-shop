@@ -95,7 +95,7 @@ Something that works is to:
 Now that we have both apps and services, we can bind the former to the latter:
 
 ```sh
-cf bind-service mysql-init mysql-ratings --binding-name shipping_database
+cf bind-service mysql-init mysql-ratings --binding-name ratings_database
 cf bind-service ratings mysql-ratings --binding-name ratings_database
 cf bind-service catalogue mongodb --binding-name catalogue_database
 cf bind-service cart redis --binding-name cart_cache
