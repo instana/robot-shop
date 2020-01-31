@@ -37,6 +37,13 @@ The following routes must be available for use:
 cf target -o stan -s robotshop
 ```
 
+## Build applications
+
+Build the Java apps:
+```sh
+pushd ../shipping && ./mvnw clean package && popd
+```
+
 ## First app push
 
 RobotShop relies on specific binding names between services and apps, so we first push the apps without creating instances (all instance counts in the manifest are `0`).
