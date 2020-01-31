@@ -5,11 +5,11 @@
 The following tiles up and running in the PCF foundation:
 
 - [Pivotal Application Service](https://network.pivotal.io/products/elastic-runtime)
-- [RabbitMQ for PCF](https://network.pivotal.io/products/p-rabbitmq/)
-- [Redis for PCF](https://network.pivotal.io/products/p-redis/)
-- [MySQL for PCF](https://network.pivotal.io/products/pivotal-mysql/)
-- [MongoDB Enterprise Service for PCF](https://network.pivotal.io/products/mongodb-enterprise-service/)
-- [Instana Microservices Application Monitoring for PCF](https://network.pivotal.io/products/instana-microservices-application-monitoring/)
+- [RabbitMQ for Pivotal Platform](https://network.pivotal.io/products/p-rabbitmq/)
+- [Redis for Pivotal Platform](https://network.pivotal.io/products/p-redis/)
+- [MySQL for Pivotal Platform](https://network.pivotal.io/products/pivotal-mysql/)
+- [MongoDB Enterprise Service for Pivotal Platform](https://network.pivotal.io/products/mongodb-enterprise-service/)
+- [Instana Microservices Application Monitoring for Pivotal Platform](https://network.pivotal.io/products/instana-microservices-application-monitoring/)
 
 ## Create an organization and a space
 
