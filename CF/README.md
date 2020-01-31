@@ -39,9 +39,10 @@ cf target -o stan -s robotshop
 
 ## Build applications
 
-Build the Java apps:
+Build the Java apps, from the repository root:
+
 ```sh
-pushd ../shipping && ./mvnw clean package && popd
+pushd shipping && ./mvnw clean package && popd
 ```
 
 ## First app push
