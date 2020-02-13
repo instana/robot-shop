@@ -30,4 +30,20 @@ spec:
           requests:
             cpu: 100m
             memory: 50Mi
+        volumeMounts:
+          - mountPath: /data/redis
+            name: redis-pv
       restartPolicy: Always
+      volumes:
+        - name: redis-pv
+          persistentVolumeClaim:
+            claimName: redis-pv-claim-redis-0
+  volumeClaimTemplates:
+  - metadata:
+      name: redis-pv-claim
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "manual"
+      resources:
+        requests:
+          storage: 1Gi
