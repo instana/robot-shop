@@ -141,11 +141,11 @@ app.get('/search/:text', (req, res) => {
 function mongoConnect() {
     return new Promise((resolve, reject) => {
         var mongoURL = process.env.MONGO_URL || 'mongodb://mongodb:27017/catalogue';
-        mongoClient.connect(mongoURL, (error, _db) => {
+        mongoClient.connect(mongoURL, (error, client) => {
             if(error) {
                 reject(error);
             } else {
-                db = _db;
+                db = client.db('catalogue');
                 collection = db.collection('products');
                 resolve('connected');
             }

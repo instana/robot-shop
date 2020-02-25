@@ -257,11 +257,11 @@ redisClient.on('ready', (r) => {
 function mongoConnect() {
     return new Promise((resolve, reject) => {
         var mongoURL = process.env.MONGO_URL || 'mongodb://mongodb:27017/users';
-        mongoClient.connect(mongoURL, (error, _db) => {
+        mongoClient.connect(mongoURL, (error, client) => {
             if(error) {
                 reject(error);
             } else {
-                db = _db;
+                db = client.db('users');
                 usersCollection = db.collection('users');
                 ordersCollection = db.collection('orders');
                 resolve('connected');
