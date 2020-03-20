@@ -1,0 +1,42 @@
+upstream backend {
+    server web:8080;
+}
+
+server {
+    listen       8090;
+    server_name  localhost;
+
+    error_log /dev/stdout info;
+
+    proxy_http_version 1.1;
+
+    #charset koi8-r;
+    #access_log  /var/log/nginx/host.access.log  main;
+    #error_log /dev/stdout debug;
+    #rewrite_log on;
+
+    #error_page  404              /404.html;
+
+    # redirect server error pages to the static page /50x.html
+    #
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+
+    location ^~ / {
+      opentracing_trace_locations off;
+      proxy_pass http://backend;
+      opentracing_propagate_context;
+      opentracing_tag "resource.name" "/";
+
+      # Add support for EUM correlation
+      add_header "server-timing" "intid;desc=${opentracing_context_x_instana_t}";
+    }
+
+    location /nginx_status {
+        stub_status on;
+        access_log off;
+    }
+}
+

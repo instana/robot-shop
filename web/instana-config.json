@@ -1,0 +1,5 @@
+{
+    "service": "rs-web-nginx",
+    "agent_host": "localhost",
+    "agent_port": 42699
+}

@@ -1,0 +1,5 @@
+{
+    "service": "rs-reverse-proxy",
+    "agent_host": "localhost",
+    "agent_port": 42699
+}
