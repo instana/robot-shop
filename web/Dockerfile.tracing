@@ -1,0 +1,35 @@
+FROM nginx:1.16
+
+RUN set -x \
+  && apt-get update \
+  && apt-get install --no-install-recommends --no-install-suggests -y \
+              curl apt-transport-https iproute2 \
+  && apt-get install --no-install-recommends --no-install-suggests -y \
+              lynx curl ca-certificates gnupg2
+
+EXPOSE 8080
+
+ENV CATALOGUE_HOST=catalogue \
+    USER_HOST=user \
+    CART_HOST=cart \
+    SHIPPING_HOST=shipping \
+    PAYMENT_HOST=payment \
+    RATINGS_HOST=ratings
+
+ARG agent_key
+ARG sensor_version
+
+ENV NGINX_SENSOR_VERSION=${sensor_version}
+
+# Download extension from Artifactory
+RUN arti_path=https://artifact-public.instana.io/artifactory/shared/com/instana/libinstana_sensor/; \
+    sensor_version=${NGINX_SENSOR_VERSION}; \
+    curl --user _:${agent_key} --silent --output /usr/local/lib/libinstana_sensor.so ${arti_path}${sensor_version}/linux-amd64-libinstana_sensor.so && \
+    curl --user _:${agent_key} --silent --output /usr/lib/nginx/modules/ngx_http_opentracing_module.so ${arti_path}${sensor_version}/linux-amd64-nginx-1.16.1-ngx_http_ot_module.so
+
+COPY entrypoint.sh /root/
+ENTRYPOINT ["/root/entrypoint.sh"]
+
+COPY nginx.conf.tracing.template /etc/nginx/nginx.conf.tracing.template
+COPY default.conf.tracing.template /etc/nginx/conf.d/default.conf.tracing.template
+COPY static /usr/share/nginx/html

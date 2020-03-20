@@ -55,6 +55,13 @@ If you want to fire up some load as well:
 $ docker-compose -f docker-compose.yaml -f docker-compose-load.yaml up
 ```
 
+If you want to try nginx tracing, please add your instana agent key to the build args in `docker-compose-proxy.yaml`
+and add it to your `up` command as well:
+
+```shell
+$ docker-compose -f docker-compose.yaml -f docker-compose-proxy.yaml -f docker-compose-load.yaml up
+```
+
 If you are running it locally on a Linux host you can also run the Instana [agent](https://docs.instana.io/quick_start/agent_setup/container/docker/) locally, unfortunately the agent is currently not supported on Mac.
 
 There is also only limited support on ARM architectures at the moment.

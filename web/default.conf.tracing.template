@@ -1,0 +1,134 @@
+server {
+    listen       8080;
+    server_name  localhost;
+
+    proxy_http_version 1.1;
+
+    #charset koi8-r;
+    #access_log  /var/log/nginx/host.access.log  main;
+    #error_log /dev/stdout debug;
+    #rewrite_log on;
+
+    location / {
+        opentracing_trace_locations off;
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+        ssi    on;
+
+        opentracing_propagate_context;
+        opentracing_tag "resource.name" "/";
+
+        add_header "server-timing" "intid;desc=${opentracing_context_x_instana_t}";
+    }
+
+    location /images/ {
+        opentracing_trace_locations off;
+
+        expires 5s;
+        root   /usr/share/nginx/html;
+        try_files $uri /images/placeholder.jpg;
+
+        opentracing_propagate_context;
+        opentracing_tag "resource.name" "/images/";
+
+        add_header "server-timing" "intid;desc=${opentracing_context_x_instana_t}";
+    }
+
+    #error_page  404              /404.html;
+
+    # redirect server error pages to the static page /50x.html
+    #
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+
+    # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+    #
+    #location ~ \.php$ {
+    #    proxy_pass   http://127.0.0.1;
+    #}
+
+    # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+    #
+    #location ~ \.php$ {
+    #    root           html;
+    #    fastcgi_pass   127.0.0.1:9000;
+    #    fastcgi_index  index.php;
+    #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+    #    include        fastcgi_params;
+    #}
+
+    # deny access to .htaccess files, if Apache's document root
+    # concurs with nginx's one
+    #
+    #location ~ /\.ht {
+    #    deny  all;
+    #}
+
+    location /api/catalogue/ {
+        opentracing_trace_locations off;
+        proxy_pass http://${CATALOGUE_HOST}:8080/;
+
+        opentracing_propagate_context;
+        opentracing_tag "resource.name" "/api/catalogue/";
+
+        add_header "server-timing" "intid;desc=${opentracing_context_x_instana_t}";
+    }
+
+    location /api/user/ {
+        opentracing_trace_locations off;
+        proxy_pass http://${USER_HOST}:8080/;
+
+        opentracing_propagate_context;
+        opentracing_tag "resource.name" "/api/user/";
+
+        add_header "server-timing" "intid;desc=${opentracing_context_x_instana_t}";
+    }
+
+    location /api/cart/ {
+        opentracing_trace_locations off;
+        proxy_pass http://${CART_HOST}:8080/;
+
+        opentracing_propagate_context;
+        opentracing_tag "resource.name" "/api/cart/";
+
+        add_header "server-timing" "intid;desc=${opentracing_context_x_instana_t}";
+    }
+
+    location /api/shipping/ {
+        opentracing_trace_locations off;
+        proxy_pass http://${SHIPPING_HOST}:8080/;
+
+        opentracing_propagate_context;
+        opentracing_tag "resource.name" "/api/shipping/";
+
+        add_header "server-timing" "intid;desc=${opentracing_context_x_instana_t}";
+    }
+
+    location /api/payment/ {
+        opentracing_trace_locations off;
+        proxy_pass http://${PAYMENT_HOST}:8080/;
+
+        opentracing_propagate_context;
+        opentracing_tag "resource.name" "/api/payment/";
+
+        add_header "server-timing" "intid;desc=${opentracing_context_x_instana_t}";
+    }
+
+    location /api/ratings/ {
+        opentracing_trace_locations off;
+        proxy_pass http://${RATINGS_HOST}:80/;
+
+        opentracing_propagate_context;
+        opentracing_tag "resource.name" "/api/ratings/";
+
+        add_header "server-timing" "intid;desc=${opentracing_context_x_instana_t}";
+    }
+
+    location /nginx_status {
+        stub_status on;
+        access_log off;
+    }
+}
+
