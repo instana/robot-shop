@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 
 services=(cart catalogue dispatch payment user)
 
