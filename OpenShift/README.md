@@ -12,6 +12,8 @@ Once the set up is completed, run the *deploy.sh* script. This script imports th
 
 When the deployment has completed, to make Stan's Robot Shop accessible the web service needs to be updated.
 
+To enable tracing for all applications we need to patch services and set `INSTANA_AGENT_HOST` to have value `status.hostIP`. Run script *patch.sh* after *deploy.sh* is done.
+
 ```bash
 oc edit svc web
 ```
