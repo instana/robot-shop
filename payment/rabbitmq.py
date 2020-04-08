@@ -1,6 +1,7 @@
 import json
 import pika
 import os
+import sys
 
 from cfenv import AppEnv
 
@@ -15,7 +16,12 @@ class Publisher:
         if 'VCAP_SERVICES' in os.environ:
             self._logger.info('Cloud Foundry detected')
 
+            if int(os.getenv('CF_INSTANCE_INDEX')) % 2 == 1:
+                # Crash horribly to show how we detect these scenarios
+                sys.exit(42)
+
             env = AppEnv()
+
             amqp_service = env.get_service(binding_name='dispatch_queue')
 
             self._logger.info('Service binding \'{binding_name}\' found'.format(binding_name='dispatch_queue'))
