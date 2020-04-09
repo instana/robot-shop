@@ -55,6 +55,11 @@ services:
       - mysql
     networks:
       - robot-shop
+    healthcheck:
+      test: ["CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost:8080/health"]
+      interval: 1s
+      timeout: 10s
+      retries: 3
   ratings:
     build:
       context: ratings
