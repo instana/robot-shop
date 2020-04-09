@@ -65,6 +65,11 @@ services:
       - robot-shop
     depends_on:
       - mysql
+    healthcheck:
+      test: ["CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost/_health"]
+      interval: 1s
+      timeout: 10s
+      retries: 3
   payment:
     build:
       context: payment
