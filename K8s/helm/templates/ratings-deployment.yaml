@@ -20,6 +20,7 @@ spec:
       containers:
       - name: ratings
         image: {{ .Values.image.repo }}/rs-ratings:{{ .Values.image.version }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: 80
         resources:

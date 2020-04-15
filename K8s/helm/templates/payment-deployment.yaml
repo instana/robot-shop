@@ -23,6 +23,7 @@ spec:
       containers:
       - name: payment
         image: {{ .Values.image.repo }}/rs-payment:{{ .Values.image.version }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         # agent networking access
         env:
           - name: INSTANA_AGENT_HOST

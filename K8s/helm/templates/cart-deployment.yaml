@@ -20,7 +20,8 @@ spec:
       containers:
       - name: cart
         image: {{ .Values.image.repo }}/rs-cart:{{ .Values.image.version }}
-        # agent networking access 
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        # agent networking access
         env:
           - name: INSTANA_AGENT_HOST
             valueFrom:

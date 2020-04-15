@@ -3,6 +3,7 @@
 image:
   repo: robotshop
   version: latest
+  pullPolicy: IfNotPresent
 
 # Alternative payment gateway URL
 # Default is https://www.paypal.com

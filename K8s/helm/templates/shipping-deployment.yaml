@@ -20,6 +20,7 @@ spec:
       containers:
       - name: shipping
         image: {{ .Values.image.repo }}/rs-shipping:{{ .Values.image.version }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: 8080
         # it's Java it needs lots of memory
