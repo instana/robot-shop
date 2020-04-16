@@ -38,7 +38,7 @@ class InstanaHeadersLoggingProcessor implements EventSubscriberInterface, ResetI
         }
 
         $request = $event->getRequest();
-        if (0 === $request->headers->get('X-INSTANA-L', 0)) {
+        if (null === $request->headers->get('X-INSTANA-L')) {
             return;
         }
 
@@ -48,8 +48,8 @@ class InstanaHeadersLoggingProcessor implements EventSubscriberInterface, ResetI
             't' => $request->headers->get('X-INSTANA-T', 'n/a'),
         ];
 
-        if (0 !== $request->headers->get('X-INSTANA-SYNTHETIC', 0)) {
-            $currentTraceHeaders['sy'] = $request->headers->get('X-INSTANA-SYNTHETIC', 0);
+        if (null !== $request->headers->get('X-INSTANA-SYNTHETIC')) {
+            $currentTraceHeaders['sy'] = $request->headers->get('X-INSTANA-SYNTHETIC');
         }
 
         $this->routeData[spl_object_id($request)] = $currentTraceHeaders;
