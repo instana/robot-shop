@@ -8,6 +8,7 @@ use Instana\RobotShop\Ratings\Controller\HealthController;
 use Instana\RobotShop\Ratings\Controller\RatingsApiController;
 use Instana\RobotShop\Ratings\Integration\InstanaHeadersLoggingProcessor;
 use Instana\RobotShop\Ratings\Service\CatalogueService;
+use Instana\RobotShop\Ratings\Service\HealthCheckService;
 use Instana\RobotShop\Ratings\Service\RatingsService;
 use Monolog\Formatter\LineFormatter;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -93,6 +94,11 @@ class Kernel extends BaseKernel implements EventSubscriberInterface
 
         $c->register(CatalogueService::class)
             ->addArgument($c->getParameter('catalogueUrl'))
+            ->addMethodCall('setLogger', [new Reference('logger')])
+            ->setAutowired(true);
+
+        $c->register(HealthCheckService::class)
+            ->addArgument(new Reference('database.connection'))
             ->addMethodCall('setLogger', [new Reference('logger')])
             ->setAutowired(true);
 

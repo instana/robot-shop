@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace Instana\RobotShop\Ratings\Service;
 
 use PDO;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 
-class HealthCheckService
+class HealthCheckService implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /**
      * @var PDO
      */
@@ -18,7 +22,7 @@ class HealthCheckService
         $this->pdo = $pdo;
     }
 
-    public function checkConnectivity()
+    public function checkConnectivity(): bool
     {
         return $this->pdo->prepare('SELECT 1 + 1 FROM DUAL;')->execute();
     }
