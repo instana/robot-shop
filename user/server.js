@@ -54,7 +54,6 @@ app.get('/health', (req, res) => {
 
 // use REDIS INCR to track anonymous users
 app.get('/uniqueid', (req, res) => {
-    req.log.error('Unique ID test');
     // get number from Redis
     redisClient.incr('anonymous-counter', (err, r) => {
         if(!err) {
