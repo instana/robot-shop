@@ -60,3 +60,23 @@ $ helm install \
     ...
 ```
 
+## Use with Minis
+
+When running on `minishift` or `minikube` set `nodeport` to true. The store will then be available on the IP address of your mini and node port of the web service.
+
+```shell
+$ mini[kube|shift] ip
+192.168.66.101
+$ kubectl get svc web
+```
+
+Combine the IP and port number to make the URL `http://192.168.66.101:32145`
+
+### MiniShift
+
+Openshift is like K8s but not K8s. Set `openshift` to true or things will break. See the notes and scripts in the OpenShift directory of this repo.
+
+```shell
+$ helm install robot-shop --set openshift=true helm
+```
+
