@@ -4,17 +4,30 @@ See the official [documentation](https://docs.instana.io/quick_start/agent_setup
 
 # Robot Shop Deployment
 
-Have a look at the contents of the *setup.sh* and *deploy,sh* scripts, you may want to tweak some settings to suit your environment.
+For OpenShift run the `setup.sh` script to create the project and set the extra permissions.
 
-Run the *setup.sh* script first, you will need the passwords for the developer and system:admin users.
+Use the Helm chart for Kubernetes to install Stan's Robot Shop. To install on Minishift.
 
-Once the set up is completed, run the *deploy.sh* script. This script imports the application images from Docker Hub into OpenShift, then it creates applications from those images.
+### Helm 3
 
-When the deployment has completed, to make Stan's Robot Shop accessible the web service needs to be updated.
-
-```bash
-oc edit svc web
+```shell
+$ cd K8s
+$ oc login -u developer
+$ oc project robot-shop
+$ helm install robot-shop --set openshift=true --set nodeport=true helm
 ```
 
-Change *type* to **NodePort** when running on Minishift or **LoadBalancer** for regular OpenShift.
+To connect to the shop.
+
+```shell
+$ minishift ip
+192.168.99.106
+$ oc get svc web
+NAME      TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+web       NodePort   172.30.180.253   <none>        8080:31147/TCP   4m
+```
+
+Use the IP and the node port to form the URL `http://192.168.99.106:31147/`
+
+
 

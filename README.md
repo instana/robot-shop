@@ -70,57 +70,18 @@ You can run Kubernetes locally using [minikube](https://github.com/kubernetes/mi
 
 The Docker container images are all available on [Docker Hub](https://hub.docker.com/u/robotshop/).
 
-Install Stan's Robot Shop to your Kubernetes cluster using the helm chart.
-
-```shell
-$ cd K8s/helm
-$ helm install --name robot-shop --namespace robot-shop .
-```
-
-There are some customisations that can be made see the [README](K8s/helm/README.md).
+Install Stan's Robot Shop to your Kubernetes cluster using the [Helm](K8s/helm/README.md) chart.
 
 To deploy the Instana agent to Kubernetes, just use the [helm](https://hub.helm.sh/charts/stable/instana-agent) chart.
-
-```shell
-$ helm install --name instana-agent --namespace instana-agent \
---set agent.key=INSTANA_AGENT_KEY \
---set agent.endpointHost=HOST \
---set agent.endpointPort=PORT \
---set zone.name=CLUSTER_NAME \
-stable/instana-agent
-```
-
-If you are having difficulties getting helm running with your K8s install, it is most likely due to RBAC, most K8s now have RBAC enabled by default. Therefore helm requires a [service account](https://github.com/helm/helm/blob/master/docs/rbac.md) to have permission to do stuff.
 
 ## Accessing the Store
 If you are running the store locally via *docker-compose up* then, the store front is available on localhost port 8080 [http://localhost:8080](http://localhost:8080/)
 
-If you are running the store on Kubernetes via minikube then, to make the store front accessible edit the *web* service definition and change the type to *NodePort* and add a port entry *nodePort: 30080*.
-
-```shell
-$ kubectl -n robot-shop edit service web
-```
-
-Snippet
-
-```yaml
-spec:
-  ports:
-  - name: "8080"
-    port: 8080
-    protocol: TCP
-    targetPort: 8080
-    nodePort: 30080
-  selector:
-    service: web
-  sessionAffinity: None
-  type: NodePort
-```
-
-The store front is then available on the IP address of minikube port 30080. To find the IP address of your minikube instance.
+If you are running the store on Kubernetes via minikube then, find the IP address of Minikube and the Node Port of the web service.
 
 ```shell
 $ minikube ip
+$ kubectl get svc web
 ```
 
 If you are using a cloud Kubernetes / Openshift / Mesosphere then it will be available on the load balancer of that system.

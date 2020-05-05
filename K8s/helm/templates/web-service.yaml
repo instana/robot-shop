@@ -11,4 +11,8 @@ spec:
     targetPort: 8080
   selector:
     service: web
+  {{ if .Values.nodeport }}
+  type: NodePort
+  {{ else }}
   type: LoadBalancer
+  {{ end }}

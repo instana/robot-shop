@@ -39,8 +39,10 @@ spec:
         name: data
       spec:
         accessModes: [ "ReadWriteOnce" ]
+        {{ if not .Values.openshift }}
         storageClassName: standard
         volumeMode: Filesystem
+        {{ end }}
         resources:
           requests:
             storage: 1Gi
