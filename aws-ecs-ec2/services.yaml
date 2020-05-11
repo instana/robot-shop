@@ -18,6 +18,10 @@ Parameters:
     Type: String
     Default: redis
     Description: The redis service name
+  RabbitMqServiceName:
+    Type: String
+    Default: rabbitmq
+    Description: The rabbitmq service name
   ImageUrl:
     Type: String
     Default: nginx
@@ -34,6 +38,10 @@ Parameters:
   RedisContainerPort:
     Type: Number
     Default: 6379
+    Description: What port number the application inside the docker container is binding to
+  RabbitMqContainerPort:
+    Type: Number
+    Default: 5672
     Description: What port number the application inside the docker container is binding to
   ContainerCpu:
     Type: Number
@@ -132,6 +140,38 @@ Resources:
           !Join [':', [!Ref 'StackName', 'ClusterName']]
       DesiredCount: 1
       TaskDefinition: !Ref 'RedisTaskDefinition'
+
+  # rabbitmq service
+  RabbitMqTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Ref 'RabbitMqServiceName'
+      Cpu: !Ref 'ContainerCpu'
+      Memory: !Ref 'ContainerMemory'
+      TaskRoleArn:
+        Fn::If:
+          - 'HasCustomRole'
+          - !Ref 'Role'
+          - !Ref "AWS::NoValue"
+      ContainerDefinitions:
+        - Name: !Ref 'RabbitMqServiceName'
+          Cpu: !Ref 'ContainerCpu'
+          Memory: !Ref 'ContainerMemory'
+          Image: rabbitmq:3.7-management-alpine
+          PortMappings:
+            - ContainerPort: !Ref 'RabbitMqContainerPort'
+          LogConfiguration:
+            LogDriver: json-file
+  RabbitMqService:
+    Type: AWS::ECS::Service
+    DependsOn: LoadBalancerRule
+    Properties:
+      ServiceName: !Ref 'RabbitMqServiceName'
+      Cluster:
+        Fn::ImportValue:
+          !Join [':', [!Ref 'StackName', 'ClusterName']]
+      DesiredCount: 1
+      TaskDefinition: !Ref 'RabbitMqTaskDefinition'
 
   WebTaskDefinition:
     Type: AWS::ECS::TaskDefinition
