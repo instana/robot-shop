@@ -3,7 +3,7 @@ Description: Deploy robot shop services to a given ECS cluster
 Parameters:
   StackName:
     Type: String
-    Default: production
+    Default: ecs-ec2-robotshop
     Description: The name of the parent cluster stack that you created. Necessary
       to locate and reference resources created by that stack.
   WebServiceName:
@@ -14,6 +14,10 @@ Parameters:
     Type: String
     Default: mongodb
     Description: The mongodb service name
+  RedisServiceName:
+    Type: String
+    Default: redis
+    Description: The redis service name
   ImageUrl:
     Type: String
     Default: nginx
@@ -26,6 +30,10 @@ Parameters:
   MongoDbContainerPort:
     Type: Number
     Default: 27017
+    Description: What port number the application inside the docker container is binding to
+  RedisContainerPort:
+    Type: Number
+    Default: 6379
     Description: What port number the application inside the docker container is binding to
   ContainerCpu:
     Type: Number
@@ -92,6 +100,38 @@ Resources:
           !Join [':', [!Ref 'StackName', 'ClusterName']]
       DesiredCount: 1
       TaskDefinition: !Ref 'MongoDbTaskDefinition'
+
+  # Redis service
+  RedisTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Ref 'RedisServiceName'
+      Cpu: !Ref 'ContainerCpu'
+      Memory: !Ref 'ContainerMemory'
+      TaskRoleArn:
+        Fn::If:
+          - 'HasCustomRole'
+          - !Ref 'Role'
+          - !Ref "AWS::NoValue"
+      ContainerDefinitions:
+        - Name: !Ref 'RedisServiceName'
+          Cpu: !Ref 'ContainerCpu'
+          Memory: !Ref 'ContainerMemory'
+          Image: redis:4.0.6
+          PortMappings:
+            - ContainerPort: !Ref 'RedisContainerPort'
+          LogConfiguration:
+            LogDriver: json-file
+  RedisService:
+    Type: AWS::ECS::Service
+    DependsOn: LoadBalancerRule
+    Properties:
+      ServiceName: !Ref 'RedisServiceName'
+      Cluster:
+        Fn::ImportValue:
+          !Join [':', [!Ref 'StackName', 'ClusterName']]
+      DesiredCount: 1
+      TaskDefinition: !Ref 'RedisTaskDefinition'
 
   WebTaskDefinition:
     Type: AWS::ECS::TaskDefinition
