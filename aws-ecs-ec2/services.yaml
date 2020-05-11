@@ -50,6 +50,10 @@ Parameters:
     Type: String
     Default: payment
     Description: The payment service name
+  DispatchServiceName:
+    Type: String
+    Default: dispatch
+    Description: The payment service name
   ImageUrl:
     Type: String
     Default: nginx
@@ -96,6 +100,10 @@ Parameters:
     Default: 80
     Description: What port number the application inside the docker container is binding to
   PaymentContainerPort:
+    Type: Number
+    Default: 8080
+    Description: What port number the application inside the docker container is binding to
+  DispatchContainerPort:
     Type: Number
     Default: 8080
     Description: What port number the application inside the docker container is binding to
@@ -462,6 +470,39 @@ Resources:
           !Join [':', [!Ref 'StackName', 'ClusterName']]
       DesiredCount: 1
       TaskDefinition: !Ref 'PaymentTaskDefinition'
+
+  # dispatch service
+  DispatchTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    DependsOn: ['RabbitMqService']
+    Properties:
+      Family: !Ref 'DispatchServiceName'
+      Cpu: !Ref 'ContainerCpu'
+      Memory: !Ref 'ContainerMemory'
+      TaskRoleArn:
+        Fn::If:
+          - 'HasCustomRole'
+          - !Ref 'Role'
+          - !Ref "AWS::NoValue"
+      ContainerDefinitions:
+        - Name: !Ref 'DispatchServiceName'
+          Cpu: !Ref 'ContainerCpu'
+          Memory: !Ref 'ContainerMemory'
+          Image: robotshop/rs-dispatch
+          PortMappings:
+            - ContainerPort: !Ref 'DispatchContainerPort'
+          LogConfiguration:
+            LogDriver: json-file
+  DispatchService:
+    Type: AWS::ECS::Service
+    DependsOn: LoadBalancerRule
+    Properties:
+      ServiceName: !Ref 'DispatchServiceName'
+      Cluster:
+        Fn::ImportValue:
+          !Join [':', [!Ref 'StackName', 'ClusterName']]
+      DesiredCount: 1
+      TaskDefinition: !Ref 'DispatchTaskDefinition'
 
   WebTaskDefinition:
     Type: AWS::ECS::TaskDefinition
