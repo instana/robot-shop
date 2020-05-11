@@ -22,6 +22,10 @@ Parameters:
     Type: String
     Default: rabbitmq
     Description: The rabbitmq service name
+  CatalogueServiceName:
+    Type: String
+    Default: catalogue
+    Description: The catalogue service name
   ImageUrl:
     Type: String
     Default: nginx
@@ -42,6 +46,10 @@ Parameters:
   RabbitMqContainerPort:
     Type: Number
     Default: 5672
+    Description: What port number the application inside the docker container is binding to
+  CatalogueContainerPort:
+    Type: Number
+    Default: 8080
     Description: What port number the application inside the docker container is binding to
   ContainerCpu:
     Type: Number
@@ -172,6 +180,39 @@ Resources:
           !Join [':', [!Ref 'StackName', 'ClusterName']]
       DesiredCount: 1
       TaskDefinition: !Ref 'RabbitMqTaskDefinition'
+
+  # catalogue service
+  CatalogueTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    DependsOn: ['MongoDbService']
+    Properties:
+      Family: !Ref 'CatalogueServiceName'
+      Cpu: !Ref 'ContainerCpu'
+      Memory: !Ref 'ContainerMemory'
+      TaskRoleArn:
+        Fn::If:
+          - 'HasCustomRole'
+          - !Ref 'Role'
+          - !Ref "AWS::NoValue"
+      ContainerDefinitions:
+        - Name: !Ref 'CatalogueServiceName'
+          Cpu: !Ref 'ContainerCpu'
+          Memory: !Ref 'ContainerMemory'
+          Image: robotshop/rs-catalogue
+          PortMappings:
+            - ContainerPort: !Ref 'CatalogueContainerPort'
+          LogConfiguration:
+            LogDriver: json-file
+  CatalogueService:
+    Type: AWS::ECS::Service
+    DependsOn: LoadBalancerRule
+    Properties:
+      ServiceName: !Ref 'CatalogueServiceName'
+      Cluster:
+        Fn::ImportValue:
+          !Join [':', [!Ref 'StackName', 'ClusterName']]
+      DesiredCount: 1
+      TaskDefinition: !Ref 'CatalogueTaskDefinition'
 
   WebTaskDefinition:
     Type: AWS::ECS::TaskDefinition
