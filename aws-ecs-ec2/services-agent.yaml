@@ -1,0 +1,120 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploy the instana agent on ECS as a daemon service
+Parameters:
+  StackName:
+    Type: String
+    Default: production
+    Description: The name of the parent cluster stack that you created. Necessary
+      to locate and reference resources created by that stack.
+  ServiceName:
+    Type: String
+    Default: instana-agent
+    Description: A name for the service
+  ImageUrl:
+    Type: String
+    Default: instana/agent
+    Description: The url of a docker image that contains the application process that
+      will handle the traffic for this service
+  ContainerCpu:
+    Type: Number
+    Default: 1024
+    Description: How much CPU to give the container. 1024 is 1 CPU
+  ContainerMemory:
+    Type: Number
+    Default: 2048
+    Description: How much memory in megabytes to give the container
+  Role:
+    Type: String
+    Default: ""
+    Description: (Optional) An IAM role to give the service's containers if the code within needs to
+      access other AWS resources like S3 buckets, DynamoDB tables, etc
+  InstanaAgentKey:
+    Type: String
+  InstanaAgentEndpoint:
+    Type: String
+    Default: "ingress-red-saas.instana.io"
+  InstanaAgentEndpointPort:
+    Type: Number
+    Default: '443'
+
+Conditions:
+  HasCustomRole: !Not [ !Equals [!Ref 'Role', ''] ]
+
+Resources:
+
+  # The task definition. This is a simple metadata description of what
+  # container to run, and what resource requirements it has.
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Ref 'ServiceName'
+      Cpu: !Ref 'ContainerCpu'
+      Memory: !Ref 'ContainerMemory'
+      TaskRoleArn:
+        Fn::If:
+          - 'HasCustomRole'
+          - !Ref 'Role'
+          - !Ref "AWS::NoValue"
+      NetworkMode: host
+      IpcMode: host
+      PidMode: host
+      Volumes:
+        - Host:
+            SourcePath: "/var/run"
+          Name: "host-var-run"
+        - Host:
+            SourcePath: "/run"
+          Name: "host-run"
+        - Host:
+            SourcePath: "/dev"
+          Name: "host-dev"
+        - Host:
+            SourcePath: "/sys"
+          Name: "host-sys"
+        - Host:
+            SourcePath: "/var/log"
+          Name: "host-var-log"
+      ContainerDefinitions:
+        - Name: !Ref 'ServiceName'
+          Cpu: !Ref 'ContainerCpu'
+          Memory: !Ref 'ContainerMemory'
+          Image: !Ref 'ImageUrl'
+          Privileged: true
+          MountPoints:
+            - ContainerPath: /var/run
+              SourceVolume: "host-var-run"
+              ReadOnly: false
+            - ContainerPath: /run
+              SourceVolume: "host-run"
+              ReadOnly: false
+            - ContainerPath: /dev
+              SourceVolume: "host-dev"
+              ReadOnly: false
+            - ContainerPath: /sys
+              SourceVolume: "host-sys"
+              ReadOnly: false
+            - ContainerPath: /var/log
+              SourceVolume: "host-var-log"
+              ReadOnly: false
+          Environment:
+            - Name: INSTANA_ZONE
+              Value: !Ref 'StackName'
+            - Name: INSTANA_AGENT_ENDPOINT
+              Value: !Ref 'InstanaAgentEndpoint'
+            - Name: INSTANA_AGENT_ENDPOINT_PORT
+              Value: !Ref 'InstanaAgentEndpointPort'
+            - Name: INSTANA_AGENT_KEY
+              Value: !Ref 'InstanaAgentKey'
+
+  # The service. The service is a resource which allows you to run multiple
+  # copies of a type of task, and gather up their logs and metrics, as well
+  # as monitor the number of running tasks and replace any that have crashed
+  Service:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: !Ref 'ServiceName'
+      Cluster:
+        Fn::ImportValue:
+          !Join [':', [!Ref 'StackName', 'ClusterName']]
+      TaskDefinition: !Ref 'TaskDefinition'
+      SchedulingStrategy: DAEMON
