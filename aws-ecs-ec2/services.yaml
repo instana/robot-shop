@@ -26,6 +26,10 @@ Parameters:
     Type: String
     Default: catalogue
     Description: The catalogue service name
+  UserServiceName:
+    Type: String
+    Default: user
+    Description: The user service name
   ImageUrl:
     Type: String
     Default: nginx
@@ -48,6 +52,10 @@ Parameters:
     Default: 5672
     Description: What port number the application inside the docker container is binding to
   CatalogueContainerPort:
+    Type: Number
+    Default: 8080
+    Description: What port number the application inside the docker container is binding to
+  UserContainerPort:
     Type: Number
     Default: 8080
     Description: What port number the application inside the docker container is binding to
@@ -213,6 +221,39 @@ Resources:
           !Join [':', [!Ref 'StackName', 'ClusterName']]
       DesiredCount: 1
       TaskDefinition: !Ref 'CatalogueTaskDefinition'
+
+  # user service
+  UserTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    DependsOn: ['MongoDbService', 'RedisService']
+    Properties:
+      Family: !Ref 'UserServiceName'
+      Cpu: !Ref 'ContainerCpu'
+      Memory: !Ref 'ContainerMemory'
+      TaskRoleArn:
+        Fn::If:
+          - 'HasCustomRole'
+          - !Ref 'Role'
+          - !Ref "AWS::NoValue"
+      ContainerDefinitions:
+        - Name: !Ref 'UserServiceName'
+          Cpu: !Ref 'ContainerCpu'
+          Memory: !Ref 'ContainerMemory'
+          Image: robotshop/rs-user
+          PortMappings:
+            - ContainerPort: !Ref 'UserContainerPort'
+          LogConfiguration:
+            LogDriver: json-file
+  UserService:
+    Type: AWS::ECS::Service
+    DependsOn: LoadBalancerRule
+    Properties:
+      ServiceName: !Ref 'UserServiceName'
+      Cluster:
+        Fn::ImportValue:
+          !Join [':', [!Ref 'StackName', 'ClusterName']]
+      DesiredCount: 1
+      TaskDefinition: !Ref 'UserTaskDefinition'
 
   WebTaskDefinition:
     Type: AWS::ECS::TaskDefinition
