@@ -42,6 +42,10 @@ Parameters:
     Type: String
     Default: shipping
     Description: The cart service name
+  RatingsServiceName:
+    Type: String
+    Default: ratings
+    Description: The cart service name
   ImageUrl:
     Type: String
     Default: nginx
@@ -82,6 +86,10 @@ Parameters:
   ShippingContainerPort:
     Type: Number
     Default: 8080
+    Description: What port number the application inside the docker container is binding to
+  RatingsContainerPort:
+    Type: Number
+    Default: 80
     Description: What port number the application inside the docker container is binding to
   ContainerCpu:
     Type: Number
@@ -380,6 +388,39 @@ Resources:
           !Join [':', [!Ref 'StackName', 'ClusterName']]
       DesiredCount: 1
       TaskDefinition: !Ref 'ShippingTaskDefinition'
+
+  # ratings service
+  RatingsTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    DependsOn: ['MySqlService']
+    Properties:
+      Family: !Ref 'RatingsServiceName'
+      Cpu: !Ref 'ContainerCpu'
+      Memory: !Ref 'ContainerMemory'
+      TaskRoleArn:
+        Fn::If:
+          - 'HasCustomRole'
+          - !Ref 'Role'
+          - !Ref "AWS::NoValue"
+      ContainerDefinitions:
+        - Name: !Ref 'RatingsServiceName'
+          Cpu: !Ref 'ContainerCpu'
+          Memory: !Ref 'ContainerMemory'
+          Image: robotshop/rs-ratings
+          PortMappings:
+            - ContainerPort: !Ref 'RatingsContainerPort'
+          LogConfiguration:
+            LogDriver: json-file
+  RatingsService:
+    Type: AWS::ECS::Service
+    DependsOn: LoadBalancerRule
+    Properties:
+      ServiceName: !Ref 'RatingsServiceName'
+      Cluster:
+        Fn::ImportValue:
+          !Join [':', [!Ref 'StackName', 'ClusterName']]
+      DesiredCount: 1
+      TaskDefinition: !Ref 'RatingsTaskDefinition'
 
   WebTaskDefinition:
     Type: AWS::ECS::TaskDefinition
