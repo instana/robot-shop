@@ -38,6 +38,10 @@ Parameters:
     Type: String
     Default: mysql
     Description: The cart service name
+  ShippingServiceName:
+    Type: String
+    Default: shipping
+    Description: The cart service name
   ImageUrl:
     Type: String
     Default: nginx
@@ -74,6 +78,10 @@ Parameters:
   MySqlContainerPort:
     Type: Number
     Default: 3306
+    Description: What port number the application inside the docker container is binding to
+  ShippingContainerPort:
+    Type: Number
+    Default: 8080
     Description: What port number the application inside the docker container is binding to
   ContainerCpu:
     Type: Number
@@ -339,6 +347,39 @@ Resources:
           !Join [':', [!Ref 'StackName', 'ClusterName']]
       DesiredCount: 1
       TaskDefinition: !Ref 'MySqlTaskDefinition'
+
+  # shipping service
+  ShippingTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    DependsOn: ['MySqlService']
+    Properties:
+      Family: !Ref 'ShippingServiceName'
+      Cpu: !Ref 'ContainerCpu'
+      Memory: !Ref 'ContainerMemory'
+      TaskRoleArn:
+        Fn::If:
+          - 'HasCustomRole'
+          - !Ref 'Role'
+          - !Ref "AWS::NoValue"
+      ContainerDefinitions:
+        - Name: !Ref 'ShippingServiceName'
+          Cpu: !Ref 'ContainerCpu'
+          Memory: !Ref 'ContainerMemory'
+          Image: robotshop/rs-shipping
+          PortMappings:
+            - ContainerPort: !Ref 'ShippingContainerPort'
+          LogConfiguration:
+            LogDriver: json-file
+  ShippingService:
+    Type: AWS::ECS::Service
+    DependsOn: LoadBalancerRule
+    Properties:
+      ServiceName: !Ref 'ShippingServiceName'
+      Cluster:
+        Fn::ImportValue:
+          !Join [':', [!Ref 'StackName', 'ClusterName']]
+      DesiredCount: 1
+      TaskDefinition: !Ref 'ShippingTaskDefinition'
 
   WebTaskDefinition:
     Type: AWS::ECS::TaskDefinition
