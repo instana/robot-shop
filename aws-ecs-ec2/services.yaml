@@ -34,6 +34,10 @@ Parameters:
     Type: String
     Default: cart
     Description: The cart service name
+  MySqlServiceName:
+    Type: String
+    Default: mysql
+    Description: The cart service name
   ImageUrl:
     Type: String
     Default: nginx
@@ -66,6 +70,10 @@ Parameters:
   CartContainerPort:
     Type: Number
     Default: 8080
+    Description: What port number the application inside the docker container is binding to
+  MySqlContainerPort:
+    Type: Number
+    Default: 3306
     Description: What port number the application inside the docker container is binding to
   ContainerCpu:
     Type: Number
@@ -295,6 +303,42 @@ Resources:
           !Join [':', [!Ref 'StackName', 'ClusterName']]
       DesiredCount: 1
       TaskDefinition: !Ref 'CartTaskDefinition'
+
+  # mysql service
+  MySqlTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Ref 'MySqlServiceName'
+      Cpu: !Ref 'ContainerCpu'
+      Memory: !Ref 'ContainerMemory'
+      TaskRoleArn:
+        Fn::If:
+          - 'HasCustomRole'
+          - !Ref 'Role'
+          - !Ref "AWS::NoValue"
+      ContainerDefinitions:
+        - Name: !Ref 'MySqlServiceName'
+          Cpu: !Ref 'ContainerCpu'
+          Memory: !Ref 'ContainerMemory'
+          LinuxParameters:
+            Capabilities:
+              Add:
+                - NET_ADMIN
+          Image: robotshop/rs-mysql-db
+          PortMappings:
+            - ContainerPort: !Ref 'MySqlContainerPort'
+          LogConfiguration:
+            LogDriver: json-file
+  MySqlService:
+    Type: AWS::ECS::Service
+    DependsOn: LoadBalancerRule
+    Properties:
+      ServiceName: !Ref 'MySqlServiceName'
+      Cluster:
+        Fn::ImportValue:
+          !Join [':', [!Ref 'StackName', 'ClusterName']]
+      DesiredCount: 1
+      TaskDefinition: !Ref 'MySqlTaskDefinition'
 
   WebTaskDefinition:
     Type: AWS::ECS::TaskDefinition
