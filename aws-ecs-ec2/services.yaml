@@ -46,6 +46,10 @@ Parameters:
     Type: String
     Default: ratings
     Description: The cart service name
+  PaymentServiceName:
+    Type: String
+    Default: payment
+    Description: The payment service name
   ImageUrl:
     Type: String
     Default: nginx
@@ -90,6 +94,10 @@ Parameters:
   RatingsContainerPort:
     Type: Number
     Default: 80
+    Description: What port number the application inside the docker container is binding to
+  PaymentContainerPort:
+    Type: Number
+    Default: 8080
     Description: What port number the application inside the docker container is binding to
   ContainerCpu:
     Type: Number
@@ -421,6 +429,39 @@ Resources:
           !Join [':', [!Ref 'StackName', 'ClusterName']]
       DesiredCount: 1
       TaskDefinition: !Ref 'RatingsTaskDefinition'
+
+  # payment service
+  PaymentTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    DependsOn: ['RabbitMqService']
+    Properties:
+      Family: !Ref 'PaymentServiceName'
+      Cpu: !Ref 'ContainerCpu'
+      Memory: !Ref 'ContainerMemory'
+      TaskRoleArn:
+        Fn::If:
+          - 'HasCustomRole'
+          - !Ref 'Role'
+          - !Ref "AWS::NoValue"
+      ContainerDefinitions:
+        - Name: !Ref 'PaymentServiceName'
+          Cpu: !Ref 'ContainerCpu'
+          Memory: !Ref 'ContainerMemory'
+          Image: robotshop/rs-payment
+          PortMappings:
+            - ContainerPort: !Ref 'PaymentContainerPort'
+          LogConfiguration:
+            LogDriver: json-file
+  PaymentService:
+    Type: AWS::ECS::Service
+    DependsOn: LoadBalancerRule
+    Properties:
+      ServiceName: !Ref 'PaymentServiceName'
+      Cluster:
+        Fn::ImportValue:
+          !Join [':', [!Ref 'StackName', 'ClusterName']]
+      DesiredCount: 1
+      TaskDefinition: !Ref 'PaymentTaskDefinition'
 
   WebTaskDefinition:
     Type: AWS::ECS::TaskDefinition
