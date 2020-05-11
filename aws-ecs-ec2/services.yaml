@@ -30,6 +30,10 @@ Parameters:
     Type: String
     Default: user
     Description: The user service name
+  CartServiceName:
+    Type: String
+    Default: cart
+    Description: The cart service name
   ImageUrl:
     Type: String
     Default: nginx
@@ -56,6 +60,10 @@ Parameters:
     Default: 8080
     Description: What port number the application inside the docker container is binding to
   UserContainerPort:
+    Type: Number
+    Default: 8080
+    Description: What port number the application inside the docker container is binding to
+  CartContainerPort:
     Type: Number
     Default: 8080
     Description: What port number the application inside the docker container is binding to
@@ -254,6 +262,39 @@ Resources:
           !Join [':', [!Ref 'StackName', 'ClusterName']]
       DesiredCount: 1
       TaskDefinition: !Ref 'UserTaskDefinition'
+
+  # cart service
+  CartTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    DependsOn: ['RedisService']
+    Properties:
+      Family: !Ref 'CartServiceName'
+      Cpu: !Ref 'ContainerCpu'
+      Memory: !Ref 'ContainerMemory'
+      TaskRoleArn:
+        Fn::If:
+          - 'HasCustomRole'
+          - !Ref 'Role'
+          - !Ref "AWS::NoValue"
+      ContainerDefinitions:
+        - Name: !Ref 'CartServiceName'
+          Cpu: !Ref 'ContainerCpu'
+          Memory: !Ref 'ContainerMemory'
+          Image: robotshop/rs-cart
+          PortMappings:
+            - ContainerPort: !Ref 'CartContainerPort'
+          LogConfiguration:
+            LogDriver: json-file
+  CartService:
+    Type: AWS::ECS::Service
+    DependsOn: LoadBalancerRule
+    Properties:
+      ServiceName: !Ref 'CartServiceName'
+      Cluster:
+        Fn::ImportValue:
+          !Join [':', [!Ref 'StackName', 'ClusterName']]
+      DesiredCount: 1
+      TaskDefinition: !Ref 'CartTaskDefinition'
 
   WebTaskDefinition:
     Type: AWS::ECS::TaskDefinition
