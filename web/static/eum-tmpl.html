@@ -1,12 +1,13 @@
 <!-- EUM include -->
 <script>
-  (function(i,s,o,g,r,a,m){i['InstanaEumObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//eum.instana.io/eum.min.js','ineum');
-  ineum('key', 'INSTANA_EUM_KEY');
+  (function(s,t,a,n){s[t]||(s[t]=a,n=s[a]=function(){n.q.push(arguments)},
+  n.q=[],n.v=2,n.l=1*new Date)})(window,"InstanaEumObject","ineum");
+
   ineum('reportingUrl', 'INSTANA_EUM_REPORTING_URL');
-  ineum('page', 'splash.html');
+  ineum('key', 'INSTANA_EUM_KEY');
+  ineum('trackSessions');
+  ineum('page', 'splash');
 </script>
+<script defer crossorigin="anonymous" src="https://eum.instana.io/eum.min.js"></script>
 <!-- EUM include end -->
 

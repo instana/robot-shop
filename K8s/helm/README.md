@@ -49,9 +49,9 @@ By default the `payment` service uses https://www.paypal.com as the pseudo payme
 $ helm install --set payment.gateway=https://foobar.com ...
 ```
 
-## End User Monitoring
+## Website Monitoring / End-User Monitoring
 
-Optionally End User Monitoring can be enabled for the web pages. Take a look at the [documentation](https://docs.instana.io/products/website_monitoring/) to see how to get a key and an endpoint url.
+Optionally Website Monitoring / End-User Monitoring can be enabled for the web pages. Take a look at the [documentation](https://docs.instana.io/website_monitoring/) to see how to get a key and an endpoint url.
 
 ```shell
 $ helm install \
