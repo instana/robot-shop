@@ -5,7 +5,7 @@ services:
       context: reverse_proxy
       args:
         agent_key: agent-key-here
-        sensor_version: 1.0.0-rc1
+        sensor_version: 1.0.0-rc2
     image: ${REPO}/rs-proxy:${TAG}
     volumes:
       - ./reverse_proxy/instana-config.json:/etc/instana-config.json
@@ -15,13 +15,23 @@ services:
       - robot-shop
     ports:
       - 8090:8090
+    healthcheck:
+      test: ["CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost:8080/"]
+      interval: 1s
+      timeout: 10s
+      retries: 3
   web:
     build:
       context: web
       dockerfile: Dockerfile.tracing
       args:
         agent_key: agent-key-here
-        sensor_version: 1.0.0-rc1
+        sensor_version: 1.0.0-rc2
     image: ${REPO}/rs-web-traced:${TAG}
     volumes:
       - ./web/instana-config.json:/etc/instana-config.json
+    healthcheck:
+      test: ["CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost:8080/"]
+      interval: 1s
+      timeout: 10s
+      retries: 3
