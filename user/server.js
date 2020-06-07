@@ -15,6 +15,10 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const pino = require('pino');
 const expPino = require('express-pino-logger');
+const { randomInt } = require('mathjs');
+
+const errorRate = parseInt(process.env.ERROR_RATE) || 0
+
 
 // MongoDB
 var db;
@@ -55,6 +59,11 @@ app.get('/health', (req, res) => {
 
 // use REDIS INCR to track anonymous users
 app.get('/uniqueid', (req, res) => {
+    if (errorRate > randomInt(1, 100)) {
+        res.status(500).send('Cannot process the uniqueid request');
+        return;
+    }
+
     req.log.error('Unique ID test');
     // get number from Redis
     redisClient.incr('anonymous-counter', (err, r) => {
@@ -71,6 +80,11 @@ app.get('/uniqueid', (req, res) => {
 
 // check user exists
 app.get('/check/:id', (req, res) => {
+    if (errorRate > randomInt(1, 100)) {
+        res.status(500).send('Cannot process the check user request');
+        return;
+    }
+
     if(mongoConnected) {
         usersCollection.findOne({name: req.params.id}).then((user) => {
             if(user) {
@@ -104,6 +118,11 @@ app.get('/users', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
+    if (errorRate > randomInt(1, 100)) {
+        res.status(500).send('Cannot process the login request');
+        return;
+    }
+
     req.log.info('login', req.body);
     if(req.body.name === undefined || req.body.password === undefined) {
         req.log.warn('credentails not complete');
@@ -134,6 +153,11 @@ app.post('/login', (req, res) => {
 
 // TODO - validate email address format
 app.post('/register', (req, res) => {
+    if (errorRate > randomInt(1, 100)) {
+        res.status(500).send('Cannot process the registration request');
+        return;
+    }
+
     req.log.info('register', req.body);
     if(req.body.name === undefined || req.body.password === undefined || req.body.email === undefined) {
         req.log.warn('insufficient data');
@@ -169,6 +193,11 @@ app.post('/register', (req, res) => {
 });
 
 app.post('/order/:id', (req, res) => {
+    if (errorRate > randomInt(1, 100)) {
+        res.status(500).send('Cannot process the order request');
+        return;
+    }
+
     req.log.info('order', req.body);
     // only for registered users
     if(mongoConnected) {
@@ -223,6 +252,11 @@ app.post('/order/:id', (req, res) => {
 });
 
 app.get('/history/:id', (req, res) => {
+    if (errorRate > randomInt(1, 100)) {
+        res.status(500).send('Cannot process the history request');
+        return;
+    }
+
     if(mongoConnected) {
         ordersCollection.findOne({
             name: req.params.id

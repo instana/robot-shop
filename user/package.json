@@ -9,13 +9,14 @@
   "author": "SteveW",
   "license": "Apache-2.0",
   "dependencies": {
-      "body-parser": "^1.18.1",
-      "express": "^4.15.4",
-      "mongodb": "^2.2.33",
-      "redis": "^2.8.0",
-      "pino": "^5.10.8",
-      "express-pino-logger": "^4.0.0",
-      "pino-pretty": "^2.5.0",
-      "instana-nodejs-sensor": "^1.28.0"
+    "body-parser": "^1.18.1",
+    "express": "^4.15.4",
+    "express-pino-logger": "^4.0.0",
+    "instana-nodejs-sensor": "^1.28.0",
+    "mathjs": "^6.6.4",
+    "mongodb": "^2.2.33",
+    "pino": "^5.10.8",
+    "pino-pretty": "^2.5.0",
+    "redis": "^2.8.0"
   }
 }
