@@ -9,6 +9,6 @@
   "author": "SteveW",
   "license": "Apache-2.0",
   "dependencies": {
-    "mongodb": "^2.2.33"
+    "mongodb": "2.2.33"
   }
 }
