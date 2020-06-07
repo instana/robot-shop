@@ -3,12 +3,20 @@ import pika
 import os
 import sys
 
+import pika.exceptions as exceptions
+
 from cfenv import AppEnv
+from random import randrange
 
 class Publisher:
     EXCHANGE='robot-shop'
     TYPE='direct'
     ROUTING_KEY = 'orders'
+
+    error_rate = 0
+
+    if 'ERROR_RATE' in os.environ:
+        error_rate = int(os.getenv('ERROR_RATE'))
 
     def __init__(self, logger):
         self._logger = logger
@@ -16,7 +24,7 @@ class Publisher:
         if 'VCAP_SERVICES' in os.environ:
             self._logger.info('Cloud Foundry detected')
 
-            if int(os.getenv('CF_INSTANCE_INDEX')) % 2 == 1:
+            if int(os.getenv('CF_INSTANCE_INDEX')) > 2:
                 # Crash horribly to show how we detect these scenarios
                 sys.exit(42)
 
@@ -57,12 +65,15 @@ class Publisher:
     def publish(self, msg, headers):
         if self._channel is None or self._channel.is_closed or self._conn is None or self._conn.is_closed:
             self._connect()
+
+        if error_rate > randrange(100):
+            raise exceptions.ConnectionWrongStateError(
+                'Connection is not open')
+
         try:
             self._publish(msg, headers)
         except pika.exceptions.ConnectionClosed:
-            self._logger.info('reconnecting to queue')
-            self._connect()
-            self._publish(msg, headers)
+            self._logger.error('Connection to queue is closed')
 
     def close(self):
         if self._conn and self._conn.is_open:
