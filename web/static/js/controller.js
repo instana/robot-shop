@@ -222,7 +222,7 @@
                 url: url,
                 method: 'PUT'
             }).then((res) => {
-                $scope.data.message = 'Thankyou for your feedback';
+                $scope.data.message = 'Thank you for your feedback';
                 $timeout(clearMessage, 3000);
                 loadRating($scope.data.product.sku);
             }).catch((e) => {
