@@ -51,7 +51,7 @@ class Kernel extends BaseKernel implements EventSubscriberInterface
 
         $response->headers->add([
             'Access-Control-Allow-Origin' => '*',
-            'Access-Control-Allow-Methods: *',
+            'Access-Control-Allow-Methods' => '*',
         ]);
     }
 
