@@ -59,6 +59,8 @@ services:
     build:
       context: ratings
     image: ${REPO}/rs-ratings:${TAG}
+    environment:
+      APP_ENV: prod
     networks:
       - robot-shop
     depends_on:

@@ -1,6 +1,9 @@
+DirectoryIndex index.php
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    RewriteCond %{ENV:REDIRECT_STATUS} =""
+    RewriteRule ^index\.php(?:/(.*)|$) %{ENV:BASE}/$1 [R=301,L]
     RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule api/(.*)$ api.php?request=$1 [QSA,NC,L]
+    RewriteRule ^ %{ENV:BASE}/index.php [L]
 </IfModule>
