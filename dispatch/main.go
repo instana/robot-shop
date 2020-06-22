@@ -217,6 +217,5 @@ func main() {
 	}()
 
 	log.Println("Waiting for messages")
-	forever := make(chan bool)
-	<-forever
+	select {}
 }
