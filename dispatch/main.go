@@ -11,7 +11,7 @@ import (
 
 	"github.com/instana/go-sensor"
 	ot "github.com/opentracing/opentracing-go"
-	ext "github.com/opentracing/opentracing-go/ext"
+	"github.com/opentracing/opentracing-go/ext"
 	otlog "github.com/opentracing/opentracing-go/log"
 	"github.com/streadway/amqp"
 )
@@ -46,32 +46,34 @@ func rabbitConnector(uri string) {
 
 	for {
 		rabbitErr = <-rabbitCloseError
-		if rabbitErr != nil {
-			log.Printf("Connecting to %s\n", amqpUri)
-			rabbitConn := connectToRabbitMQ(uri)
-			rabbitConn.NotifyClose(rabbitCloseError)
-
-			var err error
-
-			// create mappings here
-			rabbitChan, err = rabbitConn.Channel()
-			failOnError(err, "Failed to create channel")
-
-			// create exchange
-			err = rabbitChan.ExchangeDeclare("robot-shop", "direct", true, false, false, false, nil)
-			failOnError(err, "Failed to create exchange")
-
-			// create queue
-			queue, err := rabbitChan.QueueDeclare("orders", true, false, false, false, nil)
-			failOnError(err, "Failed to create queue")
-
-			// bind queue to exchange
-			err = rabbitChan.QueueBind(queue.Name, "orders", "robot-shop", false, nil)
-			failOnError(err, "Failed to bind queue")
-
-			// signal ready
-			rabbitReady <- true
+		if rabbitErr == nil {
+			return
 		}
+
+		log.Printf("Connecting to %s\n", amqpUri)
+		rabbitConn := connectToRabbitMQ(uri)
+		rabbitConn.NotifyClose(rabbitCloseError)
+
+		var err error
+
+		// create mappings here
+		rabbitChan, err = rabbitConn.Channel()
+		failOnError(err, "Failed to create channel")
+
+		// create exchange
+		err = rabbitChan.ExchangeDeclare("robot-shop", "direct", true, false, false, false, nil)
+		failOnError(err, "Failed to create exchange")
+
+		// create queue
+		queue, err := rabbitChan.QueueDeclare("orders", true, false, false, false, nil)
+		failOnError(err, "Failed to create queue")
+
+		// bind queue to exchange
+		err = rabbitChan.QueueBind(queue.Name, "orders", "robot-shop", false, nil)
+		failOnError(err, "Failed to bind queue")
+
+		// signal ready
+		rabbitReady <- true
 	}
 }
 
