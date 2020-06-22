@@ -10,7 +10,7 @@ server {
     #rewrite_log on;
 
     location / {
-        opentracing_trace_locations off;
+
         root   /usr/share/nginx/html;
         index  index.html index.htm;
         ssi    on;
@@ -22,7 +22,7 @@ server {
     }
 
     location /images/ {
-        opentracing_trace_locations off;
+
 
         expires 5s;
         root   /usr/share/nginx/html;
@@ -67,7 +67,7 @@ server {
     #}
 
     location /api/catalogue/ {
-        opentracing_trace_locations off;
+
         proxy_pass http://${CATALOGUE_HOST}:8080/;
 
         opentracing_propagate_context;
@@ -77,7 +77,7 @@ server {
     }
 
     location /api/user/ {
-        opentracing_trace_locations off;
+
         proxy_pass http://${USER_HOST}:8080/;
 
         opentracing_propagate_context;
@@ -87,7 +87,7 @@ server {
     }
 
     location /api/cart/ {
-        opentracing_trace_locations off;
+
         proxy_pass http://${CART_HOST}:8080/;
 
         opentracing_propagate_context;
@@ -97,7 +97,7 @@ server {
     }
 
     location /api/shipping/ {
-        opentracing_trace_locations off;
+
         proxy_pass http://${SHIPPING_HOST}:8080/;
 
         opentracing_propagate_context;
@@ -107,7 +107,7 @@ server {
     }
 
     location /api/payment/ {
-        opentracing_trace_locations off;
+
         proxy_pass http://${PAYMENT_HOST}:8080/;
 
         opentracing_propagate_context;
@@ -117,7 +117,7 @@ server {
     }
 
     location /api/ratings/ {
-        opentracing_trace_locations off;
+
         proxy_pass http://${RATINGS_HOST}:80/;
 
         opentracing_propagate_context;

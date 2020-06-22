@@ -25,7 +25,6 @@ server {
     }
 
     location ^~ / {
-      opentracing_trace_locations off;
       proxy_pass http://backend;
       opentracing_propagate_context;
       opentracing_tag "resource.name" "/";

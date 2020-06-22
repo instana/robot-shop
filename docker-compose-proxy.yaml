@@ -5,7 +5,7 @@ services:
       context: reverse_proxy
       args:
         agent_key: agent-key-here
-        sensor_version: 1.0.0-rc2
+        sensor_version: 1.0.0-rc6
     image: ${REPO}/rs-proxy:${TAG}
     volumes:
       - ./reverse_proxy/instana-config.json:/etc/instana-config.json
@@ -26,7 +26,7 @@ services:
       dockerfile: Dockerfile.tracing
       args:
         agent_key: agent-key-here
-        sensor_version: 1.0.0-rc2
+        sensor_version: 1.0.0-rc6
     image: ${REPO}/rs-web-traced:${TAG}
     volumes:
       - ./web/instana-config.json:/etc/instana-config.json

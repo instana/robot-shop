@@ -13,7 +13,6 @@ events {
 
 
 http {
-    opentracing on;
     error_log /dev/stdout info;
 
     opentracing_load_tracer /usr/local/lib/libinstana_sensor.so /etc/instana-config.json;
