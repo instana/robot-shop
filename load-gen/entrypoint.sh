@@ -38,8 +38,8 @@ fi
 echo "Starting $CLIENTS clients for ${RUN_TIME:-ever}"
 if [ "$SILENT" -eq 1 ]
 then
-    locust -f robot-shop.py --host "$HOST" --no-web -r 1 -c $NUM_CLIENTS $TIME > /dev/null 2>&1
+    locust -f robot-shop.py --host "$HOST" --headless -r 1 -u $NUM_CLIENTS $TIME > /dev/null 2>&1
 else
-    locust -f robot-shop.py --host "$HOST" --no-web -r 1 -c $NUM_CLIENTS $TIME
+    locust -f robot-shop.py --host "$HOST" --headless -r 1 -u $NUM_CLIENTS $TIME
 fi
 

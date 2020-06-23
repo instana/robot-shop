@@ -1,9 +1,11 @@
 import os
-from locust import HttpLocust, TaskSet, task
+from locust import HttpUser, task, between
 from random import choice
 from random import randint
 
-class UserBehavior(TaskSet):
+class UserBehavior(HttpUser):
+    wait_time = between(2, 10)
+
     def on_start(self):
         """ on_start is called when a Locust start before any task is scheduled """
         print('Starting')
@@ -69,7 +71,3 @@ class UserBehavior(TaskSet):
             self.client.post('/api/payment/pay/partner-57', json=cart)
 
 
-class WebsiteUser(HttpLocust):
-    task_set = UserBehavior
-    min_wait = 1000
-    max_wait = 5000
