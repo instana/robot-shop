@@ -12,7 +12,7 @@
       "body-parser": "^1.18.1",
       "express": "^4.15.4",
       "redis": "^2.8.0",
-      "request": "^2.83.0",
+      "request": "^2.88.2",
       "pino": "^5.10.8",
       "express-pino-logger": "^4.0.0",
       "pino-pretty": "^2.5.0",
