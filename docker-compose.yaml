@@ -1,5 +1,22 @@
 version: '3'
 services:
+  xray:
+    image: amazon/aws-xray-daemon
+    command:
+      - '--local-mode'
+      - '-o'
+      - '-n'
+      - 'us-west-2'
+    ports:
+      - 2000:2000/udp
+      - 2000:2000/tcp
+    volumes:
+      - ~/.aws/:/root/.aws/
+    environment:
+     - AWS_DEFAULT_REGION=us-west-2
+     - AWS_XRAY_CONTEXT_MISSING=RUNTIME_ERROR
+    networks:
+      - robot-shop
   mongodb:
     build:
       context: mongo
@@ -20,6 +37,8 @@ services:
     image: ${REPO}/rs-catalogue:${TAG}
     depends_on:
       - mongodb
+    environment:
+      - NODE_ENV=development
     networks:
       - robot-shop
   user:
@@ -29,6 +48,8 @@ services:
     depends_on:
       - mongodb
       - redis
+    environment:
+      - NODE_ENV=development
     networks:
       - robot-shop
   cart:
@@ -37,6 +58,8 @@ services:
     image: ${REPO}/rs-cart:${TAG}
     depends_on:
       - redis
+    environment:
+      - NODE_ENV=development
     networks:
       - robot-shop
   mysql:
@@ -71,9 +94,6 @@ services:
       - rabbitmq
     networks:
       - robot-shop
-    # Uncomment to change payment gateway
-    #environment:
-      #PAYMENT_GATEWAY: "https://www.worldpay.com"
   dispatch:
     build:
       context: dispatch
@@ -95,11 +115,6 @@ services:
       - "8080:8080"
     networks:
       - robot-shop
-    # Uncomment to enable Instana EUM
-    # environment:
-      # INSTANA_EUM_KEY: <your eum key>
-      # INSTANA_EUM_REPORTING_URL: https://eum-us-west-2.instana.io
-      # INSTANA_EUM_REPORTING_URL: https://eum-eu-west-1.instana.io
 
 networks:
   robot-shop:

@@ -1,12 +1,3 @@
-const instana = require('@instana/collector');
-// init tracing
-// MUST be done before loading anything else!
-instana({
-    tracing: {
-        enabled: true
-    }
-});
-
 const redis = require('redis');
 const request = require('request');
 const bodyParser = require('body-parser');
@@ -38,6 +29,15 @@ const expLogger = expPino({
     logger: logger
 });
 
+const AWSXRay = require('aws-xray-sdk');
+const XRayExpress = AWSXRay.express;
+if(process.env.NODE_ENV === 'development') {
+    AWSXRay.setDaemonAddress('xray:2000')
+} else {
+    // CHANGEME for kubernetes
+    AWSXRay.setDaemonAddress('http://xray.robotshop:2000')
+}
+
 const app = express();
 
 app.use(expLogger);
@@ -50,6 +50,8 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+app.use(XRayExpress.openSegment('Robot-Shop-Cart'));
 
 app.get('/health', (req, res) => {
     var stat = {
@@ -306,6 +308,8 @@ app.post('/shipping/:id', (req, res) => {
         });
     }
 });
+
+app.use(XRayExpress.closeSegment());
 
 function mergeList(list, product, qty) {
     var inlist = false;

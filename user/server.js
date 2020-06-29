@@ -1,12 +1,3 @@
-const instana = require('@instana/collector');
-// init tracing
-// MUST be done before loading anything else!
-instana({
-    tracing: {
-        enabled: true
-    }
-});
-
 const mongoClient = require('mongodb').MongoClient;
 const mongoObjectID = require('mongodb').ObjectID;
 const redis = require('redis');
@@ -31,6 +22,15 @@ const expLogger = expPino({
 
 });
 
+const AWSXRay = require('aws-xray-sdk');
+const XRayExpress = AWSXRay.express;
+if(process.env.NODE_ENV === 'development') {
+    AWSXRay.setDaemonAddress('xray:2000')
+} else {
+    // CHANGEME for kubernetes
+    AWSXRay.setDaemonAddress('http://xray.robotshop:2000')
+}
+
 const app = express();
 
 app.use(expLogger);
@@ -43,6 +43,8 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+app.use(XRayExpress.openSegment('Robot-Shop-User'));
 
 app.get('/health', (req, res) => {
     var stat = {
@@ -280,6 +282,8 @@ function mongoLoop() {
 }
 
 mongoLoop();
+
+app.use(XRayExpress.closeSegment());
 
 // fire it up!
 const port = process.env.USER_SERVER_PORT || '8080';

@@ -1,11 +1,11 @@
-const instana = require('@instana/collector');
+// const instana = require('@instana/collector');
 // init tracing
 // MUST be done before loading anything else!
-instana({
-    tracing: {
-        enabled: true
-    }
-});
+// instana({
+//     tracing: {
+//         enabled: true
+//     }
+// });
 
 const mongoClient = require('mongodb').MongoClient;
 const mongoObjectID = require('mongodb').ObjectID;
@@ -28,6 +28,14 @@ var db;
 var collection;
 var mongoConnected = false;
 
+const AWSXRay = require('aws-xray-sdk');
+const XRayExpress = AWSXRay.express;
+if(process.env.NODE_ENV === 'development') {
+    AWSXRay.setDaemonAddress('xray:2000')
+} else {
+    // CHANGEME for kubernetes
+    AWSXRay.setDaemonAddress('http://xray.robotshop:2000')
+}
 const app = express();
 
 app.use(expLogger);
@@ -40,6 +48,8 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+app.use(XRayExpress.openSegment('Robot-Shop-Catalogue'));
 
 app.get('/health', (req, res) => {
     var stat = {
@@ -137,6 +147,8 @@ app.get('/search/:text', (req, res) => {
     }
 });
 
+app.use(XRayExpress.closeSegment());
+
 // set up Mongo
 function mongoConnect() {
     return new Promise((resolve, reject) => {
@@ -168,6 +180,7 @@ mongoLoop();
 
 // fire it up!
 const port = process.env.CATALOGUE_SERVER_PORT || '8080';
+
 app.listen(port, () => {
     logger.info('Started on port', port);
 });

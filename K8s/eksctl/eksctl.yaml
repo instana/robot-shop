@@ -1,0 +1,88 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: robotshop
+  region: us-west-2
+
+
+iam:
+  withOIDC: true
+  serviceAccounts:
+  - metadata:
+      name: xray-daemon
+      # if no namespace is set, "default" will be used;
+      # the namespace will be created if it doesn't exist already
+      namespace: robotshop
+      labels: {aws-usage: "application"}
+    attachPolicyARNs:
+    - "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
+  - metadata:
+      name: cluster-autoscaler
+      namespace: kube-system
+      labels: {aws-usage: "cluster-ops"}
+    attachPolicy:
+      Version: "2012-10-17"
+      Statement:
+      - Effect: Allow
+        Action:
+        - "autoscaling:DescribeAutoScalingGroups"
+        - "autoscaling:DescribeAutoScalingInstances"
+        - "autoscaling:DescribeLaunchConfigurations"
+        - "autoscaling:DescribeTags"
+        - "autoscaling:SetDesiredCapacity"
+        - "autoscaling:TerminateInstanceInAutoScalingGroup"
+        Resource: '*'
+
+nodeGroups:
+  - name: robotshop-ng-a
+    tags:
+      # EC2 tags required for cluster-autoscaler auto-discovery
+      k8s.io/cluster-autoscaler/enabled: "true"
+      k8s.io/cluster-autoscaler/robotshop: "owned"
+    desiredCapacity: 1
+    minSize: 1
+    maxSize: 2
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+        externalDNS: true
+        certManager: true
+        ebs: true
+        albIngress: true
+        xRay: true
+        cloudWatch: true
+    availabilityZones: ["us-west-2a"]
+    ssh: # An existing key pair for EC2 host test
+      publicKeyName: kube
+    volumeSize: 50
+
+  # - name: robotshop-ng-b
+  #   desiredCapacity: 1
+  #   minSize: 1
+  #   maxSize: 2
+  #   iam:
+  #     withAddonPolicies:
+  #       imageBuilder: true
+  #       autoScaler: true
+  #       externalDNS: true
+  #       certManager: true
+  #       appMesh: true
+  #       ebs: true
+  #       fsx: true
+  #       efs: true
+  #       albIngress: true
+  #       xRay: true
+  #       cloudWatch: true
+  #   availabilityZones: ["us-west-2b"]
+  #   ssh: # An existing key pair for EC2 hosts
+  #     publicKeyName: kube
+  #   volumeSize: 50
+
+# Use the encryption key from the CLI
+secretsEncryption:
+  keyARN: "arn:aws:kms:us-west-2:164382793440:key/751f1d85-43fd-4be4-835d-906189f64c8c"
+
+cloudWatch:
+  clusterLogging:
+    enableTypes: ["*"]

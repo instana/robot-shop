@@ -1,7 +1,5 @@
 FROM node:10
 
-ENV INSTANA_AUTO_PROFILE true
-
 EXPOSE 8080
 
 WORKDIR /opt/server

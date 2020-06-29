@@ -5,3 +5,4 @@ pika
 prometheus_client
 opentracing
 instana
+aws-xray-sdk

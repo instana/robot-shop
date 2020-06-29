@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: robotshop
+  name: ratings
+  labels:
+    service: ratings
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+  selector:
+    service: ratings
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: robotshop
+  name: ratings
+  labels:
+    service: ratings
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: ratings
+  template:
+    metadata:
+      labels:
+        service: ratings
+    spec:
+      serviceAccountName: robot-shop
+      containers:
+      - name: ratings
+        image: robotshop/rs-ratings:latest
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: 200m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 50Mi
+      restartPolicy: Always

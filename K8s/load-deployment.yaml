@@ -18,7 +18,7 @@ spec:
       - name: load
         env:
           - name: HOST
-            value: "http://web:8080/"
+            value: "http://web.robotshop:8080/"
           - name: NUM_CLIENTS
             value: "15"
           - name: SILENT

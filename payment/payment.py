@@ -1,4 +1,3 @@
-import instana
 import os
 import sys
 import time
@@ -14,12 +13,25 @@ from flask import Response
 from flask import request
 from flask import jsonify
 from rabbitmq import Publisher
+from aws_xray_sdk.core import xray_recorder
+from aws_xray_sdk.ext.flask.middleware import XRayMiddleware
+
+
 # Prometheus
 import prometheus_client
 from prometheus_client import Counter, Histogram
 
 app = Flask(__name__)
 app.logger.setLevel(logging.INFO)
+
+daemon_address = os.getenv('XRAY_DAEMON', 'xray:2000')
+
+xray_recorder.configure(
+    service='Robot-Shop-Payments',
+    daemon_address=daemon_address
+)
+
+XRayMiddleware(app, xray_recorder)
 
 CART = os.getenv('CART_HOST', 'cart')
 USER = os.getenv('USER_HOST', 'user')
@@ -30,7 +42,6 @@ PromMetrics = {}
 PromMetrics['SOLD_COUNTER'] = Counter('sold_count', 'Running count of items sold')
 PromMetrics['AUS'] = Histogram('units_sold', 'Avergae Unit Sale', buckets=(1, 2, 5, 10, 100))
 PromMetrics['AVS'] = Histogram('cart_value', 'Avergae Value Sale', buckets=(100, 200, 500, 1000, 2000, 5000, 10000))
-
 
 @app.errorhandler(Exception)
 def exception_handler(err):
@@ -132,7 +143,6 @@ def pay(id):
 def queueOrder(order):
     app.logger.info('queue order')
     # RabbitMQ pika is not currently traced automatically
-    # opentracing tracer is automatically set to Instana tracer
     # start a span
 
     parent_span = ot.tracer.active_span
