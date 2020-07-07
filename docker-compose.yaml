@@ -105,6 +105,7 @@ services:
   web:
     build:
       context: web
+      dockerfile: Dockerfile_local
     image: ${REPO}/rs-web:${TAG}
     depends_on:
       - catalogue

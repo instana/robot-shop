@@ -33,7 +33,7 @@ spec:
       serviceAccountName: robot-shop
       containers:
       - name: shipping
-        image: robotshop/rs-shipping:latest
+        image: 164382793440.dkr.ecr.us-west-2.amazonaws.com/robot-shop/shipping
         ports:
         - containerPort: 8080
         # it's Java it needs lots of memory

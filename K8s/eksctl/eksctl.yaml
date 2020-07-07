@@ -35,14 +35,14 @@ iam:
         Resource: '*'
 
 nodeGroups:
-  - name: robotshop-ng-a
+  - name: robotshop-ng-a-2
     tags:
       # EC2 tags required for cluster-autoscaler auto-discovery
       k8s.io/cluster-autoscaler/enabled: "true"
       k8s.io/cluster-autoscaler/robotshop: "owned"
-    desiredCapacity: 1
-    minSize: 1
-    maxSize: 2
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 3
     iam:
       withAddonPolicies:
         autoScaler: true

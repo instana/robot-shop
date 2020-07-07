@@ -13,6 +13,15 @@ spec:
   selector:
     service: redis
 ---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  namespace: robotshop
+  name: ebs-ssd-retain
+provisioner: ebs.csi.aws.com
+volumeBindingMode: WaitForFirstConsumer
+# reclaimPolicy: Retain
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -53,9 +62,8 @@ spec:
         name: data
       spec:
         accessModes: [ "ReadWriteOnce" ]
-        storageClassName: standard
-        volumeMode: Filesystem
+        storageClassName: ebs-ssd-retain
         resources:
           requests:
-            storage: 1Gi
+            storage: 10Gi
 

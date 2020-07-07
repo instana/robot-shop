@@ -21,7 +21,6 @@ metadata:
   labels:
     service: user
 spec:
-  serviceAccountName: "xray-daemon"
   replicas: 1
   selector:
     matchLabels:
@@ -34,10 +33,13 @@ spec:
       serviceAccountName: robot-shop
       containers:
       - name: user
-        image: robotshop/rs-user:latest
+        image: 164382793440.dkr.ecr.us-west-2.amazonaws.com/robot-shop/user
+        imagePullPolicy: Always
         env:
           - name: NODE_ENV
             value: production
+          - name: AWS_XRAY_DAEMON_ADDRESS
+            value: 'xray-service.robotshop:2000'
         ports:
         - containerPort: 8080
         resources:

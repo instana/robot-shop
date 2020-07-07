@@ -32,10 +32,8 @@ const AWSXRay = require('aws-xray-sdk');
 const XRayExpress = AWSXRay.express;
 if(process.env.NODE_ENV === 'development') {
     AWSXRay.setDaemonAddress('xray:2000')
-} else {
-    // CHANGEME for kubernetes
-    AWSXRay.setDaemonAddress('http://xray.robotshop:2000')
 }
+
 const app = express();
 
 app.use(expLogger);

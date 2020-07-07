@@ -34,7 +34,7 @@ spec:
       serviceAccountName: robot-shop
       containers:
       - name: dispatch
-        image: robotshop/rs-dispatch:latest
+        image: 164382793440.dkr.ecr.us-west-2.amazonaws.com/robot-shop/dispatch
         resources:
           limits:
             cpu: 200m

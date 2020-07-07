@@ -24,7 +24,7 @@ from prometheus_client import Counter, Histogram
 app = Flask(__name__)
 app.logger.setLevel(logging.INFO)
 
-daemon_address = os.getenv('XRAY_DAEMON', 'xray:2000')
+daemon_address = os.getenv('AWS_XRAY_DAEMON_ADDRESS', 'xray:2000')
 
 xray_recorder.configure(
     service='Robot-Shop-Payments',

@@ -12,7 +12,7 @@ ENV CATALOGUE_HOST=catalogue \
 COPY entrypoint.sh /root/
 ENTRYPOINT ["/root/entrypoint.sh"]
 
-COPY default.conf.template /etc/nginx/conf.d/default.conf.template
+COPY default.conf.template_local /etc/nginx/conf.d/default.conf.template
 
 COPY static /usr/share/nginx/html
 

@@ -33,7 +33,7 @@ spec:
       serviceAccountName: robot-shop
       containers:
       - name: ratings
-        image: robotshop/rs-ratings:latest
+        image: 164382793440.dkr.ecr.us-west-2.amazonaws.com/robot-shop/ratings
         ports:
         - containerPort: 80
         resources:
