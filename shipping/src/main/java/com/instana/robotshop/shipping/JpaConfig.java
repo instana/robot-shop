@@ -1,4 +1,4 @@
-package com.instana.robotshop;
+package com.instana.robotshop.shipping;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

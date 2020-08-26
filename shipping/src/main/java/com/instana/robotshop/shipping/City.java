@@ -1,4 +1,4 @@
-package com.instana.robotshop;
+package com.instana.robotshop.shipping;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -68,5 +68,10 @@ public class City {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Country: %s City: %s Region: %s Coords: %f %f", this.code, this.city, this.region, this.latitude, this.longitude);
     }
 }
