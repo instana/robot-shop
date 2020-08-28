@@ -2,7 +2,7 @@ node {
     def cart
 
     stage('Clone repository') {
-        /* Cloning the Repository to our Workspace */
+        /* Cloning this Repository to our Workspace */
 
         checkout scm
     }
