@@ -1,26 +1,34 @@
 package com.instana.robotshop.shipping;
 
+import javax.persistence.Table;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Column;
 
 /*
 * Bean for City
 */
 @Entity
+@Table(name = "cities")
 public class City {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private long uuid;
 
+    @Column(name = "country_code")
     private String code;
     private String city;
     private String name;
     private String region;
     private double latitude;
     private double longitude;
+
+    public long getUuid() {
+        return this.uuid;
+    }
 
     public String getCode() {
         return this.code;
