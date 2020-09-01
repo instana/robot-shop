@@ -1,4 +1,4 @@
-package org.steveww.spark;
+package com.instana.robotshop.shipping;
 
 /**
  * Bean to hold shipping information
@@ -12,7 +12,7 @@ public class Ship {
         this.cost = 0.0;
     }
 
-    public Ship(long distnace, double cost) {
+    public Ship(long distance, double cost) {
         this.distance = distance;
         this.cost = cost;
     }
@@ -31,6 +31,11 @@ public class Ship {
 
     public double getCost() {
         return this.cost;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Distance: %d Cost: %f", distance, cost);
     }
 }
 
