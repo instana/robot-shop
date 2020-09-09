@@ -4,7 +4,7 @@ import * as ecs from "@aws-cdk/aws-ecs";
 import * as ecs_patterns from "@aws-cdk/aws-ecs-patterns";
 
 import * as path from 'path';
-import { InstanaFargateAgent, InstanaEnvProps } from './instanaAgent';
+import { InstanaEnvProps } from './instanaAgent';
 
 export class RobotShopFargateStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps, instanaEnvProps?: InstanaEnvProps) {
@@ -266,9 +266,6 @@ export class RobotShopFargateStack extends cdk.Stack {
       taskDefinition: webTask,
       assignPublicIp: true,
       publicLoadBalancer: true
-    });
-
-    // ### Enable Instana ###
-    new InstanaFargateAgent(this, cluster, instanaEnvProps);
+    });    
   }
 }

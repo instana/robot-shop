@@ -1,0 +1,61 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "elasticbeanstalk:DescribeEnvironments",
+        "elasticbeanstalk:ListTagsForResource",
+        "elasticbeanstalk:DescribeInstancesHealth",
+        "dynamodb:ListTables",
+        "dynamodb:DescribeTable",
+        "dynamodb:ListTagsOfResource",
+        "rds:DescribeDBInstances",
+        "rds:DescribeEvents",
+        "rds:ListTagsForResource",
+        "sqs:ListQueues",
+        "sqs:GetQueueAttributes",
+        "sqs:ListQueueTags",
+        "elasticache:ListTagsForResource",
+        "elasticache:DescribeCacheClusters",
+        "elasticache:DescribeEvents",
+        "elasticloadbalancing:DescribeLoadBalancers",
+        "elasticloadbalancing:DescribeTags",
+        "elasticmapreduce:ListClusters",
+        "elasticmapreduce:DescribeCluster",
+        "es:ListDomainNames",
+        "es:DescribeElasticsearchDomain",
+        "es:ListTags",
+        "ec2:DescribeInstances",
+        "ec2:DescribeTags",
+        "ec2:DescribeVolumes",
+        "kinesis:ListStreams",
+        "kinesis:DescribeStream",
+        "kinesis:ListTagsForStream",
+        "lambda:ListTags",
+        "lambda:ListFunctions",
+        "lambda:ListVersionsByFunction",
+        "lambda:ListEventSourceMappings",
+        "lambda:GetFunctionConfiguration",
+        "mq:ListBrokers",
+        "mq:DescribeBroker",
+        "s3:GetBucketTagging",
+        "s3:ListAllMyBuckets",
+        "s3:GetBucketLocation",
+        "xray:BatchGetTraces",
+        "xray:GetTraceSummaries",
+        "tag:GetResources"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    },
+    {
+      "Action": [
+        "cloudwatch:GetMetricStatistics",
+        "cloudwatch:GetMetricData",
+        "cloudwatch:ListMetrics"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
