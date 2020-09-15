@@ -34,7 +34,7 @@ services:
   cart:
     build:
       context: cart
-    image: ${REPO}/rs-cart:${TAG}
+    image: rafraf1111/cart:2
     depends_on:
       - redis
     networks:
