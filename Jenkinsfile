@@ -15,7 +15,6 @@ node {
     stage('build image') {
             
         cart = docker.build("rafraf1111/cart:${env.BUILD_NUMBER}")
-        
     }
    
     stage('Test image') {
@@ -33,5 +32,8 @@ node {
             cart.push("${env.BUILD_NUMBER}")
             } 
                 echo "Trying to Push Docker Build to DockerHub"
+        }
+      }
     }
+  }
 }
