@@ -6,7 +6,12 @@ node {
 
         git 'https://github.com/rafraf1987/robot-shop'
     }
-
+    
+    stage('workdir') {
+        
+        dir ('/robot-shop/tree/devops/cart')
+    }
+    
     stage('Build image') {
         /* This builds the actual image */
 
