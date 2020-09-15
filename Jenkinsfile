@@ -4,15 +4,14 @@ node {
     stage('Clone repository') {
         /* Cloning the Repository to our Workspace */
 
-        git 'https://github.com/rafraf1987/robot-shop'
+        git 'https://github.com/rafraf1987/robot-shop/cart'
     }
 
-    stage('workdir') {
-        
-        dir ('/robot-shop/tree/devops/cart') 
-         sh 'docker build --<docker-options> -t $rafraf1111/cart_1 .
+    stage('Build image') {
+        /* This builds the actual image */
+
+        cart = docker.build("rafraf1111/cart:${env.BUILD_NUMBER}")
     }
-}
 
     stage('Test image') {
         
