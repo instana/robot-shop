@@ -7,9 +7,12 @@ node {
         git 'https://github.com/rafraf1987/robot-shop'
     }
 
-    stage('Build image') {
-        /* This builds the actual image */
+    stage('workdir') {
+        
         dir ('/robot-shop/tree/devops/cart') 
+    }
+
+    stage('Build image') {
 
         cart = docker.build("rafraf1111/cart:${env.BUILD_NUMBER}")
     }
