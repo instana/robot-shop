@@ -9,11 +9,11 @@ node {
     
     stage('workdir') {
         
-        dir ('/robot-shop/tree/devops/cart')
+        dir ('/robot-shop/tree/devops/cart') {
 
         cart = docker.build("rafraf1111/cart:${env.BUILD_NUMBER}")
         
-      }
+        }
    }
     
 
