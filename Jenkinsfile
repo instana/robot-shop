@@ -18,7 +18,6 @@ node {
         
     }
    
-
     stage('Test image') {
         
         cart.inside {
@@ -34,6 +33,5 @@ node {
             cart.push("${env.BUILD_NUMBER}")
             } 
                 echo "Trying to Push Docker Build to DockerHub"
-    
     }
 }
