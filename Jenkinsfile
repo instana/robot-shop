@@ -4,7 +4,7 @@ node {
     stage('Clone repository') {
         /* Cloning the Repository to our Workspace */
 
-        git 'https://github.com/rafraf1987/robot-shop/tree/devops'
+        git 'https://github.com/rafraf1987/robot-shop'
     }
 
     stage('Build image') {
