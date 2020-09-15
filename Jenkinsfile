@@ -10,12 +10,14 @@ node {
     stage('workdir') {
         
         dir ('/robot-shop/tree/devops/cart') {
-
+    }
+        
+    stage('build image') {
+            
         cart = docker.build("rafraf1111/cart:${env.BUILD_NUMBER}")
         
-        }
-   }
-    
+    }
+   
 
     stage('Test image') {
         
