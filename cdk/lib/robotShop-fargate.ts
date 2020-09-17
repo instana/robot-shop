@@ -4,14 +4,14 @@ import * as ecs from "@aws-cdk/aws-ecs";
 import * as ecs_patterns from "@aws-cdk/aws-ecs-patterns";
 
 import * as path from 'path';
-import { InstanaEnvProps } from './instanaAgent';
+import { InstanaEnvPropsServerless, InstanaEnvPropsEum } from './instanaAgent';
 
 export class RobotShopFargateStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps, instanaEnvProps?: InstanaEnvProps) {
+  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps, instanaEnvPropsServerless?: InstanaEnvPropsServerless, instanaEnvPropsEum?: InstanaEnvPropsEum) {
     super(scope, id, props);
 
     const REPO = "robotshop";
-    const TAG = "0.4.30";
+    const TAG = "0.5.00";
 
     const CART_HOST = "cart.robot-shop";
     const CATALOGUE_HOST = "catalogue.robot-shop";
@@ -51,7 +51,7 @@ export class RobotShopFargateStack extends cdk.Stack {
       image: ecs.ContainerImage.fromRegistry(`${REPO}/rs-mongodb:${TAG}`),
       logging: ecs.AwsLogDriver.awsLogs({ streamPrefix: "robot-shop" }),
       environment: {
-        ...instanaEnvProps
+        ...instanaEnvPropsServerless
       }
     }).addPortMappings({ containerPort: MONGODB_PORT });
 
@@ -69,7 +69,7 @@ export class RobotShopFargateStack extends cdk.Stack {
       image: ecs.ContainerImage.fromRegistry(`${REPO}/rs-mysql-db:${TAG}`),
       logging: ecs.AwsLogDriver.awsLogs({ streamPrefix: "robot-shop" }),
       environment: {
-        ...instanaEnvProps
+        ...instanaEnvPropsServerless
       }
     }).addPortMappings({ containerPort: MYSQL_PORT });
     const mysqlService = new ecs.FargateService(this, "MysqlService", {
@@ -86,7 +86,7 @@ export class RobotShopFargateStack extends cdk.Stack {
       image: ecs.ContainerImage.fromRegistry(`redis:4.0.6`),
       logging: ecs.AwsLogDriver.awsLogs({ streamPrefix: "robot-shop" }),
       environment: {
-        ...instanaEnvProps
+        ...instanaEnvPropsServerless
       }
     }).addPortMappings({ containerPort: REDIS_PORT });
     const redisService = new ecs.FargateService(this, "RedisService", {
@@ -103,7 +103,7 @@ export class RobotShopFargateStack extends cdk.Stack {
       image: ecs.ContainerImage.fromRegistry(`rabbitmq:3.7-management-alpine`),
       logging: ecs.AwsLogDriver.awsLogs({ streamPrefix: "robot-shop" }),
       environment: {
-        ...instanaEnvProps
+        ...instanaEnvPropsServerless
       }
     }).addPortMappings({ containerPort: RABBITMQ_PORT[0] }, { containerPort: RABBITMQ_PORT[1] });
     const rabbitMqService = new ecs.FargateService(this, "RabbitMqService", {
@@ -117,11 +117,12 @@ export class RobotShopFargateStack extends cdk.Stack {
     // ### Catalogue ###
     const catalogueTask = new ecs.FargateTaskDefinition(this, "catalogueTask", {});
     catalogueTask.addContainer("catalogueContainer", {
-      image: ecs.ContainerImage.fromRegistry(`${REPO}/rs-catalogue:${TAG}`),
+      //image: ecs.ContainerImage.fromRegistry(`${REPO}/rs-catalogue:${TAG}`),
+      image: ecs.ContainerImage.fromAsset(path.join(__dirname, "../../catalogue")),
       logging: ecs.AwsLogDriver.awsLogs({ streamPrefix: "robot-shop" }),
       environment: {
         "MONGO_URL": `mongodb://${MONGODB_HOST}:${MONGODB_PORT}/catalogue`,
-        ...instanaEnvProps
+        ...instanaEnvPropsServerless
       }
     }).addPortMappings({ containerPort: CATALOGUE_PORT });
     const catalogueService = new ecs.FargateService(this, "CatalogueService", {
@@ -135,12 +136,13 @@ export class RobotShopFargateStack extends cdk.Stack {
     // ### User ###
     const userTask = new ecs.FargateTaskDefinition(this, "userTask", {});
     userTask.addContainer("userContainer", {
-      image: ecs.ContainerImage.fromRegistry(`${REPO}/rs-user:${TAG}`),
+      // image: ecs.ContainerImage.fromRegistry(`${REPO}/rs-user:${TAG}`),
+      image: ecs.ContainerImage.fromAsset(path.join(__dirname, "../../user")),
       logging: ecs.AwsLogDriver.awsLogs({ streamPrefix: "robot-shop" }),
       environment: {
         "MONGO_URL": `mongodb://${MONGODB_HOST}:${MONGODB_PORT}/catalogue`,
         "REDIS_HOST": REDIS_HOST,
-        ...instanaEnvProps
+        ...instanaEnvPropsServerless
       }
     }).addPortMappings({ containerPort: USER_PORT });
     const userService = new ecs.FargateService(this, "UserService", {
@@ -154,12 +156,13 @@ export class RobotShopFargateStack extends cdk.Stack {
     // ### Cart ###
     const cartTask = new ecs.FargateTaskDefinition(this, "cartTask", {});
     cartTask.addContainer("cartContainer", {
-      image: ecs.ContainerImage.fromRegistry(`${REPO}/rs-cart:${TAG}`),
+      //image: ecs.ContainerImage.fromRegistry(`${REPO}/rs-cart:${TAG}`),
+      image: ecs.ContainerImage.fromAsset(path.join(__dirname, "../../cart")),
       logging: ecs.AwsLogDriver.awsLogs({ streamPrefix: "robot-shop" }),
       environment: {
         "REDIS_HOST": REDIS_HOST,
         "CATALOGUE_HOST": CATALOGUE_HOST,
-        ...instanaEnvProps
+        ...instanaEnvPropsServerless
       }
     }).addPortMappings({ containerPort: CART_PORT });
     const cartService = new ecs.FargateService(this, "CartService", {
@@ -173,12 +176,13 @@ export class RobotShopFargateStack extends cdk.Stack {
     // ### Shipping ###
     const shippingTask = new ecs.FargateTaskDefinition(this, "shippingTask", {});
     shippingTask.addContainer("shippingContainer", {
-      image: ecs.ContainerImage.fromRegistry(`${REPO}/rs-shipping:${TAG}`),
+      //image: ecs.ContainerImage.fromRegistry(`${REPO}/rs-shipping:${TAG}`),
+      image: ecs.ContainerImage.fromAsset(path.join(__dirname, "../../shipping")),
       logging: ecs.AwsLogDriver.awsLogs({ streamPrefix: "robot-shop" }),
       environment: {
         "DB_HOST": MYSQL_HOST,
         "CART_ENDPOINT": `${CART_HOST}:${CART_PORT}`,
-        ...instanaEnvProps
+        ...instanaEnvPropsServerless
       }
     }).addPortMappings({ containerPort: SHIPPING_PORT });
     const shippingService = new ecs.FargateService(this, "ShippingService", {
@@ -197,7 +201,7 @@ export class RobotShopFargateStack extends cdk.Stack {
       environment: {
         "PDO_URL": `mysql:host=${MYSQL_HOST};dbname=ratings;charset=utf8mb4`,
         "CATALOGUE_URL": `http://${CATALOGUE_HOST}:${CATALOGUE_PORT}/`,
-        ...instanaEnvProps
+        ...instanaEnvPropsServerless
       }
     }).addPortMappings({ containerPort: RATINGS_PORT });
     const ratingsService = new ecs.FargateService(this, "RatingsService", {
@@ -217,7 +221,7 @@ export class RobotShopFargateStack extends cdk.Stack {
         "AMQP_HOST": RABBITMQ_HOST,
         "CART_HOST": CART_HOST,
         "USER_HOST": USER_HOST,
-        ...instanaEnvProps
+        ...instanaEnvPropsServerless
       }
     }).addPortMappings({ containerPort: PAYMENT_PORT });
     const paymentService = new ecs.FargateService(this, "PaymentService", {
@@ -231,11 +235,12 @@ export class RobotShopFargateStack extends cdk.Stack {
     // ### Dispatch ###
     const dispatchTask = new ecs.FargateTaskDefinition(this, "dispatchTask", {});
     dispatchTask.addContainer("dispatchContainer", {
-      image: ecs.ContainerImage.fromRegistry(`${REPO}/rs-dispatch:${TAG}`),
+      // image: ecs.ContainerImage.fromRegistry(`${REPO}/rs-dispatch:${TAG}`),
+      image: ecs.ContainerImage.fromAsset(path.join(__dirname, "../../dispatch")),
       logging: ecs.AwsLogDriver.awsLogs({ streamPrefix: "robot-shop" }),
       environment: {
         "AMQP_HOST": RABBITMQ_HOST,
-        ...instanaEnvProps
+        ...instanaEnvPropsServerless
       }
     }).addPortMappings({ containerPort: DISPATCH_PORT });
     const dispatchService = new ecs.FargateService(this, "DispatchService", {
@@ -258,7 +263,7 @@ export class RobotShopFargateStack extends cdk.Stack {
         "SHIPPING_HOST": SHIPPING_HOST,
         "PAYMENT_HOST": PAYMENT_HOST,
         "RATINGS_HOST": RATINGS_HOST,
-        ...instanaEnvProps
+        ...instanaEnvPropsEum
       }
     }).addPortMappings({ containerPort: WEB_PORT });
     const webService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, "WebService", {
@@ -266,6 +271,6 @@ export class RobotShopFargateStack extends cdk.Stack {
       taskDefinition: webTask,
       assignPublicIp: true,
       publicLoadBalancer: true
-    });    
+    });
   }
 }

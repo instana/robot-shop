@@ -3,11 +3,22 @@ import * as ecs from "@aws-cdk/aws-ecs";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import * as iam from "@aws-cdk/aws-iam";
 
-export interface InstanaEnvProps {
+export interface InstanaEnvPropsServerless {
+  /**
+   * Your agent key.
+   */
+  INSTANA_AGENT_KEY: string,
   /**
    * Your This is your serverless monitoring endpoint. Make sure to use the correct value for your region that starts with `https://serverless-`.
    */
   INSTANA_ENDPOINT_URL: string,
+}
+
+export interface InstanaEnvPropsClassic {
+  /**
+   * Your agent key.
+   */
+  INSTANA_AGENT_KEY: string,
   /**
    * Use these variable when configuring the Instana Host agent, the Instana AWS agent or Website & Mobile App Agents.
    */
@@ -16,10 +27,9 @@ export interface InstanaEnvProps {
    * Use these variable when configuring the Instana Host agent, the Instana AWS agent or Website & Mobile App Agents.
    */
   INSTANA_AGENT_ENDPOINT_PORT: string,
-  /**
-   * Your agent key.
-   */
-  INSTANA_AGENT_KEY: string,
+}
+
+export interface InstanaEnvPropsEum {
   /**
    * Your agent key for End-User Monitoring.
    */
@@ -31,7 +41,7 @@ export interface InstanaEnvProps {
 }
 
 export class InstanaEcsAgent {
-  constructor(scope: cdk.Construct, cluster: ecs.Cluster, instanaEnvProps?: InstanaEnvProps) {
+  constructor(scope: cdk.Construct, cluster: ecs.Cluster, instanaEnvProps?: InstanaEnvPropsClassic) {
     if (instanaEnvProps === undefined) return;
 
     const instanaAgentTask = new ecs.Ec2TaskDefinition(scope, "InstanaAgentTask", {
@@ -111,7 +121,7 @@ export class InstanaEcsAgent {
 };
 
 export class InstanaAgentStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps, instanaEnvProps?: InstanaEnvProps) {
+  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps, instanaEnvProps?: InstanaEnvPropsClassic) {
     super(scope, id, props);
 
     const policies = iam.PolicyDocument.fromJson(require('../configuration.json'));

@@ -17,6 +17,9 @@ RUN mvn package
 #
 FROM openjdk:8-jdk
 
+COPY --from=containers.instana.io/instana/release/aws/fargate/jvm /instana /instana
+ENV JAVA_TOOL_OPTIONS="-javaagent:/instana/instana-fargate-collector.jar"
+
 EXPOSE 8080
 
 WORKDIR /opt/shipping

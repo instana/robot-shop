@@ -5,10 +5,10 @@ import * as ecs_patterns from "@aws-cdk/aws-ecs-patterns";
 import * as autoscaling from "@aws-cdk/aws-autoscaling";
 
 import * as path from 'path';
-import { InstanaEcsAgent, InstanaEnvProps } from './instanaAgent';
+import { InstanaEcsAgent, InstanaEnvPropsClassic, InstanaEnvPropsEum } from './instanaAgent';
 
 export class RobotShopEcsStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps, instanaEnvProps?: InstanaEnvProps) {
+  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps, instanaEnvPropsClassic?: InstanaEnvPropsClassic, instanaEnvPropsEum?: InstanaEnvPropsEum) {
     super(scope, id, props);
 
     const REPO = "robotshop";
@@ -61,7 +61,7 @@ export class RobotShopEcsStack extends cdk.Stack {
       memoryReservationMiB: 256,
       logging: ecs.AwsLogDriver.awsLogs({ streamPrefix: "robot-shop" }),
       environment: {
-        ...instanaEnvProps
+        ...instanaEnvPropsClassic
       }
     }).addPortMappings({ containerPort: MONGODB_PORT });
 
@@ -80,7 +80,7 @@ export class RobotShopEcsStack extends cdk.Stack {
       memoryReservationMiB: 256,
       logging: ecs.AwsLogDriver.awsLogs({ streamPrefix: "robot-shop" }),
       environment: {
-        ...instanaEnvProps
+        ...instanaEnvPropsClassic
       }
     }).addPortMappings({ containerPort: MYSQL_PORT });
     const mysqlService = new ecs.Ec2Service(this, "MysqlService", {
@@ -98,7 +98,7 @@ export class RobotShopEcsStack extends cdk.Stack {
       memoryReservationMiB: 256,
       logging: ecs.AwsLogDriver.awsLogs({ streamPrefix: "robot-shop" }),
       environment: {
-        ...instanaEnvProps
+        ...instanaEnvPropsClassic
       }
     }).addPortMappings({ containerPort: REDIS_PORT });
     const redisService = new ecs.Ec2Service(this, "RedisService", {
@@ -116,7 +116,7 @@ export class RobotShopEcsStack extends cdk.Stack {
       memoryReservationMiB: 256,
       logging: ecs.AwsLogDriver.awsLogs({ streamPrefix: "robot-shop" }),
       environment: {
-        ...instanaEnvProps
+        ...instanaEnvPropsClassic
       }
     }).addPortMappings({ containerPort: RABBITMQ_PORT[0] }, { containerPort: RABBITMQ_PORT[1] });
     const rabbitMqService = new ecs.Ec2Service(this, "RabbitMqService", {
@@ -135,7 +135,7 @@ export class RobotShopEcsStack extends cdk.Stack {
       logging: ecs.AwsLogDriver.awsLogs({ streamPrefix: "robot-shop" }),
       environment: {
         "MONGO_URL": `mongodb://${MONGODB_HOST}:${MONGODB_PORT}/catalogue`,
-        ...instanaEnvProps
+        ...instanaEnvPropsClassic
       }
     }).addPortMappings({ containerPort: CATALOGUE_PORT });
     const catalogueService = new ecs.Ec2Service(this, "CatalogueService", {
@@ -155,7 +155,7 @@ export class RobotShopEcsStack extends cdk.Stack {
       environment: {
         "MONGO_URL": `mongodb://${MONGODB_HOST}:${MONGODB_PORT}/catalogue`,
         "REDIS_HOST": REDIS_HOST,
-        ...instanaEnvProps
+        ...instanaEnvPropsClassic
       }
     }).addPortMappings({ containerPort: USER_PORT });
     const userService = new ecs.Ec2Service(this, "UserService", {
@@ -175,7 +175,7 @@ export class RobotShopEcsStack extends cdk.Stack {
       environment: {
         "REDIS_HOST": REDIS_HOST,
         "CATALOGUE_HOST": CATALOGUE_HOST,
-        ...instanaEnvProps
+        ...instanaEnvPropsClassic
       }
     }).addPortMappings({ containerPort: CART_PORT });
     const cartService = new ecs.Ec2Service(this, "CartService", {
@@ -195,7 +195,7 @@ export class RobotShopEcsStack extends cdk.Stack {
       environment: {
         "DB_HOST": MYSQL_HOST,
         "CART_ENDPOINT": `${CART_HOST}:${CART_PORT}`,
-        ...instanaEnvProps
+        ...instanaEnvPropsClassic
       }
     }).addPortMappings({ containerPort: SHIPPING_PORT });
     const shippingService = new ecs.Ec2Service(this, "ShippingService", {
@@ -215,7 +215,7 @@ export class RobotShopEcsStack extends cdk.Stack {
       environment: {
         "PDO_URL": `mysql:host=${MYSQL_HOST};dbname=ratings;charset=utf8mb4`,
         "CATALOGUE_URL": `http://${CATALOGUE_HOST}:${CATALOGUE_PORT}/`,
-        ...instanaEnvProps
+        ...instanaEnvPropsClassic
       }
     }).addPortMappings({ containerPort: RATINGS_PORT });
     const ratingsService = new ecs.Ec2Service(this, "RatingsService", {
@@ -236,7 +236,7 @@ export class RobotShopEcsStack extends cdk.Stack {
         "AMQP_HOST": RABBITMQ_HOST,
         "CART_HOST": CART_HOST,
         "USER_HOST": USER_HOST,
-        ...instanaEnvProps
+        ...instanaEnvPropsClassic
       }
     }).addPortMappings({ containerPort: PAYMENT_PORT });
     const paymentService = new ecs.Ec2Service(this, "PaymentService", {
@@ -255,7 +255,7 @@ export class RobotShopEcsStack extends cdk.Stack {
       logging: ecs.AwsLogDriver.awsLogs({ streamPrefix: "robot-shop" }),
       environment: {
         "AMQP_HOST": RABBITMQ_HOST,
-        ...instanaEnvProps
+        ...instanaEnvPropsClassic
       }
     }).addPortMappings({ containerPort: DISPATCH_PORT });
     const dispatchService = new ecs.Ec2Service(this, "DispatchService", {
@@ -279,7 +279,7 @@ export class RobotShopEcsStack extends cdk.Stack {
         "SHIPPING_HOST": SHIPPING_HOST,
         "PAYMENT_HOST": PAYMENT_HOST,
         "RATINGS_HOST": RATINGS_HOST,
-        ...instanaEnvProps
+        ...instanaEnvPropsEum
       }
     }).addPortMappings({ containerPort: WEB_PORT });
     const webService = new ecs_patterns.ApplicationLoadBalancedEc2Service(this, "WebService", {
@@ -289,6 +289,6 @@ export class RobotShopEcsStack extends cdk.Stack {
     });
 
     // ### Enable Instana ###
-    new InstanaEcsAgent(this, cluster, instanaEnvProps);
+    new InstanaEcsAgent(this, cluster, instanaEnvPropsClassic);
   }
 }
