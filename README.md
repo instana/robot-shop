@@ -6,7 +6,7 @@ You can get more detailed information from my [blog post](https://www.instana.co
 
 This sample microservice application has been built using these technologies:
 - NodeJS ([Express](http://expressjs.com/))
-- Java ([Spark Java](http://sparkjava.com/))
+- Java ([Spring Boot](https://spring.io/))
 - Python ([Flask](http://flask.pocoo.org))
 - Golang
 - PHP (Apache)
