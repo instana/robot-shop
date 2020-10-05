@@ -55,14 +55,26 @@ services:
       - mysql
     networks:
       - robot-shop
+    healthcheck:
+      test: ["CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost:8080/health"]
+      interval: 1s
+      timeout: 10s
+      retries: 3
   ratings:
     build:
       context: ratings
     image: ${REPO}/rs-ratings:${TAG}
+    environment:
+      APP_ENV: prod
     networks:
       - robot-shop
     depends_on:
       - mysql
+    healthcheck:
+      test: ["CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost/_health"]
+      interval: 1s
+      timeout: 10s
+      retries: 3
   payment:
     build:
       context: payment

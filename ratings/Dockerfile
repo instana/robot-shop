@@ -24,3 +24,11 @@ COPY --from=build /app/vendor/ /var/www/html/vendor/
 
 COPY html/ /var/www/html
 
+# This is important. Symfony needs write permissions and we
+# dont know the context in which the container will run, i.e.
+# which user will be forced from the outside so better play
+# safe for this simple demo.
+RUN rm -Rf /var/www/var/*
+RUN chown -R www-data /var/www
+RUN chmod -R 777 /var/www
+

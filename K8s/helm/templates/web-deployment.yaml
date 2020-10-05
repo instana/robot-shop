@@ -20,6 +20,7 @@ spec:
       containers:
       - name: web
         image: {{ .Values.image.repo }}/rs-web:{{ .Values.image.version }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         {{- if .Values.eum.key }}
         env:
         - name: INSTANA_EUM_KEY
