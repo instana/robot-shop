@@ -107,8 +107,9 @@ services:
       - "8080:8080"
     networks:
       - robot-shop
-    # Uncomment to enable Instana EUM
-    # environment:
+    #environment:
+      # NGINX_INJECT_FAKE_IP: "1"
+      # Uncomment to enable Instana EUM
       # INSTANA_EUM_KEY: <your eum key>
       # INSTANA_EUM_REPORTING_URL: https://eum-us-west-2.instana.io
       # INSTANA_EUM_REPORTING_URL: https://eum-eu-west-1.instana.io
