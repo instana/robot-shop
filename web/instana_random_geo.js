@@ -6,7 +6,9 @@ var items = [
     // Chicago
     "98.142.103.241",
     // Los Angeles
-    "192.241.230.151"
+    "192.241.230.151",
+    // Europe
+    "34.105.212.119"
 ];
 
 // we get a random ip address to simulate specific locations of the requester
