@@ -1,0 +1,105 @@
+server {
+    listen       8080;
+    server_name  localhost;
+
+    proxy_http_version 1.1;
+
+    #charset koi8-r;
+    #access_log  /var/log/nginx/host.access.log  main;
+    #error_log /dev/stdout debug;
+    #rewrite_log on;
+
+    location / {
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+        ssi    on;
+    }
+
+    location /images/ {
+        expires 5s;
+        root   /usr/share/nginx/html;
+        try_files $uri /images/placeholder.jpg;
+    }
+
+    #error_page  404              /404.html;
+
+    # redirect server error pages to the static page /50x.html
+    #
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+
+    # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+    #
+    #location ~ \.php$ {
+    #    proxy_pass   http://127.0.0.1;
+    #}
+
+    # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+    #
+    #location ~ \.php$ {
+    #    root           html;
+    #    fastcgi_pass   127.0.0.1:9000;
+    #    fastcgi_index  index.php;
+    #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+    #    include        fastcgi_params;
+    #}
+
+    # deny access to .htaccess files, if Apache's document root
+    # concurs with nginx's one
+    #
+    #location ~ /\.ht {
+    #    deny  all;
+    #}
+
+    # Workaround for AWS dynamic endpoints
+    # https://tenzer.dk/nginx-with-dynamic-upstreams/
+    # https://stackoverflow.com/questions/24453388/nginx-reverse-proxy-causing-504-gateway-timeout
+
+    # DNS server running on a reserved IP address at the base of the VPC IPv4 network range, plus two. 
+    # For example, the DNS Server on a 10.0.0.0/16 network is located at 10.0.0.2. 
+    resolver 10.0.0.2; 
+    set $catalogue_endpoint http://${CATALOGUE_HOST}:8080;
+    set $user_endpoint http://${USER_HOST}:8080;
+    set $cart_endpoint http://${CART_HOST}:8080;
+    set $shipping_endpoint http://${SHIPPING_HOST}:8080;
+    set $payment_endpoint http://${PAYMENT_HOST}:8080;
+    set $ratings_endpoint http://${RATINGS_HOST}:80;
+
+    location /api/catalogue/ {
+        rewrite ^/api/catalogue/(.*) /$1 break;
+        proxy_pass $catalogue_endpoint;
+    }
+
+    location /api/user/ {
+        rewrite ^/api/user/(.*) /$1 break;
+        proxy_pass $user_endpoint;
+    }
+
+    location /api/cart/ {
+        rewrite ^/api/cart/(.*) /$1 break;
+        proxy_pass $cart_endpoint;
+    }
+
+    location /api/shipping/ {
+        rewrite ^/api/shipping/(.*) /$1 break;
+        proxy_pass $shipping_endpoint;
+    }
+
+    location /api/payment/ {
+        rewrite ^/api/payment/(.*) /$1 break;
+        proxy_pass $payment_endpoint;
+    }
+
+    location /api/ratings/ {
+        rewrite ^/api/ratings/(.*) /$1 break;
+        proxy_pass $ratings_endpoint;
+    }
+
+    location /nginx_status {
+        stub_status on;
+        access_log off;
+    }
+}
+

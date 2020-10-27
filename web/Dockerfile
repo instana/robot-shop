@@ -18,5 +18,7 @@ COPY njs.conf /etc/nginx/conf.d/njs.conf
 COPY entrypoint.sh /root/
 ENTRYPOINT ["/root/entrypoint.sh"]
 
-COPY default.conf.template /etc/nginx/conf.d/default.conf.template
+ARG NGINX_TEMPLATE=default.conf.template
+
+COPY ${NGINX_TEMPLATE} /etc/nginx/conf.d/default.conf.template
 COPY static /usr/share/nginx/html

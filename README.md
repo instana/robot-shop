@@ -74,6 +74,32 @@ Install Stan's Robot Shop to your Kubernetes cluster using the [Helm](K8s/helm/R
 
 To deploy the Instana agent to Kubernetes, just use the [helm](https://hub.helm.sh/charts/stable/instana-agent) chart.
 
+## AWS ECS
+You can also deploy Stan's Robot Shop to AWS ECS Fargate and "classic" ECS.
+A new ECS cluster within a new VPC will be created.
+Each component will be deployed as a service in a private subnet. 
+The Web component will be exposed with an ALB.
+You will receive the public URL for accessing Stan's Robot Shop from the CDK output.
+
+When you use another IP address range than the default one, you may need to update the DNS entry in the [default.conf.aws.template](web/default.conf.aws.template).
+
+Adjustments to the deployment can be made in the file [cdk.ts](cdk/lib/cdk.ts). You also need set your `INSTANA_AGENT_KEY` etc. there.
+
+For deployment switch into the `cdk` folder and execute:
+```shell
+$ npm install
+$ cdk deploy RobotShop-fargate
+```
+*You may need to apply further options to the cdk command for your environment.*
+
+Following stack are available:
+- RobotShop-fargate
+  - Deploys the RobotShop as Fargate service
+- RobotShop-ecs
+  - Deploys the RobotShop as "classic" ECS service
+- InstanaAwsSensor
+  - Installs the Instana AWS Sensor for general AWS monitoring
+
 ## Accessing the Store
 If you are running the store locally via *docker-compose up* then, the store front is available on localhost port 8080 [http://localhost:8080](http://localhost:8080/)
 
