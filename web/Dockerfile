@@ -9,7 +9,6 @@ ENV CATALOGUE_HOST=catalogue \
     PAYMENT_HOST=payment \
     RATINGS_HOST=ratings
 
-COPY njs.conf /etc/nginx/conf.d/njs.conf
 COPY entrypoint.sh /root/
 ENTRYPOINT ["/root/entrypoint.sh"]
 
