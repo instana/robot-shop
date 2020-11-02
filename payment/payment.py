@@ -1,3 +1,5 @@
+import random
+
 import instana
 import os
 import sys
@@ -171,6 +173,29 @@ def countItems(items):
 
     return count
 
+class InstanaDataCenterMiddleware():
+    data_centers = [
+        "us-east1",
+        "us-east2",
+        "us-east3",
+        "us-east4",
+        "us-central1",
+        "us-west1",
+        "us-west2",
+        "eu-west3",
+        "eu-west4"
+    ]
+
+    def __init__(self, app):
+        self.app = app
+
+    def __call__(self, environ, start_response):
+        span = ot.tracer.active_span
+
+        span.log_kv({'datacenter': random.choice(self.data_centers)})
+
+        return self.app(environ, start_response)
+
 
 # RabbitMQ
 publisher = Publisher(app.logger)
@@ -182,4 +207,5 @@ if __name__ == "__main__":
     app.logger.info('Payment gateway {}'.format(PAYMENT_GATEWAY))
     port = int(os.getenv("SHOP_PAYMENT_PORT", "8080"))
     app.logger.info('Starting on port {}'.format(port))
+    app.wsgi_app = InstanaDataCenterMiddleware(app.wsgi_app)
     app.run(host='0.0.0.0', port=port)

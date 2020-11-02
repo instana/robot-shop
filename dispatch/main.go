@@ -26,6 +26,18 @@ var (
 	rabbitCloseError chan *amqp.Error
 	rabbitReady      chan bool
 	errorPercent     int
+
+	dataCenters = []string{
+		"us-east1",
+		"us-east2",
+		"us-east3",
+		"us-east4",
+		"us-central1",
+		"us-west1",
+		"us-west2",
+		"eu-west3",
+		"eu-west4",
+	}
 )
 
 func connectToRabbitMQ(uri string) *amqp.Connection {
@@ -115,6 +127,9 @@ func createSpan(headers map[string]interface{}, order string) {
 		log.Println("Creating child span")
 		// create child span
 		span = tracer.StartSpan("getOrder", ot.ChildOf(spanContext))
+
+		fakeDataCenter := dataCenters[rand.Intn(len(dataCenters))]
+		span.SetTag("datacenter", fakeDataCenter)
 	} else {
 		log.Println(err)
 		log.Println("Failed to get context from headers")
@@ -154,6 +169,8 @@ func processSale(parentSpan ot.Span) {
 }
 
 func main() {
+	rand.Seed(time.Now().Unix())
+
 	// Instana tracing
 	ot.InitGlobalTracer(instana.NewTracerWithOptions(&instana.Options{
 		Service:           Service,
