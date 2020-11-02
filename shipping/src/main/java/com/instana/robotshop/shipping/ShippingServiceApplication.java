@@ -27,15 +27,11 @@ import java.util.Random;
 public class ShippingServiceApplication implements WebMvcConfigurer {
 
     private static final String[] DATA_CENTERS = {
+            "asia-northeast2",
+            "asia-south1",
+            "europe-west3",
             "us-east1",
-            "us-east2",
-            "us-east3",
-            "us-east4",
-            "us-central1",
-            "us-west1",
-            "us-west2",
-            "eu-west3",
-            "eu-west4"
+            "us-west1"
     };
 
     public static void main(String[] args) {

@@ -43,15 +43,11 @@ app.use((req, res, next) => {
 
 app.use((req, res, next) => {
     let dcs = [
+        "asia-northeast2",
+        "asia-south1",
+        "europe-west3",
         "us-east1",
-        "us-east2",
-        "us-east3",
-        "us-east4",
-        "us-central1",
-        "us-west1",
-        "us-west2",
-        "eu-west3",
-        "eu-west4"
+        "us-west1"
     ];
     let span = instana.currentSpan();
     span.annotate('custom.sdk.tags.datacenter', dcs[Math.floor(Math.random() * dcs.length)]);

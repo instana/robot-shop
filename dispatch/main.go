@@ -28,15 +28,11 @@ var (
 	errorPercent     int
 
 	dataCenters = []string{
+		"asia-northeast2",
+		"asia-south1",
+		"europe-west3",
 		"us-east1",
-		"us-east2",
-		"us-east3",
-		"us-east4",
-		"us-central1",
 		"us-west1",
-		"us-west2",
-		"eu-west3",
-		"eu-west4",
 	}
 )
 

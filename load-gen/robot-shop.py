@@ -8,6 +8,7 @@ from random import randint
 class UserBehavior(HttpUser):
     wait_time = between(2, 10)
 
+    # source: https://tools.tracemyip.org/search--ip/list
     fake_ip_addresses = [
         # white house
         "156.33.241.5",
@@ -16,7 +17,13 @@ class UserBehavior(HttpUser):
         # Chicago
         "98.142.103.241",
         # Los Angeles
-        "192.241.230.151"
+        "192.241.230.151",
+        # Berlin
+        "46.114.35.116",
+        # Singapore
+        "52.77.99.130",
+        # Sydney
+        "60.242.161.215"
     ]
 
     def on_start(self):
