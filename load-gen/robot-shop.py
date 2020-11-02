@@ -51,9 +51,9 @@ class UserBehavior(HttpUser):
         uniqueid = user['uuid']
         print('User {}'.format(uniqueid))
 
-        self.client.get('/api/catalogue/categories')
+        self.client.get('/api/catalogue/categories', headers={'x-forwarded-for': fake_ip})
         # all products in catalogue
-        products = self.client.get('/api/catalogue/products').json()
+        products = self.client.get('/api/catalogue/products', headers={'x-forwarded-for': fake_ip}).json()
         for i in range(2):
             item = None
             while True:
