@@ -2,11 +2,6 @@ FROM nginx:1.19
 
 EXPOSE 8080
 
-RUN sed -i '1i load_module \"modules/ngx_http_js_module.so\";' /etc/nginx/nginx.conf && \
-    sed -i '1i load_module \"modules/ngx_stream_js_module.so\";' /etc/nginx/nginx.conf
-
-COPY instana_random_geo.js /opt/nginx_js/instana_random_geo.js
-
 ENV CATALOGUE_HOST=catalogue \
     USER_HOST=user \
     CART_HOST=cart \

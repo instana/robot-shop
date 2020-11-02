@@ -54,32 +54,26 @@ server {
     #}
 
     location /api/catalogue/ {
-        proxy_set_header x-forwarded-for $fake_ip;
         proxy_pass http://${CATALOGUE_HOST}:8080/;
     }
 
     location /api/user/ {
-        proxy_set_header x-forwarded-for $fake_ip;
         proxy_pass http://${USER_HOST}:8080/;
     }
 
     location /api/cart/ {
-        proxy_set_header x-forwarded-for $fake_ip;
         proxy_pass http://${CART_HOST}:8080/;
     }
 
     location /api/shipping/ {
-        proxy_set_header X-Forwarded-For $fake_ip;
         proxy_pass http://${SHIPPING_HOST}:8080/;
     }
 
     location /api/payment/ {
-        proxy_set_header x-forwarded-for $fake_ip;
         proxy_pass http://${PAYMENT_HOST}:8080/;
     }
 
     location /api/ratings/ {
-        proxy_set_header x-forwarded-for $fake_ip;
         proxy_pass http://${RATINGS_HOST}:80/;
     }
 
