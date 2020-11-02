@@ -22,6 +22,11 @@ services:
       - mongodb
     networks:
       - robot-shop
+    healthcheck:
+      test: [ "CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost:8080/health" ]
+      interval: 1s
+      timeout: 10s
+      retries: 3
   user:
     build:
       context: user
@@ -31,6 +36,11 @@ services:
       - redis
     networks:
       - robot-shop
+    healthcheck:
+      test: [ "CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost:8080/health" ]
+      interval: 1s
+      timeout: 10s
+      retries: 3
   cart:
     build:
       context: cart
@@ -39,6 +49,11 @@ services:
       - redis
     networks:
       - robot-shop
+    healthcheck:
+      test: [ "CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost:8080/health" ]
+      interval: 1s
+      timeout: 10s
+      retries: 3
   mysql:
     build:
       context: mysql
@@ -83,6 +98,11 @@ services:
       - rabbitmq
     networks:
       - robot-shop
+    healthcheck:
+      test: ["CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost:8080/health"]
+      interval: 1s
+      timeout: 10s
+      retries: 3
     # Uncomment to change payment gateway
     #environment:
       #PAYMENT_GATEWAY: "https://www.worldpay.com"
@@ -107,9 +127,13 @@ services:
       - "8080:8080"
     networks:
       - robot-shop
-    #environment:
-      # NGINX_INJECT_FAKE_IP: "1"
-      # Uncomment to enable Instana EUM
+    healthcheck:
+      test: [ "CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost:8080/" ]
+      interval: 1s
+      timeout: 10s
+      retries: 3
+    # Uncomment to enable Instana EUM
+    # environment:
       # INSTANA_EUM_KEY: <your eum key>
       # INSTANA_EUM_REPORTING_URL: https://eum-us-west-2.instana.io
       # INSTANA_EUM_REPORTING_URL: https://eum-eu-west-1.instana.io
