@@ -6,6 +6,7 @@ namespace Instana\RobotShop\Ratings;
 
 use Instana\RobotShop\Ratings\Controller\HealthController;
 use Instana\RobotShop\Ratings\Controller\RatingsApiController;
+use Instana\RobotShop\Ratings\EventListener\InstanaDataCenterListener;
 use Instana\RobotShop\Ratings\Integration\InstanaHeadersLoggingProcessor;
 use Instana\RobotShop\Ratings\Service\CatalogueService;
 use Instana\RobotShop\Ratings\Service\HealthCheckService;
@@ -119,6 +120,12 @@ class Kernel extends BaseKernel implements EventSubscriberInterface
         $c->register(RatingsApiController::class)
             ->addMethodCall('setLogger', [new Reference('logger')])
             ->addTag('controller.service_arguments')
+            ->setAutowired(true);
+
+        $c->register(InstanaDataCenterListener::class)
+            ->addTag('kernel.event_listener', [
+                'event' => 'kernel.request'
+            ])
             ->setAutowired(true);
     }
 

@@ -13,7 +13,8 @@
         "symfony/dependency-injection": "^5.0",
         "symfony/framework-bundle": "^5.0",
         "doctrine/annotations": "^1.10",
-        "symfony/monolog-bundle": "^3.5"
+        "symfony/monolog-bundle": "^3.5",
+        "instana/instana-php-sdk": "^1.10"
     },
     "autoload": {
         "psr-4": {
