@@ -6,14 +6,23 @@ services:
     image: ${REPO}/rs-mongodb:${TAG}
     networks:
       - robot-shop
+    logging: &logging
+      driver: "json-file"
+      options:
+        max-size: "25m"
+        max-file: "2"
   redis:
     image: redis:4.0.6
     networks:
       - robot-shop
+    logging:
+      <<: *logging
   rabbitmq:
     image: rabbitmq:3.7-management-alpine
     networks:
       - robot-shop
+    logging:
+      <<: *logging
   catalogue:
     build:
       context: catalogue
@@ -27,6 +36,8 @@ services:
       interval: 1s
       timeout: 10s
       retries: 3
+    logging:
+      <<: *logging
   user:
     build:
       context: user
@@ -41,6 +52,8 @@ services:
       interval: 1s
       timeout: 10s
       retries: 3
+    logging:
+      <<: *logging
   cart:
     build:
       context: cart
@@ -54,6 +67,8 @@ services:
       interval: 1s
       timeout: 10s
       retries: 3
+    logging:
+      <<: *logging
   mysql:
     build:
       context: mysql
@@ -62,6 +77,8 @@ services:
       - NET_ADMIN
     networks:
       - robot-shop
+    logging:
+      <<: *logging
   shipping:
     build:
       context: shipping
@@ -75,6 +92,8 @@ services:
       interval: 1s
       timeout: 10s
       retries: 3
+    logging:
+      <<: *logging
   ratings:
     build:
       context: ratings
@@ -90,6 +109,8 @@ services:
       interval: 1s
       timeout: 10s
       retries: 3
+    logging:
+      <<: *logging
   payment:
     build:
       context: payment
@@ -106,6 +127,8 @@ services:
     # Uncomment to change payment gateway
     #environment:
       #PAYMENT_GATEWAY: "https://www.worldpay.com"
+    logging:
+      <<: *logging
   dispatch:
     build:
       context: dispatch
@@ -114,6 +137,8 @@ services:
       - rabbitmq
     networks:
       - robot-shop
+    logging:
+      <<: *logging
   web:
     build:
       context: web
@@ -137,6 +162,8 @@ services:
       # INSTANA_EUM_KEY: <your eum key>
       # INSTANA_EUM_REPORTING_URL: https://eum-us-west-2.instana.io
       # INSTANA_EUM_REPORTING_URL: https://eum-eu-west-1.instana.io
+    logging:
+      <<: *logging
 
 networks:
   robot-shop:
