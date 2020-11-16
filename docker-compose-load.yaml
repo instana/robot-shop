@@ -10,3 +10,8 @@ services:
       - robot-shop
     depends_on:
       - web
+    logging: &logging
+      driver: "json-file"
+      options:
+        max-size: "25m"
+        max-file: "2"
