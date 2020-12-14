@@ -93,3 +93,4 @@ $ helm install robot-shop --set openshift=true helm
 | openshift        | false | boolean | If OpenShift additional configuration is applied. |
 | payment.gateway  | null | string | External URL end-point to simulate partial/3rd party traces. |
 | psp.enabled      | false | boolean | Enable Pod Security Policy for clusters with a PSP Admission controller |
+| redis.storageClassName | standard | string | Storage class to use with Redis's StatefulSet. The default for EKS is gp2. |

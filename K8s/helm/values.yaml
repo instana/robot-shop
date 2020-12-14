@@ -28,3 +28,6 @@ nodeport: false
 # "special" Openshift. Set to true when deploying to any openshift flavour
 openshift: false
 
+# Storage class to use with redis statefulset.
+redis:
+  storageClassName: standard
