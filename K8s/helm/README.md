@@ -80,3 +80,16 @@ Openshift is like K8s but not K8s. Set `openshift` to true or things will break.
 $ helm install robot-shop --set openshift=true helm
 ```
 
+### Deployment Parameters
+
+| Key              | Default | Type   | Description |
+| ---------------- | ------- | ------ | ----------- |
+| eum.key          | null    | string | EUM Access Key |
+| eum.url          | https://eum-eu-west-1.instana.io | url | EUM endpoint URL |
+| image.pullPolicy | IfNotPresent | string | Kubernetes pull policy. One of Always,IfNotPresent, or Never. |
+| image.repo       | robotshop | string | Base docker repository to pull the images from. |
+| image.version    | latest | string | Docker tag to pull. |
+| nodeport         | false | booelan | Whether to expose the services via node port. |
+| openshift        | false | boolean | If OpenShift additional configuration is applied. |
+| payment.gateway  | null | string | External URL end-point to simulate partial/3rd party traces. |
+| psp.enabled      | false | boolean | Enable Pod Security Policy for clusters with a PSP Admission controller |
