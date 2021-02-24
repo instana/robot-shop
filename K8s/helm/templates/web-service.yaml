@@ -16,3 +16,14 @@ spec:
   {{ else }}
   type: LoadBalancer
   {{ end }}
+---
+{{if .Values.ocCreateRoute}}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: web
+spec:
+  to:
+    kind: Service
+    name: web
+{{end}}
