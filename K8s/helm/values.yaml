@@ -31,3 +31,5 @@ openshift: false
 # Storage class to use with redis statefulset.
 redis:
   storageClassName: standard
+
+ocCreateRoute: false
