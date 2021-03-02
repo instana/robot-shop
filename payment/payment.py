@@ -9,8 +9,6 @@ import uuid
 import json
 import requests
 import traceback
-import opentracing as ot
-import opentracing.ext.tags as tags
 from flask import Flask
 from flask import Response
 from flask import request
@@ -60,11 +58,6 @@ def pay(id):
     app.logger.info(cart)
 
     anonymous_user = True
-
-    # add some log info to the active trace
-    span = ot.tracer.active_span
-    span.log_kv({'id': id})
-    span.log_kv({'cart': cart})
 
     # check user exists
     try:
@@ -133,36 +126,13 @@ def pay(id):
 
 def queueOrder(order):
     app.logger.info('queue order')
-    # RabbitMQ pika is not currently traced automatically
-    # opentracing tracer is automatically set to Instana tracer
-    # start a span
 
-    parent_span = ot.tracer.active_span
-    with ot.tracer.start_active_span('queueOrder', child_of=parent_span,
-            tags={
-                    'exchange': Publisher.EXCHANGE,
-                    'key': Publisher.ROUTING_KEY
-                }) as tscope:
-        tscope.span.set_tag('span.kind', 'intermediate')
-        tscope.span.log_kv({'orderid': order.get('orderid')})
-        with ot.tracer.start_active_span('rabbitmq', child_of=tscope.span,
-                tags={
-                    'exchange': Publisher.EXCHANGE,
-                    'sort': 'publish',
-                    'address': Publisher.HOST,
-                    'key': Publisher.ROUTING_KEY
-                    }
-                ) as scope:
+    # For screenshot demo requirements optionally add in a bit of delay
+    delay = int(os.getenv('PAYMENT_DELAY_MS', 0))
+    time.sleep(delay / 1000)
 
-            # For screenshot demo requirements optionally add in a bit of delay
-            delay = int(os.getenv('PAYMENT_DELAY_MS', 0))
-            time.sleep(delay / 1000)
-
-            headers = {}
-            ot.tracer.inject(scope.span.context, ot.Format.HTTP_HEADERS, headers)
-            app.logger.info('msg headers {}'.format(headers))
-
-            publisher.publish(order, headers)
+    headers = {}
+    publisher.publish(order, headers)
 
 
 def countItems(items):
@@ -172,29 +142,6 @@ def countItems(items):
             count += item.get('qty')
 
     return count
-
-class InstanaDataCenterMiddleware():
-    data_centers = [
-        "us-east1",
-        "us-east2",
-        "us-east3",
-        "us-east4",
-        "us-central1",
-        "us-west1",
-        "us-west2",
-        "eu-west3",
-        "eu-west4"
-    ]
-
-    def __init__(self, app):
-        self.app = app
-
-    def __call__(self, environ, start_response):
-        span = ot.tracer.active_span
-
-        span.log_kv({'datacenter': random.choice(self.data_centers)})
-
-        return self.app(environ, start_response)
 
 
 # RabbitMQ
@@ -207,5 +154,4 @@ if __name__ == "__main__":
     app.logger.info('Payment gateway {}'.format(PAYMENT_GATEWAY))
     port = int(os.getenv("SHOP_PAYMENT_PORT", "8080"))
     app.logger.info('Starting on port {}'.format(port))
-    app.wsgi_app = InstanaDataCenterMiddleware(app.wsgi_app)
     app.run(host='0.0.0.0', port=port)
