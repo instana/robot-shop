@@ -4,9 +4,7 @@ This example works with [Humio](https://humio.com/) and [ELK](https://elastic.co
 
 ## Build Fluentd Container
 
-The default `fluentd` Docker image does not include the output plugin for Elasticsearch. Therefore a new Docker image based on the default image with the Elasticsearch output plugin installed should be created.
+The default `fluentd` Docker image does not include the output plugin for Elasticsearch. Therefore a new Docker image based on the default image with the Elasticsearch output plugin installed should be created, see the `Dockerfile` and `build.sh` script for examples. This example has already been built and pushed to Docker Hub.
 
-If running Robot Shop locally via `docker-compose`, the image does not need to be pushed to a registry. If running on Kubernetes, the image will need to be pushed to a registry.
-
-Deployment is also slightly different depending on which platform Robot Shop is run on. See the appropriate subdirectories for the required files and further instructions.
+Deployment is slightly different depending on which platform Robot Shop is run on. See the appropriate subdirectories for the required files and further instructions.
 

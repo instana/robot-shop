@@ -8,3 +8,4 @@ Apply the configuration:
 $ kubectl apply -f fluentd.yaml
 ```
 
+Set up [logging integration](https://www.instana.com/docs/logging/) in Instana.

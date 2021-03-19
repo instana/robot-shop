@@ -16,7 +16,7 @@ services:
     image: ${REPO}/rs-mongodb:${TAG}
     networks:
       - robto-shop
-    logging:
+    logging: &logging
       driver: "fluentd"
       options:
         fluentd-address: localhost:24224
