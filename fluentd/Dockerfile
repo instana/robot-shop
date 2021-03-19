@@ -6,5 +6,4 @@ RUN apk update && \
 RUN fluent-gem install fluent-plugin-elasticsearch && \
     fluent-gem install fluent-plugin-kubernetes_metadata_filter  && \
     fluent-gem install fluent-plugin-multi-format-parser
-USER fluent
 

@@ -134,6 +134,7 @@ spec:
             - name: varlibdockercontainers
               mountPath: /var/lib/docker/containers
               readOnly: true
+          imagePullPolicy: Always
       volumes:
         - name: fluentd-config
           configMap:
