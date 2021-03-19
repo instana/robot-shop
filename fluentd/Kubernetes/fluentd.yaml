@@ -1,0 +1,148 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: logging
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fluentd
+  namespace: logging
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: fluentd
+  namespace: logging
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - namespaces
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: fluentd
+  namespace: logging
+roleRef:
+  kind: ClusterRole
+  name: fluentd
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: ServiceAccount
+  name: fluentd
+  namespace: logging
+#
+# CONFIGURATION
+#
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluentd-config
+  namespace: logging
+data:
+  fluent.conf: |
+    <source>
+      @type tail
+      path /var/log/containers/*.log
+      pos_file /var/log/fluentd-containers.log.pos
+      tag kubernetes.*
+      read_from_head false
+      <parse>
+        @type json
+      </parse>
+    </source>
+
+    <filter kubernetes.**>
+      @type kubernetes_metadata
+      @id filter_kube_metadata
+    </filter>
+
+    # Throw away what is not needed first
+
+    #<match fluent.**>
+    #@type null
+    #</match>
+
+    <match kubernetes.var.log.containers.**kube-system**.log>
+      @type null
+    </match>
+
+    # Capture what is left
+    <match **>
+      @type elasticsearch
+      host cloud.humio.com
+      port 9200
+      scheme https
+      ssl_version TLSv1_2
+      logstash_format true
+      user <Humio index or Elasticsearch user>
+      password <Humio API key or Elasticsearch password>
+    </match>
+
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluentd
+  namespace: logging
+  labels:
+    k8s-app: fluentd
+    #https://github.com/kubernetes/kubernetes/issues/51376
+    #kubernetes.io/cluster-service: "true"
+spec:
+  selector:
+    matchLabels:
+      name: fluentd
+  template:
+    metadata:
+      labels:
+        name: fluentd
+        #kubernetes.io/cluster-service: "true"
+    spec:
+      serviceAccount: fluentd
+      serviceAccountName: fluentd
+      terminationGracePeriodSeconds: 30
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
+      containers:
+        - name: fluentd
+          image: robotshop/fluentd:elastic
+          #args:
+          #  - "-v"
+          resources:
+            limits:
+              cpu: 500m
+              memory: 500Mi
+            requests:
+              cpu: 100m
+              memory: 200Mi
+          volumeMounts:
+            - name: fluentd-config
+              mountPath: /fluentd/etc
+            - name: varlog
+              mountPath: /var/log
+            - name: varlibdockercontainers
+              mountPath: /var/lib/docker/containers
+              readOnly: true
+          imagePullPolicy: Always
+      volumes:
+        - name: fluentd-config
+          configMap:
+            name: fluentd-config
+        - name: varlog
+          hostPath:
+            path: /var/log
+        - name: varlibdockercontainers
+          hostPath:
+            path: /var/lib/docker/containers
+
