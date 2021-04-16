@@ -72,7 +72,7 @@ The Docker container images are all available on [Docker Hub](https://hub.docker
 
 Install Stan's Robot Shop to your Kubernetes cluster using the [Helm](K8s/helm/README.md) chart.
 
-To deploy the Instana agent to Kubernetes, just use the [helm](https://artifacthub.io/packages/helm/instana/instana-agent) chart.
+To deploy the Instana agent to Kubernetes, just use the [helm](https://github.com/instana/helm-charts) chart.
 
 ## Accessing the Store
 If you are running the store locally via *docker-compose up* then, the store front is available on localhost port 8080 [http://localhost:8080](http://localhost:8080/)
