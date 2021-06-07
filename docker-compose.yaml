@@ -160,8 +160,7 @@ services:
     # Uncomment to enable Instana EUM
     # environment:
       # INSTANA_EUM_KEY: <your eum key>
-      # INSTANA_EUM_REPORTING_URL: https://eum-us-west-2.instana.io
-      # INSTANA_EUM_REPORTING_URL: https://eum-eu-west-1.instana.io
+      # INSTANA_EUM_REPORTING_URL: <your reporting url>
     logging:
       <<: *logging
 
