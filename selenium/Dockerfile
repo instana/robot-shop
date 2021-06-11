@@ -22,12 +22,15 @@ RUN \
     ln -fs /opt/chromedriver-$CHROMEDRIVER_VERSION/chromedriver /usr/local/bin/chromedriver && \
     rm -rf /var/lib/apt/lists/*
 
+RUN useradd -m loader
+USER loader
+
 WORKDIR /load
 
-COPY requirements.txt ./
+COPY --chown=loader:loader requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY entrypoint.sh /load/
-COPY load.py /load/
+COPY --chown=loader:loader entrypoint.sh .
+COPY --chown=loader:loader load.py .
 
 ENTRYPOINT ["./entrypoint.sh"]
