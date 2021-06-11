@@ -28,9 +28,7 @@ docker run --name rs-website-load -e HOST -d robotshop/rs-website-load
 ## Run it on Kubernetes / OpenShift
 
 ```sh
-export HOST="<YOUR ROBOT SHOP HOST URL>"
-
-kubectl apply -f - <<EOF
+kubectl -n robot-shop apply -f - <<EOF
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -51,8 +49,8 @@ spec:
       - name: rs-website-load
         env:
           - name: HOST
-            value: "$HOST"
-        image: robotshop/rs-website-load:latest
-        #image: brightzheng100/rs-website-load:latest
+            value: "http://web:8080/"                 # or your robot shop app's real route URL
+        #image: robotshop/rs-website-load:latest
+        image: brightzheng100/rs-website-load:latest
 EOF
 ```
