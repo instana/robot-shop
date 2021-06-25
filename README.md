@@ -24,6 +24,14 @@ To see the application performance results in the Instana dashboard, you will fi
 ## Build from Source
 To optionally build from source (you will need a newish version of Docker to do this) use Docker Compose. Optionally edit the `.env` file to specify an alternative image registry and version tag; see the official [documentation](https://docs.docker.com/compose/env-file/) for more information.
 
+To download the tracing module for Nginx, it needs a valid Instana agent key. Set this in the environment before starting the build.
+
+```shell
+$ export INSTANA_AGENT_KEY="<your agent key>"
+```
+
+Now build all the images.
+
 ```shell
 $ docker-compose build
 ```
