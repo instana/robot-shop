@@ -5,13 +5,16 @@ WORKDIR /instana
 
 RUN apk add --update --no-cache curl
 
-RUN curl \
+RUN if [ -n "$KEY" ]; then curl \
     --output instana.zip \
     --user "_:$KEY" \
     https://artifact-public.instana.io/artifactory/shared/com/instana/nginx_tracing/1.1.2/linux-amd64-glibc-nginx-1.20.1.zip && \
     unzip instana.zip && \
     mv glibc-libinstana_sensor.so libinstana_sensor.so && \
-    mv glibc-nginx-1.20.1-ngx_http_ot_module.so ngx_http_opentracing_module.so
+    mv glibc-nginx-1.20.1-ngx_http_ot_module.so ngx_http_opentracing_module.so; \
+    else echo "KEY not provided. Not adding tracing"; \
+    touch dummy.so; \
+    fi
 
 
 FROM nginx:1.20.1
