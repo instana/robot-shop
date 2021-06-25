@@ -33,7 +33,7 @@ services:
       - robot-shop
     healthcheck:
       test: [ "CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost:8080/health" ]
-      interval: 1s
+      interval: 10s
       timeout: 10s
       retries: 3
     logging:
@@ -49,7 +49,7 @@ services:
       - robot-shop
     healthcheck:
       test: [ "CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost:8080/health" ]
-      interval: 1s
+      interval: 10s
       timeout: 10s
       retries: 3
     logging:
@@ -64,7 +64,7 @@ services:
       - robot-shop
     healthcheck:
       test: [ "CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost:8080/health" ]
-      interval: 1s
+      interval: 10s
       timeout: 10s
       retries: 3
     logging:
@@ -89,7 +89,7 @@ services:
       - robot-shop
     healthcheck:
       test: ["CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost:8080/health"]
-      interval: 1s
+      interval: 10s
       timeout: 10s
       retries: 3
     logging:
@@ -106,7 +106,7 @@ services:
       - mysql
     healthcheck:
       test: ["CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost/_health"]
-      interval: 1s
+      interval: 10s
       timeout: 10s
       retries: 3
     logging:
@@ -121,7 +121,7 @@ services:
       - robot-shop
     healthcheck:
       test: ["CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost:8080/health"]
-      interval: 1s
+      interval: 10s
       timeout: 10s
       retries: 3
     # Uncomment to change payment gateway
@@ -142,6 +142,9 @@ services:
   web:
     build:
       context: web
+      args:
+        # agent key to download tracing libs
+        KEY: ${INSTANA_AGENT_KEY}
     image: ${REPO}/rs-web:${TAG}
     depends_on:
       - catalogue
@@ -154,7 +157,7 @@ services:
       - robot-shop
     healthcheck:
       test: [ "CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost:8080/" ]
-      interval: 1s
+      interval: 10s
       timeout: 10s
       retries: 3
     # Uncomment to enable Instana EUM
