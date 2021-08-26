@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#set -x
+# set -x
 
 # echo "arg 1 $1"
 
@@ -15,8 +15,10 @@ if [ -n "$INSTANA_EUM_KEY" -a -n "$INSTANA_EUM_REPORTING_URL" ]
 then
     echo "Enabling Instana EUM"
     # use | instead of / as command delimiter to avoid eacaping the url
+    # strip off any trailing /
+    SAFE_URL=$(echo "$INSTANA_EUM_REPORTING_URL" | sed 's|/*$||')
     sed -i "s|INSTANA_EUM_KEY|$INSTANA_EUM_KEY|" $BASE_DIR/eum-tmpl.html
-    sed -i "s|INSTANA_EUM_REPORTING_URL|$INSTANA_EUM_REPORTING_URL|" $BASE_DIR/eum-tmpl.html
+    sed -i "s|INSTANA_EUM_REPORTING_URL|$SAFE_URL|" $BASE_DIR/eum-tmpl.html
     cp $BASE_DIR/eum-tmpl.html $BASE_DIR/eum.html
 else
     echo "EUM not enabled"
