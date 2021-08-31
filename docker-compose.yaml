@@ -12,13 +12,13 @@ services:
         max-size: "25m"
         max-file: "2"
   redis:
-    image: redis:4.0.6
+    image: redis:6.2-alpine
     networks:
       - robot-shop
     logging:
       <<: *logging
   rabbitmq:
-    image: rabbitmq:3.7-management-alpine
+    image: rabbitmq:3.8-management-alpine
     networks:
       - robot-shop
     logging:

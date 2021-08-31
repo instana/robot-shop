@@ -1,4 +1,4 @@
-FROM python:3.6
+FROM python:3.9
 
 # Some default values
 ENV HOST="http://localhost:8080/" \
