@@ -31,9 +31,9 @@ chmod 644 $BASE_DIR/eum.html
 # apply environment variables to default.conf
 envsubst '${CATALOGUE_HOST} ${USER_HOST} ${CART_HOST} ${SHIPPING_HOST} ${PAYMENT_HOST} ${RATINGS_HOST}' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
 
-if [ -f /tmp/ngx_http_opnetracing_module.so -a -f /tmp/libinstana_sensor.so ]
+if [ -f /tmp/ngx_http_opentracing_module.so -a -f /tmp/libinstana_sensor.so ]
 then
-    # Patching for Instana tracing
+    echo "Patching for Instana tracing"
     mv /tmp/ngx_http_opentracing_module.so /usr/lib/nginx/modules
     mv /tmp/libinstana_sensor.so /usr/local/lib
     cat - /etc/nginx/nginx.conf << !EOF! > /tmp/nginx.conf
@@ -51,6 +51,7 @@ env INSTANA_DEV;
     mv /tmp/nginx.conf /etc/nginx/nginx.conf
     echo "{}" > /etc/instana-config.json
 else
+    echo "Tracing not enabled"
     # remove tracing config
     sed -i '1,3d' /etc/nginx/conf.d/default.conf
 fi
