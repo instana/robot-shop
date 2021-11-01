@@ -15,6 +15,9 @@ HOST="http://localhost:8080"
 # Error flag
 ERROR=0
 
+# Verbose mode
+LOAD_DEBUG=1
+
 # Daemon flag
 DAEMON="-it"
 SILENT=0
@@ -24,7 +27,8 @@ USAGE="\
 loadgen.sh
 
 e - error flag
-d - run in background
+v - verbose mode. It implies the setting of LOAD_DEBUG and of error flag
+d - run in background. It implies the setting of SILENT mode, so the stdout will not be floaded. If -v is used, the load debug will still be printed in the stdout, even if the stdout is suppressed.
 n - number of clients
 t - time to run n clients
 h - target host
@@ -42,10 +46,14 @@ eval $(egrep '[A-Z]+=' ../.env)
 echo "Repo $REPO"
 echo "Tag $TAG"
 
-while getopts 'edn:t:h:' OPT
+while getopts 'edvn:t:h:' OPT
 do
     case $OPT in
         e)
+            ERROR=1
+            ;;
+        v)
+            LOAD_DEBUG=1
             ERROR=1
             ;;
         d)
@@ -92,9 +100,14 @@ do
     esac
 done
 
+rm -rf logs/*
 docker run \
     $DAEMON \
     --name loadgen \
+    --volume ${PWD}/robot-shop.py:/load/robot-shop.py \
+    --volume ${PWD}/entrypoint.sh:/load/entrypoint.sh \
+    --volume ${PWD}/utilities:/load/utilities \
+    --volume ${PWD}/logs:/load/logs \
     --rm \
     --network=host \
     -e "HOST=$HOST" \
@@ -102,5 +115,6 @@ docker run \
     -e "RUN_TIME=$RUN_TIME" \
     -e "SILENT=$SILENT" \
     -e "ERROR=$ERROR" \
+    -e "LOAD_DEBUG=$LOAD_DEBUG" \
     ${REPO}/rs-load:${TAG}
 

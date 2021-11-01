@@ -35,6 +35,8 @@ else
     unset TIME
 fi
 
+mkdir -p logs;
+
 echo "Starting $CLIENTS clients for ${RUN_TIME:-ever}"
 if [ "$SILENT" -eq 1 ]
 then
