@@ -27,7 +27,7 @@ USAGE="\
 loadgen.sh
 
 e - error flag
-v - verbose mode. It implies the setting of LOAD_DEBUG and of error flag
+v - verbose mode. It implies the setting of LOAD_DEBUG and of error flag. The load debug will still be printed in the stdout, even if the stdout is suppressed.
 d - run in background. It implies the setting of SILENT mode, so the stdout will not be floaded. If -v is used, the load debug will still be printed in the stdout, even if the stdout is suppressed.
 n - number of clients
 t - time to run n clients
@@ -106,10 +106,8 @@ touch logs/placeholder.txt
 docker run \
     $DAEMON \
     --name loadgen \
-    --volume ${PWD}/robot-shop.py:/load/robot-shop.py \
-    --volume ${PWD}/entrypoint.sh:/load/entrypoint.sh \
-    --volume ${PWD}/utilities:/load/utilities \
     --volume ${PWD}/logs:/load/logs \
+    --volume ${PWD}/utilities:/load/utilities \
     --rm \
     --network=host \
     -e "HOST=$HOST" \
