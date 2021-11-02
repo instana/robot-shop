@@ -5,3 +5,4 @@ vendor/
 Gopkg.lock
 load-gen/utilities/__pycache__
 load-gen/logs/php*
+agent/logs

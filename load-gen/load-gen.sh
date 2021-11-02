@@ -101,6 +101,8 @@ do
 done
 
 rm -rf logs/*
+touch logs/placeholder.txt
+
 docker run \
     $DAEMON \
     --name loadgen \
