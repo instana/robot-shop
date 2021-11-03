@@ -30,6 +30,9 @@ class UserBehavior(HttpUser):
         "60.242.161.215"
     ]
 
+    logger = None
+    rthandler = None
+    formatter = None
     php_services_api_prefix = '/api/ratings/api'
     php_service_rate = '/rate'
     php_service_fetch = '/fetch'
@@ -41,18 +44,25 @@ class UserBehavior(HttpUser):
         print('Starting')
         print("ARGS ARE:\n\"")
         print("\n".join(argv))
-        print('End of ARGS logging.infoing\n')
+        print('End of ARGS \n')
 
         for handler in logging.root.handlers[:]:
             logging.root.removeHandler(handler)
-        if os.environ.get('LOAD_DEBUG') == '1':
-            logging.basicConfig(filename='logs/calls.log', format='%(asctime)s [%(levelname)s] - %(message)s', encoding='utf-8', level=logging.DEBUG)
-        else:
-            logging.basicConfig(filename='logs/calls.log', format='%(asctime)s [%(levelname)s] - %(message)s', encoding='utf-8', level=logging.WARNING)
 
-        logging.info('Starting')
-        logging.info('LOAD_DEBUG: %s', os.environ.get("LOAD_DEBUG"))
-        logging.info('on start. php_fieldnames: %s', format(self.php_fieldnames))
+        self.logger = logging.getLogger('simple_rotating_logger')
+        self.rthandler = logging.handlers.RotatingFileHandler(filename='logs/calls.log', mode='a', maxBytes=5242880, backupCount=20, encoding='utf-8')
+        self.formatter = logging.Formatter('%(asctime)s [%(levelname)s]:%(message)s')
+        self.rthandler.setFormatter(self.formatter)
+        self.logger.addHandler(self.rthandler)
+
+        if os.environ.get('LOAD_DEBUG') == '1':
+            self.logger.setLevel(logging.DEBUG)
+        else:
+            self.logger.setLevel(logging.WARNING)
+
+        self.logger.info('Starting')
+        self.logger.info('LOAD_DEBUG: %s', os.environ.get("LOAD_DEBUG"))
+        self.logger.info('on start. php_fieldnames: %s', format(self.php_fieldnames))
 
         self.my_csv_writer = CSVWriter("logs/php_services_calls.csv", self.php_fieldnames)
 
@@ -70,7 +80,7 @@ class UserBehavior(HttpUser):
 
     @task
     def load(self):
-        logging.info('new user, new load task\n')
+        self.logger.info('new user, new load task\n')
         fake_ip = random.choice(self.fake_ip_addresses)
 
         self.client.get('/', headers={'x-forwarded-for': fake_ip})
@@ -93,26 +103,26 @@ class UserBehavior(HttpUser):
             if randint(1, 10) <= 3:
                 ratevalue = randint(1, 5)
                 put_rate_api_str = '{}{}/{}/{}'.format(self.php_services_api_prefix, self.php_service_rate, item['sku'], ratevalue )
-                logging.info('item: {} ratevalue: {} put_rate_api_str: {} by: {}\n'.format(item['sku'], ratevalue, put_rate_api_str, fake_ip))
+                self.logger.info('item: {} ratevalue: {} put_rate_api_str: {} by: {}\n'.format(item['sku'], ratevalue, put_rate_api_str, fake_ip))
                 try:
                     self.client.put(put_rate_api_str, headers)
                     self.my_csv_writer.writerow({'REQTYPE': 'PUT', 'SERVICE': '{}'.format(self.php_service_rate), 'INPUT': '{}/{}'.format(item['sku'], ratevalue ), 'HEADER': '{}'.format(headers), 'ERRFLAG': '{}'.format("")})
                 except BaseException as err:
-                    logging.warnign("Last call generated an error")
-                    logging.exception()
+                    self.logger.warnign("Last call generated an error")
+                    self.logger.exception()
                     self.my_csv_writer.writerow({'REQTYPE': 'PUT', 'SERVICE': '{}'.format(self.php_service_rate), 'INPUT': '{}/{}'.format(item['sku'], ratevalue ), 'HEADER': '{}'.format(headers), 'ERRFLAG': '{}'.format(err)})
                     pass
 
             self.client.get('/api/catalogue/product/{}'.format(item['sku']), headers={'x-forwarded-for': fake_ip})
 
             get_rate_api_str = '{}{}/{}'.format(self.php_services_api_prefix, self.php_service_fetch, item['sku'])
-            logging.info('item: {} get_rate_api_str: {} by: {}\n'.format(item['sku'], get_rate_api_str, fake_ip))
+            self.logger.info('item: {} get_rate_api_str: {} by: {}\n'.format(item['sku'], get_rate_api_str, fake_ip))
             try:
                 self.client.get(get_rate_api_str, headers={'x-forwarded-for': fake_ip})
                 self.my_csv_writer.writerow({'REQTYPE': 'GET', 'SERVICE': '{}'.format(self.php_service_fetch), 'INPUT': '{}'.format(item['sku']), 'HEADER': '{}'.format(headers), 'ERRFLAG': '{}'.format("") })
             except BaseException as err:
-                logging.warnign("Last call generated an error")
-                logging.exception()
+                self.logger.warnign("Last call generated an error")
+                self.logger.exception()
                 self.my_csv_writer.writerow({'REQTYPE': 'GET', 'SERVICE': '{}'.format(self.php_service_fetch), 'INPUT': '{}'.format(item['sku']), 'HEADER': '{}'.format(headers), 'ERRFLAG': '{}'.format(err) })
                 pass
 

@@ -25,7 +25,7 @@ $ ./load-gen.sh \
 -v
 ```
 
-The command also logs comprehensive details of all the API called in the file logs/calls.log, triggered by the option `-v` .
+The command also logs comprehensive details of all the PHP API called in the file logs/calls.log, triggered by the option `-v` .
 
 Alternatively, you can run the Container from Docker Hub directly on one of the nodes having access to the web service. Here there is an example of how to do it and an explanation for the variables involved:
 
@@ -55,7 +55,7 @@ Set the following environment variables to configure the load:
 * SILENT - Set this to 1 to surpress the very verbose output to the stdout from the script. This is a good idea if you're going to run load for more than a few minutes.
 * LOAD_DEBUG - Set this to 1 to enable the output of every API call produced from the script into the log file logs/calls.log. This is a good idea if you're going to investigate over occurred events during load generation.
 
-The load generator logs all the php API calls into the file logs/php_services_calls.csv, despite the variables SILENT and LOAD_DEBUG being set, respectively, to 1 and 0.
+The load generator logs all the PHP API calls into the file logs/php_services_calls.csv, despite the variables SILENT and LOAD_DEBUG being set, respectively, to 1 and 0.
 The content of the directory logs is cleaned everytime the script load-gen.sh is called.
 
 ## Kubernetes
