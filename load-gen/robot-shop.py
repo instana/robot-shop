@@ -1,5 +1,6 @@
 import os
 import random
+import logging
 
 from locust import HttpUser, task, between
 from utilities.CSVWriter import CSVWriter
@@ -29,26 +30,31 @@ class UserBehavior(HttpUser):
         "60.242.161.215"
     ]
 
-    phplog = None
     php_services_api_prefix = '/api/ratings/api'
     php_service_rate = '/rate'
     php_service_fetch = '/fetch'
-    php_fieldnames = ['REQTYPE', 'SERVICE', 'INPUT', 'HEADER']
+    php_fieldnames = ['REQTYPE', 'SERVICE', 'INPUT', 'HEADER', 'ERRFLAG']
     my_csv_writer = None
 
     def on_start(self):
         """ on_start is called when a Locust start before any task is scheduled """
         print('Starting')
-        print('LOAD_DEBUG: ', os.environ.get("LOAD_DEBUG"))
+        print("ARGS ARE:\n\"")
+        print("\n".join(argv))
+        print('End of ARGS logging.infoing\n')
 
+        for handler in logging.root.handlers[:]:
+            logging.root.removeHandler(handler)
         if os.environ.get('LOAD_DEBUG') == '1':
-            print("ARGS ARE:\n\"")
-            print("\n".join(argv))
-            print('End of ARGS printing\n')
-            print('on start. php_fieldnames:{}', format(self.php_fieldnames))
+            logging.basicConfig(filename='logs/calls.log', format='%(asctime)s [%(levelname)s] - %(message)s', encoding='utf-8', level=logging.DEBUG)
+        else:
+            logging.basicConfig(filename='logs/calls.log', format='%(asctime)s [%(levelname)s] - %(message)s', encoding='utf-8', level=logging.WARNING)
+
+        logging.info('Starting')
+        logging.info('LOAD_DEBUG: %s', os.environ.get("LOAD_DEBUG"))
+        logging.info('on start. php_fieldnames: %s', format(self.php_fieldnames))
 
         self.my_csv_writer = CSVWriter("logs/php_services_calls.csv", self.php_fieldnames)
-        self.phplog = open("logs/php.log", "a")
 
     @task
     def login(self):
@@ -64,7 +70,7 @@ class UserBehavior(HttpUser):
 
     @task
     def load(self):
-        self.phplog.write('new user, new load task\n')
+        logging.info('new user, new load task\n')
         fake_ip = random.choice(self.fake_ip_addresses)
 
         self.client.get('/', headers={'x-forwarded-for': fake_ip})
@@ -82,30 +88,33 @@ class UserBehavior(HttpUser):
                 if item['instock'] != 0:
                     break
 
-            self.phplog.write('fake_ip: {}\n'.format(fake_ip))
-
             headers={'x-forwarded-for': fake_ip}
             # vote for item
             if randint(1, 10) <= 3:
                 ratevalue = randint(1, 5)
                 put_rate_api_str = '{}{}/{}/{}'.format(self.php_services_api_prefix, self.php_service_rate, item['sku'], ratevalue )
-                if os.environ.get('LOAD_DEBUG') == '1':
-                    self.phplog.write('ratevalue: {}\n'.format(ratevalue))
-                    self.phplog.write('item: {}\n'.format(item['sku']))
-                    self.phplog.write('put_rate_api_str: {}\n'.format(put_rate_api_str))
-                    self.phplog.flush()
-                self.my_csv_writer.writerow({'REQTYPE': 'PUT', 'SERVICE': '{}'.format(self.php_service_rate), 'INPUT': '{}/{}'.format(item['sku'], ratevalue ), 'HEADER': '{}'.format(headers)})
-                self.client.put(put_rate_api_str, headers)
+                logging.info('item: {} ratevalue: {} put_rate_api_str: {} by: {}\n'.format(item['sku'], ratevalue, put_rate_api_str, fake_ip))
+                try:
+                    self.client.put(put_rate_api_str, headers)
+                    self.my_csv_writer.writerow({'REQTYPE': 'PUT', 'SERVICE': '{}'.format(self.php_service_rate), 'INPUT': '{}/{}'.format(item['sku'], ratevalue ), 'HEADER': '{}'.format(headers), 'ERRFLAG': '{}'.format("")})
+                except BaseException as err:
+                    logging.warnign("Last call generated an error")
+                    logging.exception()
+                    self.my_csv_writer.writerow({'REQTYPE': 'PUT', 'SERVICE': '{}'.format(self.php_service_rate), 'INPUT': '{}/{}'.format(item['sku'], ratevalue ), 'HEADER': '{}'.format(headers), 'ERRFLAG': '{}'.format(err)})
+                    pass
 
             self.client.get('/api/catalogue/product/{}'.format(item['sku']), headers={'x-forwarded-for': fake_ip})
 
             get_rate_api_str = '{}{}/{}'.format(self.php_services_api_prefix, self.php_service_fetch, item['sku'])
-            if os.environ.get('LOAD_DEBUG') == '1':
-                self.phplog.write('item: {}\n'.format(item['sku']))
-                self.phplog.write('get_rate_api_str: {}\n'.format(get_rate_api_str))
-                self.phplog.flush()
-            self.my_csv_writer.writerow({'REQTYPE': 'GET', 'SERVICE': '{}'.format(self.php_service_fetch), 'INPUT': '{}'.format(item['sku']), 'HEADER': '{}'.format(headers) })
-            self.client.get(get_rate_api_str, headers={'x-forwarded-for': fake_ip})
+            logging.info('item: {} get_rate_api_str: {} by: {}\n'.format(item['sku'], get_rate_api_str, fake_ip))
+            try:
+                self.client.get(get_rate_api_str, headers={'x-forwarded-for': fake_ip})
+                self.my_csv_writer.writerow({'REQTYPE': 'GET', 'SERVICE': '{}'.format(self.php_service_fetch), 'INPUT': '{}'.format(item['sku']), 'HEADER': '{}'.format(headers), 'ERRFLAG': '{}'.format("") })
+            except BaseException as err:
+                logging.warnign("Last call generated an error")
+                logging.exception()
+                self.my_csv_writer.writerow({'REQTYPE': 'GET', 'SERVICE': '{}'.format(self.php_service_fetch), 'INPUT': '{}'.format(item['sku']), 'HEADER': '{}'.format(headers), 'ERRFLAG': '{}'.format(err) })
+                pass
 
             self.client.get('/api/cart/add/{}/{}/1'.format(uniqueid, item['sku']), headers={'x-forwarded-for': fake_ip})
 

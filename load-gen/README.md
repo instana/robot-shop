@@ -14,7 +14,20 @@ $ ./load-gen.sh
 
 Runs the load generation script against the application started with `docker-compose up` . There are various command line options to configure the load.
 
-Alternatively, you can run the Container from Docker Hub directly on one of the nodes having access to the web service:
+The script must be run in the load-gen directory. It logs all the php API calls into the file logs/php_services_calls.csv.
+
+This command launches the load generator to run undefinitely (i.e. without time limits), simulating 5 clients calling the API reachable at the default URL http://localhost:8080:
+
+```shell
+$ ./load-gen.sh \
+-h http://host:port/
+-n 5 \
+-v
+```
+
+The command also logs comprehensive details of all the API called in the file logs/calls.log, triggered by the option `-v` .
+
+Alternatively, you can run the Container from Docker Hub directly on one of the nodes having access to the web service. Here there is an example of how to do it and an explanation for the variables involved:
 
 ```shell
 $ docker run \
@@ -22,11 +35,14 @@ $ docker run \
 --rm \
 --name="loadgen" \
 --network=host \
+--volume ${PWD}/logs:/load/logs \
+--volume ${PWD}/utilities:/load/utilities \
 -e "HOST=http://host:8080/"
 -e "NUM_CLIENTS=5" \
 -e "RUN_TIME=1h30m" \
 -e "ERROR=1" \
 -e "SILENT=1" \
+-e "LOAD_DEBUG=0" \
 robotshop/rs-load
 ```
 
@@ -36,7 +52,11 @@ Set the following environment variables to configure the load:
 * NUM_CLIENTS - How many simultaneous load scripts to run, the bigger the number the bigger the load. The default is 1
 * RUN_TIME - For NUM_CLIENTS greater than 1 the duration to run. If not set, load is run for ever with NUM_CLIENTS. See below.
 * ERROR - Set this to 1 to have erroroneous calls made to the payment service.
-* SILENT - Set this to 1 to surpress the very verbose output from the script. This is a good idea if you're going to run load for more than a few minutes.
+* SILENT - Set this to 1 to surpress the very verbose output to the stdout from the script. This is a good idea if you're going to run load for more than a few minutes.
+* LOAD_DEBUG - Set this to 1 to enable the output of every API call produced from the script into the log file logs/calls.log. This is a good idea if you're going to investigate over occurred events during load generation.
+
+The load generator logs all the php API calls into the file logs/php_services_calls.csv, despite the variables SILENT and LOAD_DEBUG being set, respectively, to 1 and 0.
+The content of the directory logs is cleaned everytime the script load-gen.sh is called.
 
 ## Kubernetes
 
