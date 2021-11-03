@@ -48,7 +48,7 @@ class UserBehavior(HttpUser):
             print('on start. php_fieldnames:{}', format(self.php_fieldnames))
 
         self.my_csv_writer = CSVWriter("logs/php_services_calls.csv", self.php_fieldnames)
-        self.phplog = open("logs/phplog.txt", "a")
+        self.phplog = open("logs/php.log", "a")
 
     @task
     def login(self):
