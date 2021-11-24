@@ -22,8 +22,12 @@ eum:
 psp:
   enabled: false
 
-# For the mini ones minikube, minishift set to true
-nodeport: false
+
+web:
+  # autotrace-webhook binaries to log in debug level
+  debug_autotrace: false
+  # For the mini ones minikube, minishift set to true
+  nodeport: false
 
 # "special" Openshift. Set to true when deploying to any openshift flavour
 openshift: false
