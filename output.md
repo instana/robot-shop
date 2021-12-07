@@ -10,6 +10,12 @@ Screenshot link: ![image](https://user-images.githubusercontent.com/29515983/144
 
 When there are multiple developers in the picture its good practice to always have separate branches and only merge with master branch when you are ready to release changes or the bit you are adding/changing is finished and tested. You are also able to see what features are introduced in the software and can be easily rolled back.
 
+Repo settings > Branches > Branch Protection rule > Master selected:
+Require a pull request before merging
+    - Require approvals before merging
+Required signed commits
+Include administrators
+
 
 Cool logo:
 **web/static/index.html** > made changes to to the **img src**
