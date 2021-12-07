@@ -8,6 +8,9 @@ ERROR: In the mysql dockerfile line 12 needed a couple of changes, space between
 accessed the application on http://localhost:8080/ , 
 Screenshot link: ![image](https://user-images.githubusercontent.com/29515983/144965828-9f01851f-1e9c-41b9-82a8-4ddc4a327c49.png)
 
+When there are multiple developers in the picture its good practice to always have separate branches and only merge with master branch when you are ready to release changes or the bit you are adding/changing is finished and tested. You are also able to see what features are introduced in the software and can be easily rolled back.
+
+
 Cool logo:
 **web/static/index.html** > made changes to to the **img src**
 
