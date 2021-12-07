@@ -8,7 +8,7 @@
 - **docker-compose up -d** to bring up all the containers 
 - **ERROR: /us/bin/env: ‘bash\r’: No such file or directory** - core.autocrlf was set to true in git. I changed it to false using **git config --global core.autocrlf false** and     cloned the repo again and rebuilt the containers and it worked 
 - Accessed the application on http://localhost:8080/ 
-Screenshot link: ![image](https://user-images.githubusercontent.com/29515983/144965828-9f01851f-1e9c-41b9-82a8-4ddc4a327c49.png)
+-  ![image](https://user-images.githubusercontent.com/29515983/144965828-9f01851f-1e9c-41b9-82a8-4ddc4a327c49.png)
 
 ## Is there anything wrong with commiting directly to master branch?
 When there are multiple developers in the picture its good practice to always have separate branches and only merge with master branch when you are ready to release changes or the bit you are adding/changing is finished and tested. You are also able to see what features are introduced in the software and can be easily rolled back.
