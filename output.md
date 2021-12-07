@@ -13,3 +13,6 @@ robot-shop/web/static/index.html > made changes to to the **img src**
 
 Signature **AAR** at the bottom left:
 Added **AAR** to the footer in **web/index.html file**
+
+![image](https://user-images.githubusercontent.com/29515983/145072600-58e4aa16-053f-4dbc-bd68-40dbfeec3423.png)
+
