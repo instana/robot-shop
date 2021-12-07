@@ -9,4 +9,4 @@ accessed the application on http://localhost:8080/ ,
 Screenshot link: ![image](https://user-images.githubusercontent.com/29515983/144965828-9f01851f-1e9c-41b9-82a8-4ddc4a327c49.png)
 
 Cool logo:
-robot-shop/web/static/index.html >>>>   <img src="/media/ironman.png"/>
+robot-shop/web/static/index.html >>>>   **<img src="/media/ironman.png"/>**
