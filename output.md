@@ -10,3 +10,6 @@ Screenshot link: ![image](https://user-images.githubusercontent.com/29515983/144
 
 Cool logo:
 robot-shop/web/static/index.html > made changes to to the **img src**
+
+Signature **AAR** at the bottom left:
+Added **AAR** to the footer in **web/index.html file**
