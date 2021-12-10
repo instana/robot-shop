@@ -37,8 +37,6 @@ docker-compose build
 
 6. Started application
 ```shell
-sudo su
-export INSTANA_AGENT_KEY="<my key from instana)"
 docker-compose up
 
 ```
