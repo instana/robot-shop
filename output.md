@@ -2,18 +2,18 @@ On my Windows platform, using administratove cmd prompt.
 
 1. WSL already installed, enabled VM platform 
 ```shell
-dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+$ dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
 ```
 
 2. Upgraded existing Unbuntu WSL to 2
 ```shell
-wsl --set-version Ubuntu 2
+$ wsl --set-version Ubuntu 2
 ```
 
 3. set WSL v2 default for good measure
 
 ```shell
-wsl --set-default-version 2
+$ wsl --set-default-version 2
 
 ```
 
@@ -31,13 +31,13 @@ In my WSL Ubuntu environment (running in Windows)
 ```shell
 export INSTANA_AGENT_KEY="<my key from instana)"
 
-docker-compose build
+$ docker-compose build
 
 ```
 
 6. Started application
 ```shell
-docker-compose up
+$ docker-compose up
 
 ```
 
