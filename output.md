@@ -44,3 +44,5 @@ $ docker-compose up
 7. Accessed the store http://localhost:8080
 
 ![alt text](Images/home.jpg "The home page")
+
+
