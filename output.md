@@ -22,7 +22,7 @@ wsl --set-default-version 2
 
 5. Enabled WSL Integration with Ubuntu
 
-![alt text](Images/WSL.png "Enable WSL")
+![alt text](Images/WSL.jpg "Enable WSL")
 
 In my WSL Ubuntu environment (running in Windows)
 
