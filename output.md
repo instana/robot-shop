@@ -31,11 +31,20 @@ If you made changes to the repository settings, then add it your answers in the 
     1: none desired at this time
 
 Find a fun, cool logo to replace the current one on the main page. Also put a signature at the bottom. 
-    <img src="web/static/images/cyberchrissie.png"/>
+    
 
 Merge your changes into the main branch of your repo and add a screenshot of the new main page to output.md.
 
     1: Merged.
-    2: My changes did not update localhost:8080 output.  
-    3: Seeing posts that there is a known issue with docker desktop.
-    4: Please review index.html for code modifications requested.`
+    2: Updating the docker instance with the new image and signature required some effort as the docker desktop open in editor DID not open the correct file.
+    3. To work around:
+        a: open cli in docker desktop
+        b: find location of index.html 
+        c: cd usr/share/nginx/html/
+        d: apt install vim
+        e: sed -i 's/Stan/Chrissie/g' index.html (changes reference of stan to chrissie)
+        f: overwrite the images via https://docs.docker.com/engine/reference/commandline/cp/
+        g: docker cp ../../cyberchrissie.png robot-shop_web_1:/usr/share/nginx/html/images/cyberchrissie.png
+
+
+<img src="web/static/images/index.png"/>
