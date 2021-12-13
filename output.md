@@ -18,13 +18,14 @@ application and the screenshot of the homepage:
 
 Is there anything wrong with committing the file directly to the master
 branch?
-    Master should reflect a production branch, a working final version. Working directly in master means that if you create bugs you have no other option for "going back" than to reverse/delete/reset commits, which is not a clean way of working and can cause you to lose the parts of the new code that were OK.
+
+    1: Master should reflect a production branch, a working final version. Working directly in master means that if you create bugs you have no other option for "going back" than to reverse/delete/reset commits, which is not a clean way of working and can cause you to lose the parts of the new code that were OK.
 
 How would you prevent that? 
-    Settings > Branches > Branch Protection Rules and click 'Add Rule'. Then, enter the name of the branch you want to protect and click the checkbox to require pull request reviews before merging.
+    2: Settings > Branches > Branch Protection Rules and click 'Add Rule'. Then, enter the name of the branch you want to protect and click the checkbox to require pull request reviews before merging.
 
 If you made changes to the repository settings, then add it your answers in the output.md file
-    none desired at this time
+    3: none desired at this time
 
 
 Find a fun, cool logo to replace the current one on the main page. Also put a signature at the bottom. 
