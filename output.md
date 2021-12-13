@@ -26,10 +26,10 @@ If you made changes to the repository settings, then add it your answers in the 
     3: none desired at this time
 
 Find a fun, cool logo to replace the current one on the main page. Also put a signature at the bottom. 
-    ![cyberchrissie image](/web/static/images/cyberchrissie.png)
     <img src="web/static/images/cyberchrissie.png"/>
 
 Merge your changes into the main branch of your repo and add a screenshot of the new main page to output.md.
 Merged.
 My changes did not update localhost:8080 output.  
 Seeing posts that there is a known issue with docker desktop.
+please review index.html for code modifications requested.
