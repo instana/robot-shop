@@ -14,8 +14,9 @@ application and the screenshot of the homepage:
     11: verified running application robot-shop in docker
     12: visited http://localhost:8080/
     13: confirmed and took screenshot called homepage.png - placed into repo
-         <img src="web/static/images/homepage.png"/>
-
+         
+    <img src="web/static/images/homepage.png"/> 
+    
 Is there anything wrong with committing the file directly to the master
 branch?
 
