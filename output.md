@@ -13,10 +13,10 @@ application and the screenshot of the homepage:
     10: ran docker-compose up
     11: verified running application robot-shop in docker
     12: visited http://localhost:8080/
-    13: confirmed and took screenshot called homepage.png - placed into repo
-         
-    <img src="web/static/images/homepage.png"/> 
-    
+    13: confirmed and took screenshot called homepage.png - placed into repo   
+
+<img src="web/static/images/homepage.png"/>
+
 Is there anything wrong with committing the file directly to the master
 branch?
 
@@ -34,6 +34,7 @@ Find a fun, cool logo to replace the current one on the main page. Also put a si
     <img src="web/static/images/cyberchrissie.png"/>
 
 Merge your changes into the main branch of your repo and add a screenshot of the new main page to output.md.
+
     1: Merged.
     2: My changes did not update localhost:8080 output.  
     3: Seeing posts that there is a known issue with docker desktop.
