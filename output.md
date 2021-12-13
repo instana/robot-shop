@@ -1,5 +1,6 @@
 Create an output.md file capturing the steps you followed to run the
 application and the screenshot of the homepage:
+
     1: installed docker desktop
     2: visted https://docs.microsoft.com/en-us/windows/wsl/install-manual#step-1---enable-the-windows-subsystem-for-linux
     3: enabled the windows subsystem for linux
@@ -17,19 +18,22 @@ application and the screenshot of the homepage:
 
 Is there anything wrong with committing the file directly to the master
 branch?
+
     1: Master should reflect a production branch, a working final version. Working directly in master means that if you create bugs you have no other option for "going back" than to reverse/delete/reset commits, which is not a clean way of working and can cause you to lose the parts of the new code that were OK.
 
 How would you prevent that? 
-    2: Settings > Branches > Branch Protection Rules and click 'Add Rule'. Then, enter the name of the branch you want to protect and click the checkbox to require pull request reviews before merging.
+
+    1: Settings > Branches > Branch Protection Rules and click 'Add Rule'. Then, enter the name of the branch you want to protect and click the checkbox to require pull request reviews before merging.
 
 If you made changes to the repository settings, then add it your answers in the output.md file
-    3: none desired at this time
+    
+    1: none desired at this time
 
 Find a fun, cool logo to replace the current one on the main page. Also put a signature at the bottom. 
     <img src="web/static/images/cyberchrissie.png"/>
 
 Merge your changes into the main branch of your repo and add a screenshot of the new main page to output.md.
-Merged.
-My changes did not update localhost:8080 output.  
-Seeing posts that there is a known issue with docker desktop.
-please review index.html for code modifications requested.
+    1: Merged.
+    2: My changes did not update localhost:8080 output.  
+    3: Seeing posts that there is a known issue with docker desktop.
+    4: Please review index.html for code modifications requested.`
