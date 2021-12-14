@@ -2,7 +2,7 @@ Create an output.md file capturing the steps you followed to run the
 application and the screenshot of the homepage:
 
     1: installed docker desktop
-    2: visted https://docs.microsoft.com/en-us/windows/wsl/install-manual#step-1---enable-the-windows-subsystem-for-linux
+    2: visited https://docs.microsoft.com/en-us/windows/wsl/install-manual#step-1---enable-the-windows-subsystem-for-linux
     3: enabled the windows subsystem for linux
     4: downloaded the linux kernal update package
     5: set wsl 2 as my default version
@@ -31,20 +31,21 @@ If you made changes to the repository settings, then add it your answers in the 
     1: none desired at this time
 
 Find a fun, cool logo to replace the current one on the main page. Also put a signature at the bottom. 
-    
 
+    1: created custom logo for myself titled cyberchrissie.
+    
 Merge your changes into the main branch of your repo and add a screenshot of the new main page to output.md.
 
     1: Merged.
     2: Updating the docker instance with the new image and signature required some effort as the docker desktop open in editor DID not open the correct file.
     3. To work around:
-        a: open cli in docker desktop
-        b: find location of index.html 
-        c: cd usr/share/nginx/html/
-        d: apt install vim
-        e: sed -i 's/Stan/Chrissie/g' index.html (changes reference of stan to chrissie)
-        f: overwrite the images via https://docs.docker.com/engine/reference/commandline/cp/
-        g: docker cp ../../cyberchrissie.png robot-shop_web_1:/usr/share/nginx/html/images/cyberchrissie.png
+        a: opened cli in docker desktop
+        b: used find utility to identify location of index.html 
+        c: sed -i 's/Stan/Chrissie/g' index.html (to replace reference of stan to chrissie)
+        d: cd usr/share/nginx/html/
+        e: apt install vim
+        f: transferred custom images from local instance to docker instance via https://docs.docker.com/engine/reference/commandline/cp/
+        g: ran command docker cp ../../cyberchrissie.png robot-shop_web_1:/usr/share/nginx/html/images/cyberchrissie.png 
 
 
 <img src="web/static/images/index.png"/>
