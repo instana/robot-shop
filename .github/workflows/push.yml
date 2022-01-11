@@ -1,8 +1,6 @@
 name: docker-compose-actions-workflow
 on:
   push:
-    branches:
-      - '*'
     paths-ignore:
       - 'K8s/**'
       - 'load-gen/**'
