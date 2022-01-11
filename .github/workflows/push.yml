@@ -2,18 +2,26 @@ name: docker-compose-actions-workflow
 on:
   push:
     branches:
-      - 'master'
+      - '*'
     paths-ignore:
-      - 'DCOS/**'
       - 'K8s/**'
       - 'load-gen/**'
-      - 'OpenShift/**'
-      - 'Swarm/**'
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Build the stack
-        run: docker-compose build
+      - id: auth
+        uses: google-github-actions/auth@v0.4.0
+        with:
+          workload_identity_provider: 'projects/962672166969/locations/global/workloadIdentityPools/robot-shop'
+          service_account: 'gh-actions-actor@robot-shop-337906.iam.gserviceaccount.com'
+
+      - id: get-gke-credentials
+        uses: google-github-actions/get-gke-credentials@v0.4.0
+        with:
+          cluster_name: robot-cluster
+          location: us-central1-c
+
+      - id: get-pods
+        run: kubectl get pods
