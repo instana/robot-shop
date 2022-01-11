@@ -78,7 +78,7 @@ You can run Kubernetes locally using [minikube](https://github.com/kubernetes/mi
 
 The Docker container images are all available on [Docker Hub](https://hub.docker.com/u/robotshop/).
 
-Install Stan's Robot Shop to your Kubernetes cluster using the [Helm](K8s/helm/README.md) chart.
+Install Stan's Robot Shop to your Kubernetes cluster using the [Helm](_ops/helm/README.md) chart.
 
 To deploy the Instana agent to Kubernetes, just use the [helm](https://github.com/instana/helm-charts) chart.
 
@@ -105,7 +105,7 @@ To enable Website Monioring / End-User Monitoring (EUM) see the official [docume
 
 ### Kubernetes
 
-The Helm chart for installing Stan's Robot Shop supports setting the key and endpoint url required for website monitoring, see the [README](K8s/helm/README.md).
+The Helm chart for installing Stan's Robot Shop supports setting the key and endpoint url required for website monitoring, see the [README](_ops/helm/README.md).
 
 ## Prometheus
 
