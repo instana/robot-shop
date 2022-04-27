@@ -5,20 +5,17 @@ WORKDIR /instana
 
 RUN apk add --update --no-cache curl
 
-RUN if [ -n "$KEY" ]; then nginx_version='1.5.0' \
-    curl --output index.html --user "_:$KEY" https://artifact-public.instana.io/artifactory/shared/com/instana/nginx_tracing/ \
-    nginx_version=$(cat index.html |egrep "a href"| tail -1 | awk '{print $2;}'|sed 's/href="//'|sed 's/\/".*//') \
-    rm index.html \
-    curl \
-     --output instana.zip \
-     --user "_:$KEY" \
-     https://artifact-public.instana.io/artifactory/shared/com/instana/nginx_tracing/$nginx_version/linux-amd64-nginx-1.20.1.zip && \
-     unzip instana.zip && \
-     mv glibc-libinstana_sensor.so libinstana_sensor.so && \
-     mv glibc-nginx-1.20.1-ngx_http_ot_module.so ngx_http_opentracing_module.so; \
+RUN if [ -n "$KEY" ]; then curl \
+    --output instana.zip \
+    --user "_:$KEY" \
+    https://artifact-public.instana.io/artifactory/shared/com/instana/nginx_tracing/1.1.2/linux-amd64-glibc-nginx-1.20.1.zip && \
+    unzip instana.zip && \
+    mv glibc-libinstana_sensor.so libinstana_sensor.so && \
+    mv glibc-nginx-1.20.1-ngx_http_ot_module.so ngx_http_opentracing_module.so; \
     else echo "KEY not provided. Not adding tracing"; \
-        touch dummy.so; \
+    touch dummy.so; \
     fi
+
 
 FROM nginx:1.20.1
 
