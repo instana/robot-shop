@@ -62,7 +62,7 @@ $ helm install \
 
 ## Use with Minis
 
-When running on `minishift` or `minikube` set `nodeport` to true. The store will then be available on the IP address of your mini and node port of the web service.
+When running on `minishift` or `minikube` set `web.nodeport` to true. The store will then be available on the IP address of your mini and node port of the web service.
 
 ```shell
 $ mini[kube|shift] ip
@@ -82,16 +82,17 @@ $ helm install robot-shop --set openshift=true helm
 
 ### Deployment Parameters
 
-| Key              | Default | Type   | Description |
-| ---------------- | ------- | ------ | ----------- |
-| eum.key          | null    | string | EUM Access Key |
-| eum.url          | https://eum-eu-west-1.instana.io | url | EUM endpoint URL |
-| image.pullPolicy | IfNotPresent | string | Kubernetes pull policy. One of Always,IfNotPresent, or Never. |
-| image.repo       | robotshop | string | Base docker repository to pull the images from. |
-| image.version    | latest | string | Docker tag to pull. |
-| nodeport         | false | booelan | Whether to expose the services via node port. |
-| openshift        | false | boolean | If OpenShift additional configuration is applied. |
-| payment.gateway  | null | string | External URL end-point to simulate partial/3rd party traces. |
-| psp.enabled      | false | boolean | Enable Pod Security Policy for clusters with a PSP Admission controller |
+| Key                    | Default | Type   | Description |
+| ----------------       | ------- | ------ | ----------- |
+| eum.key                | null    | string | EUM Access Key |
+| eum.url                | https://eum-eu-west-1.instana.io | url | EUM endpoint URL |
+| image.pullPolicy       | IfNotPresent | string | Kubernetes pull policy. One of Always,IfNotPresent, or Never. |
+| image.repo             | robotshop | string | Base docker repository to pull the images from. |
+| image.version          | latest | string | Docker tag to pull. |
+| web.nodeport           | false | boolean | Whether to expose the services via node port. |
+| web.debug_autotrace    | false | boolean | Whether to log in debug level the autotrace NGINX functionality |
+| openshift              | false | boolean | If OpenShift additional configuration is applied. |
+| payment.gateway        | null | string | External URL end-point to simulate partial/3rd party traces. |
+| psp.enabled            | false | boolean | Enable Pod Security Policy for clusters with a PSP Admission controller |
 | redis.storageClassName | standard | string | Storage class to use with Redis's StatefulSet. The default for EKS is gp2. |
-| ocCreateRoute    | false | boolean | If you are running on OpenShift and need a Route to the web service, set this to `true` |
+| ocCreateRoute          | false | boolean | If you are running on OpenShift and need a Route to the web service, set this to `true` |

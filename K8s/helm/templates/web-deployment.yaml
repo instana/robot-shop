@@ -21,8 +21,15 @@ spec:
       - name: web
         image: {{ .Values.image.repo }}/rs-web:{{ .Values.image.version }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        {{- if .Values.eum.key }}
+        {{- if or .Values.web.debug_autotrace .Values.eum.key }}
         env:
+        {{- end}}
+        {{- if .Values.web.debug_autotrace }}
+        - name: INSTANA_LII_LOG_LEVEL
+          value: "debug"
+        - name: INSTANA_IWN_LOG_LEVEL
+          value: "debug"
+        {{- else if .Values.eum.key }}
         - name: INSTANA_EUM_KEY
           value: {{ .Values.eum.key }}
         - name: INSTANA_EUM_REPORTING_URL
