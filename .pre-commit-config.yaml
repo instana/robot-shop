@@ -1,0 +1,8 @@
+repos:
+  - repo: https://github.com/cycodehq/cycode_cli
+    rev: 0.0.15
+    hooks:
+      - id: cycode
+        language_version: python3
+        stages:
+          - commit
