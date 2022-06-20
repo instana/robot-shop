@@ -89,8 +89,44 @@ Pulling payment   ... done
 Pulling dispatch  ... done
 Pulling web       ... done
 
-thesonics@worker01:~/robot-shop$ gpg --list-secret-keys --keyid-format=long
-thesonics@worker01:~/robot-shop$ gpg --full-generate-key
+thesonics@worker01:~/robot-shop$ docker-compose  up
+
+
+
+I had no problems to merge it:
+thesonics@worker01:~/robot-shop$ git push origin HEAD:master
+Username for 'https://github.com': IdoG999
+Password for 'https://IdoG999@github.com': 
+Enumerating objects: 7, done.
+Counting objects: 100% (7/7), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (5/5), done.
+Writing objects: 100% (5/5), 1.87 KiB | 1.87 MiB/s, done.
+Total 5 (delta 1), reused 0 (delta 0)
+remote: Resolving deltas: 100% (1/1), completed with 1 local object.
+To https://github.com/IdoG999/robot-shop.git
+   dd14400..700169a  HEAD -> master
+thesonics@worker01:~/robot-shop$ git checkout master
+Switched to branch 'master'
+Your branch is behind 'origin/master' by 8 commits, and can be fast-forwarded.
+  (use "git pull" to update your local branch)
+thesonics@worker01:~/robot-shop$ git pull
+Updating dd14400..700169a
+Fast-forward
+ a.txt     |  0
+ output.md | 97 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 97 insertions(+)
+ delete mode 100644 a.txt
+ create mode 100644 output.md
+thesonics@worker01:~/robot-shop$ git checkout Ido123
+Switched to branch 'Ido123'
+Your branch is ahead of 'origin/Ido123' by 7 commits.
+  (use "git push" to publish your local commits)
+thesonics@worker01:~/robot-shop$ git pull
+Already up to date.
+thesonics@worker01:~/robot-shop$ git merge master
+Already up to date.
+thesonics@worker01:~/robot-shop$ 
 
 
 
