@@ -41,4 +41,4 @@ COPY entrypoint.sh /root/
 ENTRYPOINT ["/root/entrypoint.sh"]
 
 COPY default.conf.template /etc/nginx/conf.d/default.conf.template
-COPY static /usr/share/nginx/html
+COPY /home/thesonics/robot-shop/web/static /usr/share/nginx/html
