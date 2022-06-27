@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/cycodehq/cycode_cli
-    rev: 0.0.15
+    rev: 0.0.25
     hooks:
       - id: cycode
         language_version: python3
