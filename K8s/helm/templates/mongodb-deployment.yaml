@@ -17,9 +17,11 @@ spec:
       {{ if .Values.psp.enabled }}
       serviceAccountName: robot-shop
       {{ end }}
+      imagePullSecrets:
+        - name: docker-hub      
       containers:
       - name: mongodb
-        image: {{ .Values.image.repo }}/rs-mongodb:{{ .Values.image.version }}
+        image: {{ .Values.image.repo }}/robot-shop-rs-mongodb:{{ .Values.image.version }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: 27017

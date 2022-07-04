@@ -17,9 +17,11 @@ spec:
       {{ if .Values.psp.enabled }}
       serviceAccountName: robot-shop
       {{ end }}
+      imagePullSecrets:
+        - name: docker-hub      
       containers:
       - name: shipping
-        image: {{ .Values.image.repo }}/rs-shipping:{{ .Values.image.version }}
+        image: {{ .Values.image.repo }}/robot-shop-rs-shipping:{{ .Values.image.version }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: 8080

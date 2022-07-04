@@ -1,9 +1,9 @@
 # Registry and rpository for Docker images
 # Default is docker/robotshop/image:latest
 image:
-  repo: robotshop
+  repo: asserts
   version: latest
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 # Alternative payment gateway URL
 # Default is https://www.paypal.com
@@ -23,7 +23,7 @@ psp:
   enabled: false
 
 # For the mini ones minikube, minishift set to true
-nodeport: false
+nodeport: true
 
 # "special" Openshift. Set to true when deploying to any openshift flavour
 openshift: false
