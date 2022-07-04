@@ -17,9 +17,11 @@ spec:
       {{ if .Values.psp.enabled }}
       serviceAccountName: robot-shop
       {{ end }}
+      imagePullSecrets:
+        - name: docker-hub
       containers:
       - name: cart
-        image: {{ .Values.image.repo }}/rs-cart:{{ .Values.image.version }}
+        image: {{ .Values.image.repo }}/robot-shop-rs-cart:{{ .Values.image.version }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         # agent networking access
         env:

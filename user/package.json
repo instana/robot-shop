@@ -15,6 +15,8 @@
       "redis": "^2.8.0",
       "pino": "^5.10.8",
       "express-pino-logger": "^4.0.0",
+      "prom-client": "14.0.1",      
+      "express-prometheus-middleware": "1.2.0",
       "pino-pretty": "^2.5.0",
       "@instana/collector": "^1.132.2"
   }
