@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    release: kube-prometheus-stack
+  name: user
+spec:
+  endpoints:
+    - path: /metrics
+  namespaceSelector:
+    any: true
+  selector:
+    matchLabels:
+      service: user
