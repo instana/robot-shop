@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    release: kube-prometheus-stack
+  name: shipping
+spec:
+  endpoints:
+    - path: /actuator/prometheus
+  namespaceSelector:
+    any: true
+  selector:
+    matchLabels:
+      service: shipping
