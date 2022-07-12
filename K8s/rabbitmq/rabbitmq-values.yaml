@@ -1,0 +1,10 @@
+# reference
+# https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-rabbitmq-exporter
+rabbitmq:
+  url: http://rabbitmq:15672
+
+prometheus:
+  monitor:
+    enabled: true
+    additionalLabels:
+      release: kube-prometheus-stack
