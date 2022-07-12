@@ -15,21 +15,15 @@ from flask import request
 from flask import jsonify
 from rabbitmq import Publisher
 # Prometheus
-import prometheus_client
-from prometheus_client import Counter, Histogram
+from prometheus_flask_exporter import PrometheusMetrics
 
 app = Flask(__name__)
+metrics = PrometheusMetrics(app)
 app.logger.setLevel(logging.INFO)
 
 CART = os.getenv('CART_HOST', 'cart')
 USER = os.getenv('USER_HOST', 'user')
 PAYMENT_GATEWAY = os.getenv('PAYMENT_GATEWAY', 'https://paypal.com/')
-
-# Prometheus
-PromMetrics = {}
-PromMetrics['SOLD_COUNTER'] = Counter('sold_count', 'Running count of items sold')
-PromMetrics['AUS'] = Histogram('units_sold', 'Avergae Unit Sale', buckets=(1, 2, 5, 10, 100))
-PromMetrics['AVS'] = Histogram('cart_value', 'Avergae Value Sale', buckets=(100, 200, 500, 1000, 2000, 5000, 10000))
 
 
 @app.errorhandler(Exception)
@@ -40,15 +34,6 @@ def exception_handler(err):
 @app.route('/health', methods=['GET'])
 def health():
     return 'OK'
-
-# Prometheus
-@app.route('/metrics', methods=['GET'])
-def metrics():
-    res = []
-    for m in PromMetrics.values():
-        res.append(prometheus_client.generate_latest(m))
-
-    return Response(res, mimetype='text/plain')
 
 
 @app.route('/pay/<id>', methods=['POST'])
@@ -88,13 +73,6 @@ def pay(id):
         return str(err), 500
     if req.status_code != 200:
         return 'payment error', req.status_code
-
-    # Prometheus
-    # items purchased
-    item_count = countItems(cart.get('items', []))
-    PromMetrics['SOLD_COUNTER'].inc(item_count)
-    PromMetrics['AUS'].observe(item_count)
-    PromMetrics['AVS'].observe(cart.get('total', 0))
 
     # Generate order id
     orderid = str(uuid.uuid4())

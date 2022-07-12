@@ -3,5 +3,6 @@ Flask
 requests
 pika
 prometheus_client
+prometheus-flask-exporter
 opentracing
 instana
