@@ -12,11 +12,7 @@ spec:
   serviceName: redis
   template:
     metadata:
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "9121"
       labels:
-        app: redis
         service: redis
     spec:
       {{ if .Values.psp.enabled }}
@@ -24,7 +20,7 @@ spec:
       {{ end }}
       containers:
       - name: redis
-        image: redis:4.0.6
+        image: redis:6.2-alpine
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: 6379
@@ -38,14 +34,6 @@ spec:
           requests:
             cpu: 100m
             memory: 50Mi
-      - name: redis-exporter
-        image: oliver006/redis_exporter:latest
-        resources:
-          requests:
-            cpu: 100m
-            memory: 100Mi
-        ports:
-          - containerPort: 9121
       restartPolicy: Always
   volumeClaimTemplates:
     - metadata:
