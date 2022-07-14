@@ -2,16 +2,6 @@ kubectl create ns robot-shop
 
 helm install robot-shop --namespace robot-shop helm
 
-kubectl apply -f user-service-monitor.yaml
-
-kubectl apply -f shipping-service-monitor.yaml 
-
-kubectl apply -f payment-service-monitor.yaml
-
-kubectl apply -f catalogue-service-monitor.yaml
-
-kubectl apply -f cart-service-monitor.yaml
-
 helm install mysql-exporter prometheus-community/prometheus-mysql-exporter -f mysql/mysql-values.yaml -n robot-shop
 
 helm install redis-exporter prometheus-community/prometheus-redis-exporter -f redis/redis-values.yaml -n robot-shop
