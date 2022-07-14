@@ -1,10 +1,2 @@
 mongodb:
   uri: "mongodb://mongodb:27017"
-
-serviceMonitor:
-  enabled: true
-  interval: 15s
-  labels:
-    release: kube-prometheus-stack
-  scrapeTimeout: 10s
-  namespace: robot-shop

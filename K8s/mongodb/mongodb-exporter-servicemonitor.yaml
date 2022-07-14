@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    release: kube-prometheus-stack
+  name: prometheus-mongodb-exporter-sm
+spec:
+  endpoints:
+    - path: /metrics
+  namespaceSelector:
+    any: true
+  selector:
+    matchLabels:
+      "app.kubernetes.io/name": prometheus-mongodb-exporter
