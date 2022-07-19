@@ -55,7 +55,7 @@ app.use(promMid({
      * Uncommenting the `extraMasks` config will use the list of regexes to
      * reformat URL path names and replace the values found with a placeholder value
     */
-    // extraMasks: [/..:..:..:..:..:../],
+    extraMasks: ['^anonymous.[0-9]+$'],
     /**
      * The prefix option will cause all metrics to have the given prefix.
      * E.g.: `app_prefix_http_requests_total`
