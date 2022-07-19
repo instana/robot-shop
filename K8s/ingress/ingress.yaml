@@ -1,0 +1,61 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: robot-shop-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: localhost
+      http:
+        paths:
+          - path: /api/catalogue/(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: catalogue
+                port:
+                  number: 8080
+          - path: /api/user/(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: user
+                port:
+                  number: 8080
+          - path: /api/cart/(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: cart
+                port:
+                  number: 8080
+          - path: /api/shipping/(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: shipping
+                port:
+                  number: 8080
+          - path: /api/payment/(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: payment
+                port:
+                  number: 8080
+          - path: /api/ratings/(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: ratings
+                port:
+                  number: 80
+          - path: /(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: web
+                port:
+                  number: 8080

@@ -1,0 +1,10 @@
+controller:
+  metrics:
+    port: 10254
+    # if this port is changed, change healthz-port: in extraArgs: accordingly
+    enabled: true
+
+    serviceMonitor:
+      enabled: true
+      additionalLabels:
+        release: kube-prometheus-stack
