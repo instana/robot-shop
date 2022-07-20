@@ -7,7 +7,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: localhost
+    - host: robot-shop.dev.asserts.ai
       http:
         paths:
           - path: /api/catalogue/(.*)
@@ -59,3 +59,6 @@ spec:
                 name: web
                 port:
                   number: 8080
+  tls:
+    - hosts:
+        - robot-shop.dev.asserts.ai
