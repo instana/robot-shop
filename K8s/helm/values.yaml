@@ -3,7 +3,7 @@
 image:
   repo: asserts
   version: latest
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
 
 # Alternative payment gateway URL
 # Default is https://www.paypal.com
@@ -27,6 +27,6 @@ openshift: false
 
 # Storage class to use with redis statefulset.
 redis:
-  storageClassName: standard
+  storageClassName: gp3
 
 ocCreateRoute: false

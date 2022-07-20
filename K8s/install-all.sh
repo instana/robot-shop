@@ -12,6 +12,7 @@ helm install percona-mongodb prometheus-community/prometheus-mongodb-exporter -f
 
 kubectl apply -f mongodb/mongodb-exporter-servicemonitor.yaml
 
-helm install ingress-nginx ingress-nginx --repo https://kubernetes.github.io/ingress-nginx -f ingress/values.yaml -n robot-shop
+# commented out since we already have an ingress controller running
+#helm install ingress-nginx ingress-nginx --repo https://kubernetes.github.io/ingress-nginx -f ingress/values.yaml -n robot-shop
 
 kubectl apply -f ingress/ingress.yaml -n robot-shop
