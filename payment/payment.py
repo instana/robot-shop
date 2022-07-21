@@ -17,8 +17,12 @@ from rabbitmq import Publisher
 # Prometheus
 from prometheus_flask_exporter import PrometheusMetrics
 
+def path(req):
+    """ Use the first URI segment as the value for the 'path' label """
+    return "/" + req.path[1:].split("/")[0]
+
 app = Flask(__name__)
-metrics = PrometheusMetrics(app)
+metrics = PrometheusMetrics(app, group_by=path)
 app.logger.setLevel(logging.INFO)
 
 CART = os.getenv('CART_HOST', 'cart')
