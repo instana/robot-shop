@@ -12,6 +12,9 @@ spec:
   - name: http-management
     port: 15672
     targetPort: 15672
+  - name: prometheus-metrics
+    port: 15692
+    targetPort: 15692
   - name: tcp-epmd
     port: 4369
     targetPort: 4369
