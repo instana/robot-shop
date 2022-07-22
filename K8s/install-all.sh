@@ -16,3 +16,6 @@ kubectl apply -f mongodb/mongodb-exporter-servicemonitor.yaml
 #helm install ingress-nginx ingress-nginx --repo https://kubernetes.github.io/ingress-nginx -f ingress/values.yaml -n robot-shop
 
 kubectl apply -f ingress/ingress.yaml -n robot-shop
+
+# Enable Rabbit MQ Native Prometheus Exporter
+kubectl --context kind-kind -n robot-shop exec -it $(kubectl -n robot-shop get pods -o name | grep -E "rabbitmq-[0-9].*" | sed -E 's/pod.(.+)/\1/g') --container rabbitmq -- /bin/bash -c "rabbitmq-plugins enable rabbitmq_prometheus"
