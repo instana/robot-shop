@@ -1,2 +1,5 @@
+extraArgs:
+  - --collect-all
+  - --compatible-mode
 mongodb:
   uri: "mongodb://mongodb:27017"
