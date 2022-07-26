@@ -9,8 +9,5 @@ spec:
   - name: http
     port: 8080
     targetPort: 8080
-  - name: headless
-    port: 55555
-    targetPort: 0
   selector:
     service: dispatch

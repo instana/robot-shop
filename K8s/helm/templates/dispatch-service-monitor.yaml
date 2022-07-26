@@ -3,7 +3,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     release: kube-prometheus-stack
-  name: cart
+  name: dispatch
 spec:
   endpoints:
     - path: /metrics
