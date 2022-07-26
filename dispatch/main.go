@@ -247,7 +247,7 @@ func main() {
 		}
 	}()
 
-	http.Handle("/metrics", promhttp.Handler())
+    http.Handle("/metrics", promhttp.Handler())
     panic(http.ListenAndServe(":8080", nil))
 
 	log.Println("Waiting for messages")
