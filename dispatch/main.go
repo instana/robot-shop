@@ -15,8 +15,8 @@ import (
 	otlog "github.com/opentracing/opentracing-go/log"
 	"github.com/streadway/amqp"
 	"github.com/prometheus/client_golang/prometheus"
-    "github.com/prometheus/client_golang/prometheus/promhttp"
-    "net/http"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"net/http"
 )
 
 const (
@@ -40,12 +40,12 @@ var (
 )
 
 var methodDurationHistogram = prometheus.NewHistogramVec(
-    prometheus.HistogramOpts{
-        Name:    "method_timed_seconds",
-        Help:    "histogram",
-        Buckets: []float64{0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10},
-    },
-    []string{"method"},
+	prometheus.HistogramOpts{
+		Name:    "method_timed_seconds",
+		Help:    "histogram",
+		Buckets: []float64{0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10},
+	},
+	[]string{"method"},
 )
 
 func init() {
@@ -236,19 +236,19 @@ func main() {
 			failOnError(err, "Failed to consume")
 
 			for d := range msgs {
-			    start := time.Now()
+				start := time.Now()
 				log.Printf("Order %s\n", d.Body)
 				log.Printf("Headers %v\n", d.Headers)
 				id := getOrderId(d.Body)
 				go createSpan(d.Headers, id)
 				duration := time.Since(start)
-                methodDurationHistogram.WithLabelValues("dispatchOrder").Observe(duration.Seconds())
+				methodDurationHistogram.WithLabelValues("dispatchOrder").Observe(duration.Seconds())
 			}
 		}
 	}()
 
-    http.Handle("/metrics", promhttp.Handler())
-    panic(http.ListenAndServe(":8080", nil))
+	http.Handle("/metrics", promhttp.Handler())
+	panic(http.ListenAndServe(":8080", nil))
 
 	log.Println("Waiting for messages")
 	select {}
