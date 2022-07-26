@@ -14,6 +14,9 @@ import (
 	"github.com/opentracing/opentracing-go/ext"
 	otlog "github.com/opentracing/opentracing-go/log"
 	"github.com/streadway/amqp"
+	"github.com/prometheus/client_golang/prometheus"
+    "github.com/prometheus/client_golang/prometheus/promhttp"
+    "net/http"
 )
 
 const (
@@ -35,6 +38,19 @@ var (
 		"us-west1",
 	}
 )
+
+var methodDurationHistogram = prometheus.NewHistogramVec(
+    prometheus.HistogramOpts{
+        Name:    "method_timed_seconds",
+        Help:    "histogram",
+        Buckets: []float64{0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10},
+    },
+    []string{"method"},
+)
+
+func init() {
+    prometheus.MustRegister(methodDurationHistogram)
+}
 
 func connectToRabbitMQ(uri string) *amqp.Connection {
 	for {
@@ -220,13 +236,19 @@ func main() {
 			failOnError(err, "Failed to consume")
 
 			for d := range msgs {
+			    start := time.Now()
 				log.Printf("Order %s\n", d.Body)
 				log.Printf("Headers %v\n", d.Headers)
 				id := getOrderId(d.Body)
 				go createSpan(d.Headers, id)
+				duration := time.Since(start)
+                methodDurationHistogram.WithLabelValues("dispatchOrder").Observe(duration.Seconds())
 			}
 		}
 	}()
+
+	http.Handle("/metrics", promhttp.Handler())
+    panic(http.ListenAndServe(":8080", nil))
 
 	log.Println("Waiting for messages")
 	select {}
