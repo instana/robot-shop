@@ -9,5 +9,8 @@ spec:
   - name: mysql
     port: 3306
     targetPort: 3306
+  - name: exporter
+    port: 9104
+    targetPort: 9104
   selector:
     service: mysql

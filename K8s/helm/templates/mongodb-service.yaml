@@ -9,5 +9,8 @@ spec:
   - name: mongodb
     port: 27017
     targetPort: 27017
+  - name: exporter
+    port: 9216
+    targetPort: 9216
   selector:
     service: mongodb
