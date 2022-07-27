@@ -3,12 +3,13 @@ kind: ServiceMonitor
 metadata:
   labels:
     release: kube-prometheus-stack
-  name: prometheus-mongodb-exporter-sm
+  name: redis
 spec:
   endpoints:
     - path: /metrics
+      targetPort: 9121
   namespaceSelector:
     any: true
   selector:
     matchLabels:
-      "app.kubernetes.io/name": prometheus-mongodb-exporter
+      service: redis

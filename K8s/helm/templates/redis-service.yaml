@@ -9,5 +9,8 @@ spec:
   - name: redis
     port: 6379
     targetPort: 6379
+  - name: exporter
+    port: 9121
+    targetPort: 9121
   selector:
     service: redis
