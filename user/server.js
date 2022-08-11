@@ -255,9 +255,23 @@ app.get('/history/:id', (req, res) => {
 });
 
 // connect to Redis
-var redisClient = redis.createClient({
-    host: process.env.REDIS_HOST || 'redis'
-});
+let redisConnectionSettings = {}
+let redisProtocol = 'redis'
+let redisHost = process.env.REDIS_HOST || 'redis'
+let redisPort = process.env.REDIS_PORT || '6379'
+let redisDB = process.env.REDIS_DB || '0'
+
+if (process.env.REDIS_SSL_CRT) {
+    redisConnectionSettings.tls = {
+        ca: Buffer.from(process.env.REDIS_SSL_CRT, 'base64').toString('utf-8')
+    }
+    redisProtocol = 'rediss'
+}
+
+var redisClient = redis.createClient(
+    `${redisProtocol}://${redisHost}:${redisPort}/${redisDB}`, 
+    redisConnectionSettings
+);
 
 redisClient.on('error', (e) => {
     logger.error('Redis ERROR', e);

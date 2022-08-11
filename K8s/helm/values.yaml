@@ -32,4 +32,10 @@ openshift: false
 redis:
   storageClassName: standard
 
+appRedisConnection:
+  host:
+  port:
+  db:
+  sslCrt:
+
 ocCreateRoute: false

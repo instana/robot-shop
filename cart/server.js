@@ -25,8 +25,19 @@ const counter = new promClient.Counter({
 
 
 var redisConnected = false;
+let redisConnectionSettings = {}
+let redisProtocol = 'redis'
+let redisHost = process.env.REDIS_HOST || 'redis'
+let redisPort = process.env.REDIS_PORT || '6379'
+let redisDB = process.env.REDIS_DB || '0'
 
-var redisHost = process.env.REDIS_HOST || 'redis'
+if (process.env.REDIS_SSL_CRT) {
+    redisConnectionSettings.tls = {
+        ca: Buffer.from(process.env.REDIS_SSL_CRT, 'base64').toString('utf-8')
+    }
+    redisProtocol = 'rediss'
+}
+
 var catalogueHost = process.env.CATALOGUE_HOST || 'catalogue'
 
 const logger = pino({
@@ -387,9 +398,10 @@ function saveCart(id, cart) {
 }
 
 // connect to Redis
-var redisClient = redis.createClient({
-    host: redisHost
-});
+var redisClient = redis.createClient(
+    `${redisProtocol}://${redisHost}:${redisPort}/${redisDB}`, 
+    redisConnectionSettings
+);
 
 redisClient.on('error', (e) => {
     logger.error('Redis ERROR', e);
