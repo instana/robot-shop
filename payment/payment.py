@@ -32,7 +32,7 @@ PAYMENT_GATEWAY = os.getenv('PAYMENT_GATEWAY', 'https://paypal.com/')
 
 @app.errorhandler(Exception)
 def exception_handler(err):
-    app.logger.error(str(err))
+    app.logger.exception(str(err))
     return str(err), 500
 
 @app.route('/health', methods=['GET'])
