@@ -18,14 +18,14 @@ spec:
       - name: load
         env:
           - name: HOST
-            value: "http://web:8080/"
+            value: "https://robot-shop.dev.asserts.ai"
           - name: NUM_CLIENTS
-            value: "15"
+            value: "5"
           - name: SILENT
             value: "1"
           - name: ERROR
             value: "1"
-        image: robotshop/rs-load:latest
+        image: asserts/robot-shop-rs-load:latest
         resources:
           limits:
             cpu: 200m
