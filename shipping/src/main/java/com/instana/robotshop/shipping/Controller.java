@@ -79,7 +79,15 @@ public class Controller {
     public List<City> cities(@PathVariable String code) {
         logger.info("cities by code {}", code);
 
+        long start = System.currentTimeMillis();
         List<City> cities = cityrepo.findByCode(code);
+        long timeTaken = System.currentTimeMillis() - start;
+        if (timeTaken > 1000) {
+            String query = String.format("select city0_.uuid as uuid1_0_, city0_.city as city2_0_, city0_.country_code as" +
+                    " country_3_0_, city0_.latitude as latitude4_0_, city0_.longitude as longitud5_0_, city0_.name as" +
+                    " name6_0_, city0_.region as region7_0_ from cities city0_ where city0_.country_code='%s'", code);
+            logger.error("SlowQuery: {} milliseconds. SQL: '{}'", timeTaken, query);
+        }
 
         return cities;
     }

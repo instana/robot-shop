@@ -60,6 +60,8 @@ def pay(id):
     # check that the cart is valid
     # this will blow up if the cart is not valid
     has_shipping = False
+    if cart.get('items') is None:
+        raise TypeError('No items in cart')
     for item in cart.get('items'):
         if item.get('sku') == 'SHIP':
             has_shipping = True
