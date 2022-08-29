@@ -1,5 +1,6 @@
 import os
 import random
+from datetime import datetime
 
 from locust import HttpUser, task, between
 from random import choice
@@ -74,7 +75,13 @@ class UserBehavior(HttpUser):
         self.client.get('/api/cart/update/{}/{}/2'.format(uniqueid, item['sku']), headers={'x-forwarded-for': fake_ip}, name='/api/cart/update')
 
         # country codes
-        code = choice(self.client.get('/api/shipping/codes', headers={'x-forwarded-for': fake_ip}).json())
+        codes = self.client.get('/api/shipping/codes', headers={'x-forwarded-for': fake_ip}).json()
+        # Select a country with many cities to simulate excessive load in
+        # shipping service between the 30th and 40th minute of every hour.
+        if 30 <= datetime.now().minute < 40:
+            code = next((code for code in codes if code['code'] == 'us'))
+        else:
+            code = next((code for code in codes if code['code'] == 'ch'))
         city = choice(self.client.get('/api/shipping/cities/{}'.format(code['code']), headers={'x-forwarded-for': fake_ip}, name='/api/shipping/cities').json())
         print('code {} city {}'.format(code, city))
         shipping = self.client.get('/api/shipping/calc/{}'.format(city['uuid']), headers={'x-forwarded-for': fake_ip}, name='/api/shipping/calc').json()
@@ -90,7 +97,8 @@ class UserBehavior(HttpUser):
     @task
     def error(self):
         fake_ip = random.choice(self.fake_ip_addresses)
-        if os.environ.get('ERROR') == '1':
+        # Simulate payment errors in the first 10 minutes of every hour
+        if os.environ.get('ERROR') == '1' and datetime.now().minute < 10:
             print('Error request')
             cart = {'total': 0, 'tax': 0}
             self.client.post('/api/payment/pay/partner-57', json=cart, headers={'x-forwarded-for': fake_ip})
