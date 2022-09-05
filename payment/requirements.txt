@@ -4,5 +4,6 @@ requests
 pika
 prometheus_client
 prometheus-flask-exporter
+flask_apscheduler
 opentracing
 instana
