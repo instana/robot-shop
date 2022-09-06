@@ -135,6 +135,15 @@ app.get('/cart/:id', (req, res) => {
 
 // delete cart with id
 app.delete('/cart/:id', (req, res) => {
+    try {
+        if (req.query.error === 'True') {
+            throw new Error('Invalid cart id: ' + req.params.id);
+        }
+    } catch(e) {
+        logger.error(e);
+        res.status(500).send(e.message);
+        return;
+    }
     redisClient.del(req.params.id, (err, data) => {
         if(err) {
             req.log.error('ERROR', err);
