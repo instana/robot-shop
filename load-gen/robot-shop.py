@@ -76,9 +76,8 @@ class UserBehavior(HttpUser):
 
         # country codes
         codes = self.client.get('/api/shipping/codes', headers={'x-forwarded-for': fake_ip}).json()
-        # Select a country with many cities to simulate excessive load in
-        # shipping service between the 30th and 40th minute of every hour.
-        if 30 <= datetime.now().minute < 40:
+        # Select a country with many cities to simulate excessive load in shipping service between 10:00 and 10:15 AM.
+        if datetime.now().hour == 10 and datetime.now().minute < 15:
             code = next((code for code in codes if code['code'] == 'us'))
         else:
             code = next((code for code in codes if code['code'] == 'ch'))
@@ -97,8 +96,8 @@ class UserBehavior(HttpUser):
     @task
     def error(self):
         fake_ip = random.choice(self.fake_ip_addresses)
-        # Simulate payment errors in the first 10 minutes of every hour
-        if os.environ.get('ERROR') == '1' and datetime.now().minute < 10:
+        # Simulate payment errors between 2:00 and 2:30 PM
+        if os.environ.get('ERROR') == '1' and datetime.now().hour == 14 and datetime.now().minute < 30:
             print('Error request')
             cart = {'total': 0, 'tax': 0}
             self.client.post('/api/payment/pay/partner-57', json=cart, headers={'x-forwarded-for': fake_ip})
