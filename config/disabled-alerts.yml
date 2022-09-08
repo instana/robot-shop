@@ -1,0 +1,23 @@
+disabledAlertConfigs:
+  - name: MongodbUserErrors
+    matchLabels:
+      alertname: MongodbUserErrors
+      alertgroup: mongodb.percona.alerts
+  - name: catalogue anomalies
+    matchLabels:
+      alertname: RequestRateAnomaly
+      job: catalogue
+      asserts_request_type: inbound
+      asserts_request_context: /product/.*
+  - name: cart anomalies
+    matchLabels:
+      alertname: LatencyAverageAnomaly
+      job: cart
+      asserts_request_type: inbound
+      asserts_request_context: /(add|update)/#val/.*/#val
+  - name: user check anomaly
+    matchLabels:
+      alertname: RequestRateAnomaly
+      job: user
+      asserts_request_type: inbound
+      asserts_request_context: /check/#val
