@@ -24,12 +24,12 @@ spec:
           - name: SILENT
             value: "1"
           - name: ERROR
-            value: "1"
+            value: "0"
         image: asserts/robot-shop-rs-load:latest
         resources:
           limits:
-            cpu: 200m
-            memory: 200Mi
+            cpu: 1000m
+            memory: 800Mi
           requests:
-            cpu: 100m
-            memory: 100Mi
+            cpu: 500m
+            memory: 400Mi
