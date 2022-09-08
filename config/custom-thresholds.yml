@@ -1,0 +1,22 @@
+name: custom_thresholds
+groups:
+  - name: custom_thresholds
+      - record: asserts:resource:threshold
+        expr: .95
+        labels:
+          asserts_source: nodejs
+          asserts_resource_type: memory:usage
+          asserts_severity: warning
+          asserts_threshold_level: source
+      - record: asserts:resource:threshold
+        expr: .98
+        labels:
+          asserts_source: nodejs
+          asserts_resource_type: memory:usage
+          asserts_severity: critical
+          asserts_threshold_level: source
+      - record: asserts:latency:p99:threshold
+        expr: 5
+        labels:
+          job: shipping
+          asserts_threshold_level: job

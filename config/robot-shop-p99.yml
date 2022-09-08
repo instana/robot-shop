@@ -1,0 +1,15 @@
+name: robot-shop-p99
+groups:
+  - name: robot-shop-p99.rules
+    rules:
+      - record: asserts:latency:service:p99
+        expr: |
+          histogram_quantile (0.99,
+            sum (
+                rate(nginx_ingress_controller_request_duration_seconds_bucket{asserts_request_context=~"robot-shop-ingress.+"}[5m])>0
+            ) by (le, namespace, job, service, exported_namespace, asserts_env, asserts_site)
+          )
+        labels:
+          asserts_entity_type: Service
+          asserts_request_type: inbound
+          asserts_source: nginx_ingress

@@ -1,0 +1,13 @@
+name: user-defined-relations
+groups:
+  - name: user-defined-relations
+    rules:
+      - record: asserts:relation:calls
+        expr: 1
+        labels:
+          workload: load
+          dst_workload: ingress-nginx-controller
+          namespace: robot-shop
+          dst_namespace: nginx
+          asserts_env: dev
+          asserts_site: dev

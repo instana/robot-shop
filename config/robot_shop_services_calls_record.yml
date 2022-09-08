@@ -1,0 +1,102 @@
+name: robot-shop-calls-relation
+groups:
+  - name: robot-shop-calls-relation.rules
+    rules:
+      - record: asserts:relation:calls
+        expr: |
+          sum by (asserts_env, asserts_site, namespace)
+            (asserts:request:rate5m{job="cart", namespace="robot-shop", asserts_request_context=~"/add.*|/cart.*|/rename.*|/shipping.*|/update.*"}) > 0
+        labels:
+          job: cart
+          dst_job: redis
+          dst_namespace: robot-shop
+
+      - record: asserts:relation:calls
+        expr: |
+          sum by (asserts_env, asserts_site, namespace)
+            (asserts:request:rate5m{job="cart", namespace="robot-shop", asserts_request_context=~"/add.*"}) > 0
+        labels:
+          job: cart
+          dst_job: catalogue
+          dst_namespace: robot-shop
+
+      - record: asserts:relation:calls
+        expr: |
+          sum by (asserts_env, asserts_site, namespace)
+            (asserts:request:rate5m{job="catalogue", namespace="robot-shop", asserts_request_context=~"/categories|/product.*|/search.*"}) > 0
+        labels:
+          job: catalogue
+          dst_job: mongodb
+          dst_namespace: robot-shop
+
+      - record: asserts:relation:calls
+        expr: |
+          sum by (asserts_env, asserts_site, namespace)
+            (rate(asserts:request:total{job="payment", namespace="robot-shop", asserts_request_context="/pay", status="200"}[5m])) > 0
+        labels:
+          job: payment
+          dst_job: rabbitmq
+          dst_namespace: robot-shop
+
+      - record: asserts:relation:calls
+        expr: |
+          sum by (asserts_env, asserts_site, namespace)
+            (rate(asserts:request:total{job="payment", namespace="robot-shop", asserts_request_context="/pay", status="200"}[5m])) > 0
+        labels:
+          job: payment
+          dst_job: cart
+          dst_namespace: robot-shop
+
+      - record: asserts:relation:calls
+        expr: |
+          sum by (asserts_env, asserts_site, namespace)
+            (asserts:request:rate5m{job="payment", namespace="robot-shop", asserts_request_context="/pay"}) > 0
+        labels:
+          job: payment
+          dst_job: user
+          dst_namespace: robot-shop
+
+      - record: asserts:relation:calls
+        expr: |
+          sum by (asserts_env, asserts_site, namespace)
+            (asserts:request:rate5m{job="shipping", namespace="robot-shop", asserts_request_context=~"/calc.*|/cities.*|/codes|/count|/match.*"}) > 0
+        labels:
+          job: shipping
+          dst_job: mysql
+          dst_namespace: robot-shop
+
+      - record: asserts:relation:calls
+        expr: |
+          sum by (asserts_env, asserts_site, namespace)
+            (asserts:request:rate5m{job="shipping", namespace="robot-shop", asserts_request_context=~"/confirm.*"}) > 0
+        labels:
+          job: shipping
+          dst_job: cart
+          dst_namespace: robot-shop
+
+      - record: asserts:relation:calls
+        expr: |
+          sum by (asserts_env, asserts_site, namespace)
+            (asserts:request:rate5m{job="user", namespace="robot-shop", asserts_request_context=~"/check.*|/history.*|/login|/order.*|/register|/users"}) > 0
+        labels:
+          job: user
+          dst_job: mongodb
+          dst_namespace: robot-shop
+
+      - record: asserts:relation:calls
+        expr: |
+          sum by (asserts_env, asserts_site, namespace)
+            (asserts:request:rate5m{job="user", namespace="robot-shop", asserts_request_context="/uniqueid"}) > 0
+        labels:
+          job: user
+          dst_job: redis
+          dst_namespace: robot-shop
+
+      - record: asserts:relation:calls
+        expr: |
+          sum by (asserts_env, asserts_site, namespace)
+            (rate(go_method_timed_seconds_count{job="dispatch", namespace="robot-shop", method="dispatchOrder"}[5m])) > 0
+        labels:
+          job: rabbitmq
+          dst_job: dispatch
+          dst_namespace: robot-shop
