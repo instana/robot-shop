@@ -21,7 +21,7 @@ spec:
         - name: docker-hub      
       containers:
       - name: shipping
-        image: {{ .Values.image.repo }}/robot-shop-rs-shipping:{{ .Values.image.version }}
+        image: {{ .Values.image.repo }}/robot-shop-rs-shipping:{{ .Values.image.shippingVersion }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: 8080

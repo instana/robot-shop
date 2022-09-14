@@ -3,7 +3,7 @@ services:
   mongodb:
     build:
       context: mongo
-    image: ${REPO}/robot-shop-rs-mongodb:${TAG}
+    image: ${REPO}/robot-shop-rs-mongodb:${MONGODB_TAG}
     networks:
       - robot-shop
     logging: &logging
@@ -26,7 +26,7 @@ services:
   catalogue:
     build:
       context: catalogue
-    image: ${REPO}/robot-shop-rs-catalogue:${TAG}
+    image: ${REPO}/robot-shop-rs-catalogue:${CATALOGUE_TAG}
     depends_on:
       - mongodb
     networks:
@@ -41,7 +41,7 @@ services:
   user:
     build:
       context: user
-    image: ${REPO}/robot-shop-rs-user:${TAG}
+    image: ${REPO}/robot-shop-rs-user:${USER_TAG}
     depends_on:
       - mongodb
       - redis
@@ -57,7 +57,7 @@ services:
   cart:
     build:
       context: cart
-    image: ${REPO}/robot-shop-rs-cart:${TAG}
+    image: ${REPO}/robot-shop-rs-cart:${CART_TAG}
     depends_on:
       - redis
     networks:
@@ -72,7 +72,7 @@ services:
   mysql:
     build:
       context: mysql
-    image: ${REPO}/robot-shop-rs-mysql-db:${TAG}
+    image: ${REPO}/robot-shop-rs-mysql-db:${MYSQL_TAG}
     cap_add:
       - NET_ADMIN
     networks:
@@ -82,7 +82,7 @@ services:
   shipping:
     build:
       context: shipping
-    image: ${REPO}/robot-shop-rs-shipping:${TAG}
+    image: ${REPO}/robot-shop-rs-shipping:${SHIPPING_TAG}
     depends_on:
       - mysql
     networks:
@@ -97,7 +97,7 @@ services:
   ratings:
     build:
       context: ratings
-    image: ${REPO}/robot-shop-rs-ratings:${TAG}
+    image: ${REPO}/robot-shop-rs-ratings:${RATINGS_TAG}
     environment:
       APP_ENV: prod
     networks:
@@ -114,7 +114,7 @@ services:
   payment:
     build:
       context: payment
-    image: ${REPO}/robot-shop-rs-payment:${TAG}
+    image: ${REPO}/robot-shop-rs-payment:${PAYMENT_TAG}
     depends_on:
       - rabbitmq
     networks:
@@ -132,7 +132,7 @@ services:
   dispatch:
     build:
       context: dispatch
-    image: ${REPO}/robot-shop-rs-dispatch:${TAG}
+    image: ${REPO}/robot-shop-rs-dispatch:${DISPATCH_TAG}
     depends_on:
       - rabbitmq
     networks:
@@ -145,7 +145,7 @@ services:
       args:
         # agent key to download tracing libs
         KEY: ${INSTANA_AGENT_KEY}
-    image: ${REPO}/robot-shop-rs-web:${TAG}
+    image: ${REPO}/robot-shop-rs-web:${WEB_TAG}
     depends_on:
       - catalogue
       - user

@@ -21,7 +21,7 @@ spec:
         - name: docker-hub
       containers:
       - name: cart
-        image: {{ .Values.image.repo }}/robot-shop-rs-cart:{{ .Values.image.version }}
+        image: {{ .Values.image.repo }}/robot-shop-rs-cart:{{ .Values.image.cartVersion }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         # agent networking access
         env:
