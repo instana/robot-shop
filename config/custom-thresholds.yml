@@ -16,7 +16,12 @@ groups:
           asserts_severity: critical
           asserts_threshold_level: source
       - record: asserts:latency:p99:threshold
-        expr: 5
+        expr: 4
         labels:
           job: shipping
+          asserts_threshold_level: job
+      - record: asserts:latency:p99:threshold
+        expr: 4
+        labels:
+          job: ingress-nginx-controller-metrics
           asserts_threshold_level: job
