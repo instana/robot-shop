@@ -102,5 +102,5 @@ docker run \
     -e "RUN_TIME=$RUN_TIME" \
     -e "SILENT=$SILENT" \
     -e "ERROR=$ERROR" \
-    ${REPO}/rs-load:${TAG}
+    ${REPO}/rs-load:${LOAD_TAG}
 

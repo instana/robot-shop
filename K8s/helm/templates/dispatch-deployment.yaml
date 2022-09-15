@@ -21,7 +21,7 @@ spec:
         - name: docker-hub      
       containers:
       - name: dispatch
-        image: {{ .Values.image.repo }}/robot-shop-rs-dispatch:{{ .Values.image.version }}
+        image: {{ .Values.image.repo }}/robot-shop-rs-dispatch:{{ .Values.image.dispatchVersion }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
           # agent networking access

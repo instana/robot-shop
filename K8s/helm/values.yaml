@@ -2,7 +2,16 @@
 # Default is docker/robotshop/image:latest
 image:
   repo: asserts
-  version: latest
+  cartVersion: "1.0.1"
+  catalogueVersion: "1.0.1"
+  dispatchVersion: "1.0.1"
+  mongodbVersion: "1.0"
+  mysqlVersion: "1.0"
+  paymentVersion: "1.0.1"
+  ratingsVersion: "1.0"
+  shippingVersion: "1.0.1"
+  userVersion: "1.0.1"
+  webVersion: "1.0"
   pullPolicy: IfNotPresent
 
 # Alternative payment gateway URL

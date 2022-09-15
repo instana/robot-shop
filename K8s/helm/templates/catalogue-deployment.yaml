@@ -21,7 +21,7 @@ spec:
         - name: docker-hub      
       containers:
       - name: catalogue
-        image: {{ .Values.image.repo }}/robot-shop-rs-catalogue:{{ .Values.image.version }}
+        image: {{ .Values.image.repo }}/robot-shop-rs-catalogue:{{ .Values.image.catalogueVersion }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
           - name: INSTANA_AGENT_HOST

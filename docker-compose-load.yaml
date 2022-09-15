@@ -1,7 +1,7 @@
 version: '3'
 services:
   load:
-    image: ${REPO}/rs-load:${TAG}
+    image: ${REPO}/rs-load:${LOAD_TAG}
     build:
       context: load-gen
     environment:

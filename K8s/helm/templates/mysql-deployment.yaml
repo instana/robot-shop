@@ -21,7 +21,7 @@ spec:
         - name: docker-hub      
       containers:
       - name: mysql
-        image: {{ .Values.image.repo }}/robot-shop-rs-mysql-db:{{ .Values.image.version }}
+        image: {{ .Values.image.repo }}/robot-shop-rs-mysql-db:{{ .Values.image.mysqlVersion }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         # added for Istio
         securityContext:

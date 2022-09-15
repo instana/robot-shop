@@ -21,7 +21,7 @@ spec:
         - name: docker-hub      
       containers:
       - name: user
-        image: {{ .Values.image.repo }}/robot-shop-rs-user:{{ .Values.image.version }}
+        image: {{ .Values.image.repo }}/robot-shop-rs-user:{{ .Values.image.userVersion }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
           # agent networking access
