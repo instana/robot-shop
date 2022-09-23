@@ -2,7 +2,7 @@ name: robot-shop-p99
 groups:
   - name: robot-shop-p99.rules
     rules:
-      - record: asserts:latency:service:p99
+      - record: robot_shop:p99
         expr: |
           histogram_quantile (0.99,
             sum (

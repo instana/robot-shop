@@ -14,10 +14,10 @@ image:
   webVersion: "1.0"
   pullPolicy: IfNotPresent
 
-# Alternative payment gateway URL
-# Default is https://www.paypal.com
+# Payment gateway URL
 payment:
   gateway: null
+  #gateway: https://www.paypal.com
   #gateway: https://www.worldpay.com
 
 # EUM configuration

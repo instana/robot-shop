@@ -30,7 +30,7 @@ build_info = Gauge('payment_build_info', 'Build information',
 
 CART = os.getenv('CART_HOST', 'cart')
 USER = os.getenv('USER_HOST', 'user')
-PAYMENT_GATEWAY = os.getenv('PAYMENT_GATEWAY', 'https://paypal.com/')
+PAYMENT_GATEWAY = os.getenv('PAYMENT_GATEWAY')
 
 scheduler = APScheduler()
 scheduler.init_app(app)
@@ -98,17 +98,18 @@ def pay(id):
         app.logger.warn('cart not valid')
         return 'cart not valid', 400
 
-    # dummy call to payment gateway, hope they dont object
-    try:
-        req = requests.get(PAYMENT_GATEWAY)
-    except requests.exceptions.RequestException as err:
-        app.logger.error(err)
-        return str(err), 500
-    if req.status_code != 200:
-        app.logger.error('{} returned {} - {}'.format(PAYMENT_GATEWAY, req.status_code, req.text))
-        return 'payment error', req.status_code
-    else:
-        app.logger.info('{} returned 200'.format(PAYMENT_GATEWAY))
+    # dummy call to payment gateway, hope they don't object
+    if PAYMENT_GATEWAY:
+        try:
+            req = requests.get(PAYMENT_GATEWAY)
+        except requests.exceptions.RequestException as err:
+            app.logger.error(err)
+            return str(err), 500
+        if req.status_code != 200:
+            app.logger.error('{} returned {} - {}'.format(PAYMENT_GATEWAY, req.status_code, req.text))
+            return 'payment error', req.status_code
+        else:
+            app.logger.info('{} returned 200'.format(PAYMENT_GATEWAY))
 
     # Generate order id
     orderid = str(uuid.uuid4())
