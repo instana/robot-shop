@@ -39,3 +39,6 @@ redis:
   storageClassName: gp3
 
 ocCreateRoute: false
+
+rabbitmq:
+  enableExporter: false
