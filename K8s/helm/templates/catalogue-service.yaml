@@ -3,6 +3,7 @@ kind: Service
 metadata:
   labels:
     service: catalogue
+    app: robot-shop
   name: catalogue
 spec:
   ports:

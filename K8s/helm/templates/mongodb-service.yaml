@@ -3,6 +3,7 @@ kind: Service
 metadata:
   labels:
     service: mongodb
+    app: robot-shop
   name: mongodb
 spec:
   ports:

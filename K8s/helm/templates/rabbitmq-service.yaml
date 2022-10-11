@@ -4,6 +4,7 @@ metadata:
   name: rabbitmq
   labels:
     service: rabbitmq
+    app: robot-shop
 spec:
   ports:
   - name: tcp-amqp

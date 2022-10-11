@@ -4,6 +4,7 @@ metadata:
   name: payment
   labels:
     service: payment
+    app: robot-shop
 spec:
   ports:
   - name: http
