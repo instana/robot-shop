@@ -94,7 +94,7 @@ app.get('/uniqueid', (req, res) => {
                 });
             },
             (err) => {
-                req.log.error('ERROR %o', err);
+                req.log.error(err);
                 res.status(500).send(err);
             }
         );
@@ -129,7 +129,7 @@ app.get('/users', (req, res) => {
         usersCollection.find().toArray().then((users) => {
             res.json(users);
         }).catch((e) => {
-            req.log.error('ERROR', e);
+            req.log.error(e);
             res.status(500).send(e);
         });
     } else {
@@ -147,7 +147,7 @@ app.post('/login', (req, res) => {
         usersCollection.findOne({
             name: req.body.name,
         }).then((user) => {
-            req.log.info('user', user);
+            req.log.info('user %o', user);
             if(user) {
                 if(user.password == req.body.password) {
                     res.json(user);
@@ -158,7 +158,7 @@ app.post('/login', (req, res) => {
                 res.status(404).send('name not found');
             }
         }).catch((e) => {
-            req.log.error('ERROR', e);
+            req.log.error(e);
             res.status(500).send(e);
         });
     } else {
@@ -186,15 +186,15 @@ app.post('/register', (req, res) => {
                     password: req.body.password,
                     email: req.body.email
                 }).then((r) => {
-                    req.log.info('inserted', r.result);
+                    req.log.info('inserted %o', r.result);
                     res.send('OK');
                 }).catch((e) => {
-                    req.log.error('ERROR', e);
+                    req.log.error(e);
                     res.status(500).send(e);
                 });
             }
         }).catch((e) => {
-            req.log.error('ERROR', e);
+            req.log.error(e);
             res.status(500).send(e);
         });
     } else {
