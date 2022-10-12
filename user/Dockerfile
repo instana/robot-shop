@@ -1,6 +1,4 @@
-FROM node:14
-
-ENV INSTANA_AUTO_PROFILE true
+FROM node:16
 
 EXPOSE 8080
 
