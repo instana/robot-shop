@@ -1,6 +1,3 @@
-# Instana tracing
-opentracing_load_tracer /usr/local/lib/libinstana_sensor.so /etc/instana-config.json;
-opentracing_propagate_context;
 
 server {
     listen       8080;
