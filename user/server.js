@@ -13,14 +13,17 @@ var usersCollection;
 var ordersCollection;
 var mongoConnected = false;
 
+// Redis
+var redisHost = process.env.REDIS_HOST || 'redis';
+var redisConnected = false;
+
 const logger = pino({
-    level: 'warn',
+    level: 'info',
     prettyPrint: false,
     useLevelLabels: true
 });
 const expLogger = expPino({
     logger: logger
-
 });
 
 const app = express();
@@ -74,7 +77,8 @@ app.use(bodyParser.json());
 app.get('/health', (req, res) => {
     var stat = {
         app: 'OK',
-        mongo: mongoConnected
+        mongo: mongoConnected,
+        redis: redisConnected
     };
     res.json(stat);
 });
@@ -82,16 +86,22 @@ app.get('/health', (req, res) => {
 // use REDIS INCR to track anonymous users
 app.get('/uniqueid', (req, res) => {
     // get number from Redis
-    redisClient.incr('anonymous-counter', (err, r) => {
-        if(!err) {
-            res.json({
-                uuid: 'anonymous-' + r
-            });
-        } else {
-            req.log.error('ERROR', err);
-            res.status(500).send(err);
-        }
-    });
+    if(redisConnected) {
+        redisClient.incr('anonymous-counter').then(
+            (val) => {
+                res.json({
+                    uuid: 'anonymous-' + val
+                });
+            },
+            (err) => {
+                req.log.error('ERROR %o', err);
+                res.status(500).send(err);
+            }
+        );
+    } else {
+        req.log.error('Redis not available');
+        res.status(500).send('Redis not available');
+    }
 });
 
 // check user exists
@@ -268,16 +278,20 @@ app.get('/history/:id', (req, res) => {
 });
 
 // connect to Redis
+logger.info('connecting to redis host %s', redisHost);
 var redisClient = redis.createClient({
-    host: process.env.REDIS_HOST || 'redis'
+    url: 'redis://' + redisHost
 });
 
 redisClient.on('error', (e) => {
-    logger.error('Redis ERROR', e);
+    logger.error('Redis ERROR %o', e);
 });
-redisClient.on('ready', (r) => {
-    logger.info('Redis READY', r);
+redisClient.on('ready', () => {
+    redisConnected = true;
+    logger.info('Redis READY');
 });
+
+redisClient.connect();
 
 // set up Mongo
 function mongoConnect() {
@@ -311,6 +325,6 @@ mongoLoop();
 // fire it up!
 const port = process.env.USER_SERVER_PORT || '8080';
 app.listen(port, () => {
-    logger.info('Started on port', port);
+    logger.info('Started on port %s', port);
 });
 
