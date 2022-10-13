@@ -99,6 +99,8 @@ services:
     build:
       context: ratings
     image: ${REPO}/robot-shop-rs-ratings:${RATINGS_TAG}
+    depends_on:
+      - mysql
     environment:
       APP_ENV: prod
     networks:
