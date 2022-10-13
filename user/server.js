@@ -87,17 +87,14 @@ app.get('/health', (req, res) => {
 app.get('/uniqueid', (req, res) => {
     // get number from Redis
     if(redisConnected) {
-        redisClient.incr('anonymous-counter').then(
-            (val) => {
-                res.json({
-                    uuid: 'anonymous-' + val
-                });
-            },
-            (err) => {
-                req.log.error(err);
-                res.status(500).send(err);
-            }
-        );
+        redisClient.incr('anonymous-counter').then((val) => {
+            res.json({
+                uuid: 'anonymous-' + val
+            });
+        }).catch((err) => {
+            req.log.error(err);
+            res.ststus(500).send(err);
+        });
     } else {
         req.log.error('Redis not available');
         res.status(500).send('Redis not available');
