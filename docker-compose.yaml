@@ -101,6 +101,7 @@ services:
     image: ${REPO}/robot-shop-rs-ratings:${RATINGS_TAG}
     depends_on:
       - mysql
+      - catalogue
     environment:
       APP_ENV: prod
     networks:
@@ -108,7 +109,7 @@ services:
     depends_on:
       - mysql
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/_health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 10s
       timeout: 10s
       retries: 3
