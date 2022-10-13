@@ -1,0 +1,7 @@
+uwsgi
+Flask
+requests
+prometheus_client
+prometheus-flask-exporter
+flask_apscheduler
+mysql-connector-python
