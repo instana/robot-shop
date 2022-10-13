@@ -60,6 +60,7 @@ services:
     image: ${REPO}/robot-shop-rs-cart:${CART_TAG}
     depends_on:
       - redis
+      - catalogue
     networks:
       - robot-shop
     healthcheck:
