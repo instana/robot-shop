@@ -1,0 +1,115 @@
+version: 0.1.0
+type: experiment
+name: k8s-params
+description: >
+  An experiment to determine an adequate amount of RAM and CPU for request and
+  pod limits, as well as an appropriate number of pod instances.
+
+env:
+- name: DIGITALOCEAN_ACCESS_TOKEN
+  value: ${DIGITALOCEAN_ACCESS_TOKEN}
+  sensitive: true
+- name: NODE_COUNT
+  value: 4
+- name: NODE_SIZE
+  value: s-4vcpu-8gb
+- name: DO_REGION
+  value: tor1
+
+setup:
+  max-parallelism: 1
+  seed: 9876
+  timeout: 600 # TODO Add a timeout param
+  experiment:
+    init: |
+      echo "test-cluster-$(openssl rand -hex 4)" > CLUSTER.txt
+      doctl kubernetes cluster create "$(cat CLUSTER.txt)" --region $DO_REGION --size $NODE_SIZE --count $NODE_COUNT
+    shutdown: |
+      doctl kubernetes cluster delete "$(cat CLUSTER.txt)" --force
+  trials:
+    deployment: |
+      kubectl create ns robot-shop
+      helm install robot-shop --set redis.storageClassName=do-block-storage --namespace robot-shop ./K8s/helm
+      kubectl wait --for=condition=Ready pods --timeout=300s --all --all-namespaces
+    post-deployment: |
+      IP=$(kubectl describe svc web -n robot-shop | grep "LoadBalancer Ingress:" | awk '{print $3}')
+      echo "http://$IP:8080" > HOST.txt
+    test:
+      host-file: HOST.txt
+      duration: 60
+      users: 100
+      rate: 20
+      tests:
+      - load-gen/robot-shop.py
+    cleanup: |
+      kubectl delete ns robot-shop
+
+knobs:
+- name: replicas
+  description: >
+    Number of pods to run.
+  type: range
+  bounds:
+    min: 1
+    max: 10
+  renderers:
+  - type: replace
+    pattern: resource-quota.yaml
+    regex: '20'
+    directory: ./K8s
+
+- name: limits.memory
+  description: >
+    Amount of RAM at the pod level.
+  type: range
+  bounds:
+    min: 32
+    max: 3072
+  renderers:
+  - type: replace
+    pattern: resource-quota.yaml
+    regex: '5120'
+    directory: ./K8s
+
+- name: limits.cpu
+  description: >
+    Amount of CPU at the pod level.
+  type: range
+  bounds:
+    min: 0.5
+    max: 4.0
+  renderers:
+  - type: replace
+    pattern: resource-quota.yaml
+    regex: '4'
+    directory: ./K8s
+
+- name: requests.memory
+  description: >
+    Amount of RAM at the request level.
+  type: range
+  bounds:
+    min: 16
+    max: 2048
+  renderers:
+  - type: replace
+    pattern: resource-quota.yaml
+    regex: '3072'
+    directory: ./K8s
+
+- name: requests.cpu
+  description: >
+    Amount of CPU at the request level.
+  type: range
+  bounds:
+    min: 0.25
+    max: 2.0
+  renderers:
+  - type: replace
+    pattern: resource-quota.yaml
+    regex: '2'
+    directory: ./K8s
+
+constraints:
+- requests.memory <= limits.memory
+- requests.cpu <= limits.cpu

@@ -6,6 +6,6 @@ spec:
   hard:
     limits.cpu: 4
     requests.cpu: 2
-    limits.memory: 5Gi
-    requests.memory: 3Gi
+    limits.memory: 5120MiB
+    requests.memory: 3072MiB
     pods: 20
