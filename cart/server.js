@@ -101,7 +101,8 @@ app.get('/cart/:id', (req, res) => {
                 if(val == null) {
                     res.status(404).send('cart not found');
                 } else {
-                    res.json(val);
+                    res.type('json');
+                    res.send(val);
                 }
             },
             (err) => {
