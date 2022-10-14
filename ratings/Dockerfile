@@ -12,5 +12,5 @@ RUN pip install -r requirements.txt
 COPY *.py /app/
 COPY ratings.ini /app/
 
-CMD ["python", "ratings.py"]
-#CMD ["uwsgi", "--ini", "ratings.ini"]
+#CMD ["python", "ratings.py"]
+CMD ["uwsgi", "--ini", "ratings.ini"]

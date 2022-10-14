@@ -1,7 +1,5 @@
-import json
 import logging
 import os
-import sys
 import time
 import threading
 import requests
@@ -14,11 +12,11 @@ from flask import request
 
 from prometheus_flask_exporter import PrometheusMetrics
 
-CATALOGUE_HOST = os.getenv('CATALOGUE_HOST', 'catalogue')
-MYSQL_HOST = os.getenv('MYSQL_HOST', 'mysql')
-MYSQL_PORT = os.getenv('MYSQL_PORT', '3306')
-MYSQL_USER = os.getenv('MYSQL_USER', 'ratings')
-MYSQL_PASS = os.getenv('MYSQL_PASS', 'iloveit')
+CATALOGUE_HOST = os.getenv('SHOP_CATALOGUE_HOST', 'catalogue')
+MYSQL_HOST = os.getenv('SHOP_MYSQL_HOST', 'mysql')
+MYSQL_PORT = os.getenv('SHOP_MYSQL_PORT', '3306')
+MYSQL_USER = os.getenv('SHOP_MYSQL_USER', 'ratings')
+MYSQL_PASS = os.getenv('SHOP_MYSQL_PASS', 'iloveit')
 
 mysql_cnx = None
 
@@ -35,6 +33,14 @@ app.logger.setLevel(logging.INFO)
 def exception_handler(err):
     app.logger.exception(str(err))
     return str(err), 500
+
+'''Loop waiting for MySQL
+The health probe will kick this off'''
+@app.before_first_request
+def init_db():
+    # attempt MySQL connection in background
+    loop = threading.Thread(target=db_connect_loop, daemon=True)
+    loop.start()
 
 @app.route('/health', methods=['GET'])
 def health():
@@ -155,6 +161,10 @@ def get_product(sku):
         
     return product
 
+def db_connect_loop():
+    while db_connect():
+        time.sleep(5)
+
 def db_connect():
     global mysql_cnx
 
@@ -174,15 +184,7 @@ def db_connect():
 
     return mysql_cnx == None
 
-'''Loop waiting for MySQL'''
-def db_connect_loop():
-    while db_connect():
-        time.sleep(5)
-
 if __name__ == '__main__':
-    # attempt MySQL connection in background
-    loop = threading.Thread(target=db_connect_loop, daemon=True)
-    loop.start()
-    port = int(os.getenv('RATINGS_PORT', '8080'))
+    port = int(os.getenv('SHOP_RATINGS_PORT', '8080'))
     app.logger.info('Listening on {}'.format(port))
     app.run(host='0.0.0.0', port=port)
