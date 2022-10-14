@@ -24,7 +24,8 @@ spec:
         image: {{ .Values.image.repo }}/robot-shop-rs-ratings:{{ .Values.image.ratingsVersion }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
-        - containerPort: 80
+        - name: http
+          containerPort: 8080
         resources:
           limits:
             cpu: 200m
@@ -32,12 +33,16 @@ spec:
           requests:
             cpu: 100m
             memory: 50Mi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 10
         readinessProbe:
           httpGet:
-            path: /_health
-            port: 80
+            path: /ready
+            port: http
           initialDelaySeconds: 5
-          periodSeconds: 5
-          failureThreshold: 30
-          successThreshold: 1
+          periodSeconds: 10
       restartPolicy: Always
