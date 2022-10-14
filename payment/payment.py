@@ -165,9 +165,6 @@ def countItems(items):
 publisher = Publisher(app.logger)
 
 if __name__ == "__main__":
-    #sh = logging.StreamHandler(sys.stdout)
-    #sh.setLevel(logging.INFO)
-    #fmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     app.logger.info('Payment gateway {}'.format(PAYMENT_GATEWAY))
     port = int(os.getenv("SHOP_PAYMENT_PORT", "8080"))
     app.logger.info('Starting on port {}'.format(port))
