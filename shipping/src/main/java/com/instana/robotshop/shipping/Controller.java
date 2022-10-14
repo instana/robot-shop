@@ -59,6 +59,11 @@ public class Controller {
         return "OK";
     }
 
+    @GetMapping("/ready")
+    public String ready() {
+        return "ready";
+    }
+
     @GetMapping("/count")
     public String count() {
         long count = cityrepo.count();

@@ -41,6 +41,14 @@ def health():
     status = {'mysql connected': mysql_cnx != None}
     return jsonify(status)
 
+'''Depends on MySQL connection to serve requests'''
+@app.route('/ready', methods=['GET'])
+def ready():
+    if mysql_cnx == None:
+        return 'not ready', 404
+    else:
+        return 'ready'
+
 @app.route('/api/rate/<sku>/<score>', methods=['PUT'])
 def add_rating(sku, score):
     # validate score

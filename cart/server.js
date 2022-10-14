@@ -86,6 +86,14 @@ app.get('/health', (req, res) => {
     res.json(stat);
 });
 
+app.get('/ready', (req, res) => {
+    if(redisConnected) {
+        res.send('ready');
+    } else {
+        res.status(404).send('not ready');
+    }
+});
+
 // Prometheus
 app.get('/metrics', (req, res) => {
     res.header('Content-Type', 'text/plain');

@@ -83,6 +83,14 @@ app.get('/health', (req, res) => {
     res.json(stat);
 });
 
+app.get('/ready', (req, res) => {
+    if(mongoConnected && redisConnected) {
+        res.send('ready');
+    } else {
+        res.status(404).send('not ready');
+    }
+});
+
 // use REDIS INCR to track anonymous users
 app.get('/uniqueid', (req, res) => {
     // get number from Redis
