@@ -23,12 +23,6 @@ spec:
       - name: user
         image: {{ .Values.image.repo }}/robot-shop-rs-user:{{ .Values.image.userVersion }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        env:
-          # agent networking access
-          - name: INSTANA_AGENT_HOST
-            valueFrom:
-              fieldRef:
-                fieldPath: status.hostIP
         ports:
         - name: http
           containerPort: 8080

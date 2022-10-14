@@ -7,8 +7,7 @@ ENV CATALOGUE_HOST=catalogue \
     CART_HOST=cart \
     SHIPPING_HOST=shipping \
     PAYMENT_HOST=payment \
-    RATINGS_HOST=ratings \
-    INSTANA_SERVICE_NAME=nginx-web
+    RATINGS_HOST=ratings
 
 COPY entrypoint.sh /root/
 ENTRYPOINT ["/root/entrypoint.sh"]
