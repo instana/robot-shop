@@ -2,7 +2,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: http-services
+  name: metrics
   labels:
     release: prometheus
     app: robot-shop
@@ -15,3 +15,23 @@ spec:
   endpoints:
     - port: http
     - port: exporter
+
+---
+# Java does things differently
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: micrometer
+  labels:
+    release: prometheus
+    app: robot-shop
+spec:
+  selector:
+    matchLabels:
+      app: robot-shop
+      service: shipping
+  namespaceSelector:
+    any: true
+  endpoints:
+    - port: http
+      path: /actuator/prometheus
