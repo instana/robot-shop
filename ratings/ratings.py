@@ -82,7 +82,7 @@ def update_rating(sku, score):
         rating = get_rating(sku)
         app.logger.info('current rating {}'.format(rating))
         # iffy maths
-        new_avg = (rating['avg_rating'] * rating['rating_count']) + score / (rating['rating_count'] + 1)
+        new_avg = ((rating['avg_rating'] * rating['rating_count']) + score) / (rating['rating_count'] + 1)
         cursor = mysql_cnx.cursor()
         query = 'UPDATE ratings SET avg_rating = %s, rating_count = %s WHERE sku = %s'
         values = (new_avg, rating['rating_count'] + 1, sku)
