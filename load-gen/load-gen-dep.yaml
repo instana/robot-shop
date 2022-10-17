@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: load-gen
+  labels:
+    app: robot-shop
+    service: load-gen
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: load-gen
+  template:
+    metadata:
+      service: load-gen
+    spec:
+      imagePullSecrets:
+      - name: docker-hub
+      containers:
+      - name: load-gen
+        image: ${REPO}/robot-shop-rs-load:${LOAD_TAG}
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: 200m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 50Mi
