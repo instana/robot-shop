@@ -118,6 +118,9 @@ then
     echo "Docker"
 else
     echo "Kubernetes"
+    # overrides for K8s
+    SILENT=1
+    RUN_TIME=0
 fi
 echo "HOST=$HOST"
 echo "NUM_CLIENTS=$NUM_CLIENTS"
@@ -156,5 +159,6 @@ else
     yq -i '.spec.template.spec.containers[0].env += {"name": "SILENT", "value": "'$SILENT'"}' $YAML
     yq -i '.spec.template.spec.containers[0].env += {"name": "ERROR", "value": "'$ERROR'"}' $YAML
 
+    cat $YAML
     kubectl apply -f $YAML
 fi

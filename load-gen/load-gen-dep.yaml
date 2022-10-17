@@ -12,7 +12,8 @@ spec:
       service: load-gen
   template:
     metadata:
-      service: load-gen
+      labels:
+        service: load-gen
     spec:
       imagePullSecrets:
       - name: docker-hub
