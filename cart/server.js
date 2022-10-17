@@ -135,15 +135,13 @@ app.delete('/cart/:id', (req, res) => {
         return;
     }
 
-    redisClient.del(req.params.id).then(
-        (val) => {
+    redisClient.del(req.params.id).then((val) => {
             if(val == 1) {
                 res.send('OK');
             } else {
                 res.status(404).send('cart not found');
             }
-        },
-        (err) => {
+        }).catch((err) => {
             req.log.errot(err);
             res.status(500).send(e);
         }
@@ -414,7 +412,7 @@ function saveCart(id, cart) {
 }
 
 // connect to Redis
-logger.info('Connectiong to redis host %s', redisHost);
+logger.info('Connecting to redis host %s', redisHost);
 var redisClient = redis.createClient({
     url: 'redis://' + redisHost
 });
