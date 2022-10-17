@@ -15,6 +15,7 @@ spec:
   endpoints:
     - port: http
     - port: exporter
+    - port: prometheus-metrics
 
 ---
 # Java does things differently
