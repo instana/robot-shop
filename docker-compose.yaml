@@ -106,8 +106,6 @@ services:
       APP_ENV: prod
     networks:
       - robot-shop
-    depends_on:
-      - mysql
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 10s
