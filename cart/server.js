@@ -142,7 +142,7 @@ app.delete('/cart/:id', (req, res) => {
                 res.status(404).send('cart not found');
             }
         }).catch((err) => {
-            req.log.errot(err);
+            req.log.error(err);
             res.status(500).send(e);
         }
     );
