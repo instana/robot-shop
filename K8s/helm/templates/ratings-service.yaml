@@ -4,6 +4,7 @@ metadata:
   name: ratings
   labels:
     service: ratings
+    app: robot-shop
 spec:
   ports:
   - name: http

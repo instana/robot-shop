@@ -4,6 +4,7 @@ metadata:
   name: dispatch
   labels:
     service: dispatch
+    app: robot-shop
 spec:
   ports:
   - name: http

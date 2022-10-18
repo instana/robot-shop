@@ -41,12 +41,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.instana</groupId>
-			<artifactId>instana-java-sdk</artifactId>
-			<version>1.2.0</version>
-		</dependency>
-
-		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<scope>runtime</scope>

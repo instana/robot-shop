@@ -32,7 +32,7 @@ services:
     networks:
       - robot-shop
     healthcheck:
-      test: [ "CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost:8080/health" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
       interval: 10s
       timeout: 10s
       retries: 3
@@ -48,7 +48,7 @@ services:
     networks:
       - robot-shop
     healthcheck:
-      test: [ "CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost:8080/health" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
       interval: 10s
       timeout: 10s
       retries: 3
@@ -60,10 +60,11 @@ services:
     image: ${REPO}/robot-shop-rs-cart:${CART_TAG}
     depends_on:
       - redis
+      - catalogue
     networks:
       - robot-shop
     healthcheck:
-      test: [ "CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost:8080/health" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
       interval: 10s
       timeout: 10s
       retries: 3
@@ -88,7 +89,7 @@ services:
     networks:
       - robot-shop
     healthcheck:
-      test: ["CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost:8080/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 10s
       timeout: 10s
       retries: 3
@@ -98,14 +99,15 @@ services:
     build:
       context: ratings
     image: ${REPO}/robot-shop-rs-ratings:${RATINGS_TAG}
+    depends_on:
+      - mysql
+      - catalogue
     environment:
       APP_ENV: prod
     networks:
       - robot-shop
-    depends_on:
-      - mysql
     healthcheck:
-      test: ["CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost/_health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 10s
       timeout: 10s
       retries: 3
@@ -120,7 +122,7 @@ services:
     networks:
       - robot-shop
     healthcheck:
-      test: ["CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost:8080/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 10s
       timeout: 10s
       retries: 3
@@ -142,9 +144,6 @@ services:
   web:
     build:
       context: web
-      args:
-        # agent key to download tracing libs
-        KEY: ${INSTANA_AGENT_KEY}
     image: ${REPO}/robot-shop-rs-web:${WEB_TAG}
     depends_on:
       - catalogue
@@ -156,14 +155,10 @@ services:
     networks:
       - robot-shop
     healthcheck:
-      test: [ "CMD", "curl", "-H", "X-INSTANA-SYNTHETIC: 1", "-f", "http://localhost:8080/" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/" ]
       interval: 10s
       timeout: 10s
       retries: 3
-    # Uncomment to enable Instana EUM
-    # environment:
-      # INSTANA_EUM_KEY: <your eum key>
-      # INSTANA_EUM_REPORTING_URL: <your reporting url>
     logging:
       <<: *logging
 

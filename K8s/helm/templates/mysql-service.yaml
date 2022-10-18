@@ -3,6 +3,7 @@ kind: Service
 metadata:
   labels:
     service: mysql
+    app: robot-shop
   name: mysql
 spec:
   ports:

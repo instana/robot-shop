@@ -20,13 +20,6 @@ payment:
   #gateway: https://www.paypal.com
   #gateway: https://www.worldpay.com
 
-# EUM configuration
-# Provide your key and set the endpoint
-eum:
-  key: null
-  url: https://eum-eu-west-1.instana.io
-  #url: https://eum-us-west-2.instana.io
-
 # Pod Security Policy
 psp:
   enabled: false

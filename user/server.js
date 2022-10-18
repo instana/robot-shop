@@ -13,14 +13,17 @@ var usersCollection;
 var ordersCollection;
 var mongoConnected = false;
 
+// Redis
+var redisHost = process.env.REDIS_HOST || 'redis';
+var redisConnected = false;
+
 const logger = pino({
-    level: 'warn',
+    level: 'info',
     prettyPrint: false,
     useLevelLabels: true
 });
 const expLogger = expPino({
     logger: logger
-
 });
 
 const app = express();
@@ -74,24 +77,36 @@ app.use(bodyParser.json());
 app.get('/health', (req, res) => {
     var stat = {
         app: 'OK',
-        mongo: mongoConnected
+        mongo: mongoConnected,
+        redis: redisConnected
     };
     res.json(stat);
+});
+
+app.get('/ready', (req, res) => {
+    if(mongoConnected && redisConnected) {
+        res.send('ready');
+    } else {
+        res.status(404).send('not ready');
+    }
 });
 
 // use REDIS INCR to track anonymous users
 app.get('/uniqueid', (req, res) => {
     // get number from Redis
-    redisClient.incr('anonymous-counter', (err, r) => {
-        if(!err) {
+    if(redisConnected) {
+        redisClient.incr('anonymous-counter').then((val) => {
             res.json({
-                uuid: 'anonymous-' + r
+                uuid: 'anonymous-' + val
             });
-        } else {
-            req.log.error('ERROR', err);
-            res.status(500).send(err);
-        }
-    });
+        }).catch((err) => {
+            req.log.error(err);
+            res.ststus(500).send(err);
+        });
+    } else {
+        req.log.error('Redis not available');
+        res.status(500).send('Redis not available');
+    }
 });
 
 // check user exists
@@ -119,7 +134,7 @@ app.get('/users', (req, res) => {
         usersCollection.find().toArray().then((users) => {
             res.json(users);
         }).catch((e) => {
-            req.log.error('ERROR', e);
+            req.log.error(e);
             res.status(500).send(e);
         });
     } else {
@@ -137,7 +152,7 @@ app.post('/login', (req, res) => {
         usersCollection.findOne({
             name: req.body.name,
         }).then((user) => {
-            req.log.info('user', user);
+            req.log.info('user %o', user);
             if(user) {
                 if(user.password == req.body.password) {
                     res.json(user);
@@ -148,7 +163,7 @@ app.post('/login', (req, res) => {
                 res.status(404).send('name not found');
             }
         }).catch((e) => {
-            req.log.error('ERROR', e);
+            req.log.error(e);
             res.status(500).send(e);
         });
     } else {
@@ -176,15 +191,15 @@ app.post('/register', (req, res) => {
                     password: req.body.password,
                     email: req.body.email
                 }).then((r) => {
-                    req.log.info('inserted', r.result);
+                    req.log.info('inserted %o', r.result);
                     res.send('OK');
                 }).catch((e) => {
-                    req.log.error('ERROR', e);
+                    req.log.error(e);
                     res.status(500).send(e);
                 });
             }
         }).catch((e) => {
-            req.log.error('ERROR', e);
+            req.log.error(e);
             res.status(500).send(e);
         });
     } else {
@@ -268,16 +283,20 @@ app.get('/history/:id', (req, res) => {
 });
 
 // connect to Redis
+logger.info('connecting to redis host %s', redisHost);
 var redisClient = redis.createClient({
-    host: process.env.REDIS_HOST || 'redis'
+    url: 'redis://' + redisHost
 });
 
 redisClient.on('error', (e) => {
-    logger.error('Redis ERROR', e);
+    logger.error('Redis ERROR %o', e);
 });
-redisClient.on('ready', (r) => {
-    logger.info('Redis READY', r);
+redisClient.on('ready', () => {
+    redisConnected = true;
+    logger.info('Redis READY');
 });
+
+redisClient.connect();
 
 // set up Mongo
 function mongoConnect() {
@@ -311,6 +330,6 @@ mongoLoop();
 // fire it up!
 const port = process.env.USER_SERVER_PORT || '8080';
 app.listen(port, () => {
-    logger.info('Started on port', port);
+    logger.info('Started on port %s', port);
 });
 

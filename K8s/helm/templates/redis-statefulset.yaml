@@ -39,8 +39,10 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
           requests:
+            cpu: 100m
             memory: 50Mi
           limits:
+            cpu: 200m
             memory: 50Mi
         ports:
           - name: exporter

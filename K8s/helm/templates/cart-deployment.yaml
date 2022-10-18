@@ -23,14 +23,21 @@ spec:
       - name: cart
         image: {{ .Values.image.repo }}/robot-shop-rs-cart:{{ .Values.image.cartVersion }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        # agent networking access
-        env:
-          - name: INSTANA_AGENT_HOST
-            valueFrom:
-              fieldRef:
-                fieldPath: status.hostIP
         ports:
-        - containerPort: 8080
+        - name: http
+          containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 10
         resources:
           limits:
             cpu: 200m

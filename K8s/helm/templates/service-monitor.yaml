@@ -1,0 +1,18 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: metrics
+  labels:
+    release: prometheus
+    app: robot-shop
+spec:
+  selector:
+    matchLabels:
+      app: robot-shop
+  namespaceSelector:
+    any: true
+  endpoints:
+    - port: http
+    - port: exporter
+    - port: prometheus-metrics

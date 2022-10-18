@@ -1,6 +1,3 @@
-# Instana tracing
-opentracing_load_tracer /usr/local/lib/libinstana_sensor.so /etc/instana-config.json;
-opentracing_propagate_context;
 
 server {
     listen       8080;
@@ -78,7 +75,7 @@ server {
     }
 
     location /api/ratings/ {
-        proxy_pass http://${RATINGS_HOST}:80/;
+        proxy_pass http://${RATINGS_HOST}:8080/;
     }
 
     location /nginx_status {
