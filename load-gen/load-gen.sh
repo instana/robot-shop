@@ -5,6 +5,8 @@
 YAML=$(mktemp)
 trap "rm -f $YAML" 0 1 2 3
 
+clear
+
 # Changing the NUM_CLIENTS environment variable varies the load on the application
 # The bigger the number the more requests, the bigger the load
 NUM_CLIENTS=1
@@ -44,7 +46,10 @@ then
 fi
 
 # get the tag info
-eval $(egrep '[A-Z]+=' ../.env)
+for VAR in $(egrep '[A-Z]+=' ../.env)
+do
+    eval $VAR
+done
 
 echo "Repo $REPO"
 echo "Tag $LOAD_TAG"
@@ -95,7 +100,7 @@ do
             ;;
         k)
             # test for yq and k
-            if [ ! which yq kubectl ]
+            if ! which yq kubectl
             then
                 echo "yq and/or kubectl not found on PATH"
                 echo "Bye"
@@ -111,7 +116,6 @@ do
     esac
 done
 
-clear
 /bin/echo -n "Deploying to "
 if [ $KUBERNETES -eq 0 ]
 then
