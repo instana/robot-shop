@@ -45,7 +45,7 @@ spec:
             cpu: 200m
             memory: 50Mi
         ports:
-          - name: exporter
+          - name: http-metrics
             containerPort: 9121
       restartPolicy: Always
   volumeClaimTemplates:

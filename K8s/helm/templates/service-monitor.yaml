@@ -14,5 +14,4 @@ spec:
     any: true
   endpoints:
     - port: http
-    - port: exporter
-    - port: prometheus-metrics
+    - port: http-metrics

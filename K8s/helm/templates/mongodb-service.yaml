@@ -7,10 +7,10 @@ metadata:
   name: mongodb
 spec:
   ports:
-  - name: mongodb
+  - name: mongo
     port: 27017
     targetPort: 27017
-  - name: exporter
+  - name: http-metrics
     port: 9216
     targetPort: 9216
   selector:
