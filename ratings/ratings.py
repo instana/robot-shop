@@ -51,19 +51,11 @@ def health():
 '''Depends on MySQL connection to serve requests'''
 @app.route('/ready', methods=['GET'])
 def ready():
-    connection = None
-    try:
-        connection = mysql.connector.connect(pool_name='ratings')
-        if connection.is_connected():
-            return 'ready'
-        else:
-            return 'not ready', 404
-    except Exception as err:
-        app.logger.error(err)
-        return str(err), 500
-    finally:
-        if connection:
-            connection.close()
+    # test connection
+    if mysql_pool_cnx and mysql_pool_cnx.is_connected():
+        return 'ready'
+    else:
+        return 'not ready', 404
 
 @app.route('/api/rate/<sku>/<score>', methods=['PUT'])
 def add_rating(sku, score):
@@ -178,16 +170,12 @@ def get_product(sku):
         
     return product
 
-# TODO - run loop indefinitly check for connection and reconnecting if required
-# mysql_pool.is_connected()
-# mysql_pool.reconnect(attempts=1, delay=0)
 def db_connect_loop():
     while True:
         if mysql_pool_cnx == None or not mysql_pool_cnx.is_connected():
             db_connect()
             time.sleep(5)
 
-# TODO - implement a pooled connection
 def db_connect():
     global mysql_pool_cnx
 
