@@ -3,6 +3,7 @@ import os
 import time
 import threading
 import requests
+import pprint
 
 import mysql.connector
 
@@ -18,7 +19,7 @@ MYSQL_PORT = os.getenv('SHOP_MYSQL_PORT', '3306')
 MYSQL_USER = os.getenv('SHOP_MYSQL_USER', 'ratings')
 MYSQL_PASS = os.getenv('SHOP_MYSQL_PASS', 'iloveit')
 
-mysql_cnx = None
+mysql_pool_cnx = None
 
 def path(req):
     ''' Use the first URI segment'''
@@ -35,7 +36,7 @@ def exception_handler(err):
     return str(err), 500
 
 '''Loop waiting for MySQL
-The health probe will kick this off'''
+This is run once when the service starts'''
 @app.before_first_request
 def init_db():
     # attempt MySQL connection in background
@@ -44,16 +45,25 @@ def init_db():
 
 @app.route('/health', methods=['GET'])
 def health():
-    status = {'mysql connected': mysql_cnx != None}
+    status = {'health': True}
     return jsonify(status)
 
 '''Depends on MySQL connection to serve requests'''
 @app.route('/ready', methods=['GET'])
 def ready():
-    if mysql_cnx == None:
-        return 'not ready', 404
-    else:
-        return 'ready'
+    connection = None
+    try:
+        connection = mysql.connector.connect(pool_name='ratings')
+        if connection.is_connected():
+            return 'ready'
+        else:
+            return 'not ready', 404
+    except Exception as err:
+        app.logger.error(err)
+        return str(err), 500
+    finally:
+        if connection:
+            connection.close()
 
 @app.route('/api/rate/<sku>/<score>', methods=['PUT'])
 def add_rating(sku, score):
@@ -96,35 +106,41 @@ def update_rating(sku, score):
         rating = get_rating(sku)
         app.logger.info('current rating {}'.format(rating))
         # iffy maths
+        # TODO - implement moving average
         new_avg = ((rating['avg_rating'] * rating['rating_count']) + score) / (rating['rating_count'] + 1)
-        cursor = mysql_cnx.cursor()
+        connection = mysql.connector.connect(pool_name='ratings')
+        cursor = connection.cursor()
         query = 'UPDATE ratings SET avg_rating = %s, rating_count = %s WHERE sku = %s'
         values = (new_avg, rating['rating_count'] + 1, sku)
         cursor.execute(query, values)
-        mysql_cnx.commit()
+        connection.commit()
     except Exception as err:
         app.logger.error(err)
     finally:
         cursor.close()
+        connection.close()
 
 '''create rating'''
 def add_rating(sku, score):
     try:
-        cursor = mysql_cnx.cursor()
+        connection = mysql.connector.connect(pool_name='ratings')
+        cursor = connection.cursor()
         query = 'INSERT INTO ratings (sku, avg_rating, rating_count) VALUES (%s, %s, %s)'
         values = (sku, score, 1)
         cursor.execute(query, values)
-        mysql_cnx.commit()
+        connection.commit()
     except Exception as err:
         app.logger.error(err)
     finally:
         cursor.close()
+        connection.close()
 
 '''Get current rating'''
 def get_rating(sku):
     rating = None
     try:
-        cursor = mysql_cnx.cursor()
+        connection = mysql.connector.connect(pool_name='ratings')
+        cursor = connection.cursor()
         query = 'SELECT avg_rating, rating_count FROM ratings WHERE sku = %s'
         cursor.execute(query, (sku,))
         row = cursor.fetchone()
@@ -145,6 +161,7 @@ def get_rating(sku):
         app.logger.error(err)
     finally:
         cursor.close()
+        connection.close()
     
     return rating
 
@@ -161,28 +178,35 @@ def get_product(sku):
         
     return product
 
+# TODO - run loop indefinitly check for connection and reconnecting if required
+# mysql_pool.is_connected()
+# mysql_pool.reconnect(attempts=1, delay=0)
 def db_connect_loop():
-    while db_connect():
-        time.sleep(5)
+    while True:
+        if mysql_pool_cnx == None or not mysql_pool_cnx.is_connected():
+            db_connect()
+            time.sleep(5)
 
+# TODO - implement a pooled connection
 def db_connect():
-    global mysql_cnx
+    global mysql_pool_cnx
 
     app.logger.info('Connecting to MySQL {}:{}'.format(MYSQL_HOST, MYSQL_PORT))
     try:
-        mysql_cnx = mysql.connector.connect(
+        mysql_pool_cnx = mysql.connector.connect(
             user=MYSQL_USER,
             password=MYSQL_PASS,
             host=MYSQL_HOST,
             port=MYSQL_PORT,
-            database='ratings'
+            database='ratings',
+            pool_name='ratings',
+            pool_size=10,
+            pool_reset_session=True
         )
         app.logger.info('MySQL Connected OK')
     except mysql.connector.Error as err:
         app.logger.error(err)
-        mysql_cnx = None
-
-    return mysql_cnx == None
+        mysql_pool_cnx = None
 
 if __name__ == '__main__':
     port = int(os.getenv('SHOP_RATINGS_PORT', '8080'))
