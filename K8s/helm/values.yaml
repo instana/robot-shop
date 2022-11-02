@@ -33,3 +33,9 @@ redis:
   storageClassName: standard
 
 ocCreateRoute: false
+
+affinity: {}
+
+nodeSelector: {}
+
+tolerations: []
