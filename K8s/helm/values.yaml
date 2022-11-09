@@ -5,12 +5,6 @@ image:
   version: latest
   pullPolicy: IfNotPresent
 
-# Alternative payment gateway URL
-# Default is https://www.paypal.com
-payment:
-  gateway: null
-  #gateway: https://www.worldpay.com
-
 # EUM configuration
 # Provide your key and set the endpoint
 eum:
@@ -28,14 +22,70 @@ nodeport: false
 # "special" Openshift. Set to true when deploying to any openshift flavour
 openshift: false
 
-# Storage class to use with redis statefulset.
-redis:
-  storageClassName: standard
-
 ocCreateRoute: false
 
-affinity: {}
+payment:
+  # Alternative payment gateway URL
+  # Default is https://www.paypal.com
+  gateway: null
+  #gateway: https://www.worldpay.com
+  affinity: {}
+  nodeSelector: {}
+  tolerations: []
 
-nodeSelector: {}
+redis:
+  # Storage class to use with redis statefulset.
+  storageClassName: standard
+  affinity: {}
+  nodeSelector: {}
+  tolerations: []
 
-tolerations: []
+cart:
+  affinity: {}
+  nodeSelector: {}
+  tolerations: []
+
+catalogue:
+  affinity: {}
+  nodeSelector: {}
+  tolerations: []
+
+dispatch:
+  affinity: {}
+  nodeSelector: {}
+  tolerations: []
+
+mongodb:
+  affinity: {}
+  nodeSelector: {}
+  tolerations: []
+
+mysql:
+  affinity: {}
+  nodeSelector: {}
+  tolerations: []
+
+rabbitmq:
+  affinity: {}
+  nodeSelector: {}
+  tolerations: []
+
+ratings:
+  affinity: {}
+  nodeSelector: {}
+  tolerations: []
+
+shipping:
+  affinity: {}
+  nodeSelector: {}
+  tolerations: []
+
+user:
+  affinity: {}
+  nodeSelector: {}
+  tolerations: []
+
+web:
+  affinity: {}
+  nodeSelector: {}
+  tolerations: []

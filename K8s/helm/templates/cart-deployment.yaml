@@ -36,15 +36,15 @@ spec:
           requests:
             cpu: 100m
             memory: 50Mi
-      {{- with .Values.affinity }}
+      {{- with .Values.cart.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.nodeSelector }}
+      {{- with .Values.cart.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.tolerations }}
+      {{- with .Values.cart.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
