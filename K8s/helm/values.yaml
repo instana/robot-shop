@@ -1,4 +1,4 @@
-# Registry and rpository for Docker images
+# Registry and repository for Docker images
 # Default is docker/robotshop/image:latest
 image:
   repo: robotshop
