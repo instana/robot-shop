@@ -80,7 +80,7 @@ Openshift is like K8s but not K8s. Set `openshift` to true or things will break.
 $ helm install robot-shop --set openshift=true helm
 ```
 
-### Deployment Parameters
+## Deployment Parameters
 
 | Key              | Default | Type   | Description |
 | ---------------- | ------- | ------ | ----------- |
@@ -95,3 +95,92 @@ $ helm install robot-shop --set openshift=true helm
 | psp.enabled      | false | boolean | Enable Pod Security Policy for clusters with a PSP Admission controller |
 | redis.storageClassName | standard | string | Storage class to use with Redis's StatefulSet. The default for EKS is gp2. |
 | ocCreateRoute    | false | boolean | If you are running on OpenShift and need a Route to the web service, set this to `true` |
+| `<workload>`.affinity    | {} | object | Affinity for pod assignment on nodes with matching labels (Refer [here](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)) |
+| `<workload>`.nodeSelector    | {} | object | Node labels for pod assignment (Refer [here](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)) |
+| `<workload>`.tolerations    | [] | list | Tolerations for pod assignment on nodes with matching taints (Refer [here](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)) |
+---
+> ### Notes for `affinity` and `tolerations`
+> `<workload>` can be substituted with the different microservices consisting of Robot shop, namely:
+> - [`cart`](./templates/cart-deployment.yaml)
+> - [`catalogue`](./templates/catalogue-deployment.yaml)
+> - [`dispatch`](./templates/dispatch-deployment.yaml)
+> - [`mongodb`](./templates/mongodb-deployment.yaml)
+> - [`mysql`](./templates/mysql-deployment.yaml)
+> - [`payment`](./templates/payment-deployment.yaml)
+> - [`rabbitmq`](./templates/rabbitmq-deployment.yaml)
+> - [`ratings`](./templates/ratings-deployment.yaml)
+> - [`redis`](./templates/redis-statefulset.yaml)
+> - [`shipping`](./templates/shipping-deployment.yaml)
+> - [`user`](./templates/user-deployment.yaml)
+> - [`web`](./templates/web-deployment.yaml)
+>
+> `affinity`, `nodeSelector` and `tolerations` can be set for individual workloads.
+------
+## Examples for deployment using `affinities` and `tolerations`
+<br />
+
+`values.yaml`
+```yaml
+.
+..
+...
+shipping:
+    gateway: null
+    affinity:
+        nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+                - key: node-restriction.kubernetes.io/pool_0
+                    operator: Exists
+                    values: []
+    tolerations:
+        - key: "pool_0"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+        - key: "pool_0"
+        operator: "Equal"
+        value: "true"
+        effect: "NoExecute"
+    nodeSelector: {}
+
+user:
+    affinity:
+        nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+                - key: node-restriction.kubernetes.io/pool_1
+                    operator: Exists
+                    values: []
+    tolerations:
+        - key: "pool_1"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+        - key: "pool_1"
+        operator: "Equal"
+        value: "true"
+        effect: "NoExecute"
+    nodeSelector: {}
+...
+..
+.
+ ```
+
+In this example, the `shipping` Pods will be deployed on only those nodes that have the label `node-restriction.kubernetes.io/pool_0` and are tainted using
+```
+kubectl taint node <node_name> pool_0=true:NoSchedule
+kubectl taint node <node_name> pool_0=true:NoExecute
+```
+
+Similarly, the `user` Pods will be deployed on only those nodes that have the label `node-restriction.kubernetes.io/pool_1` and are tainted using
+```
+kubectl taint node <node_name> pool_1=true:NoSchedule
+kubectl taint node <node_name> pool_1=true:NoExecute
+```
+
+Hence, this way we can control which `Robot shop` workloads are running on which nodes/nodepools.
+
+> *Note*: `nodeSelector` will behave in a similar fashion.
