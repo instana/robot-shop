@@ -24,68 +24,41 @@ openshift: false
 
 ocCreateRoute: false
 
+######################################
+# Affinities for individual workloads
+# set in the following way:
+# <workload>:
+#   affinity: {}
+#   nodeSelector: {}
+#   tolerations: []
+######################################
+
+cart: {}
+
+catalogue: {}
+
+dispatch: {}
+
+mongodb: {}
+
+mysql: {}
+
 payment:
   # Alternative payment gateway URL
   # Default is https://www.paypal.com
   gateway: null
   #gateway: https://www.worldpay.com
-  affinity: {}
-  nodeSelector: {}
-  tolerations: []
+
+rabbitmq: {}
+
+ratings: {}
 
 redis:
   # Storage class to use with redis statefulset.
   storageClassName: standard
-  affinity: {}
-  nodeSelector: {}
-  tolerations: []
 
-cart:
-  affinity: {}
-  nodeSelector: {}
-  tolerations: []
+shipping: {}
 
-catalogue:
-  affinity: {}
-  nodeSelector: {}
-  tolerations: []
+user: {}
 
-dispatch:
-  affinity: {}
-  nodeSelector: {}
-  tolerations: []
-
-mongodb:
-  affinity: {}
-  nodeSelector: {}
-  tolerations: []
-
-mysql:
-  affinity: {}
-  nodeSelector: {}
-  tolerations: []
-
-rabbitmq:
-  affinity: {}
-  nodeSelector: {}
-  tolerations: []
-
-ratings:
-  affinity: {}
-  nodeSelector: {}
-  tolerations: []
-
-shipping:
-  affinity: {}
-  nodeSelector: {}
-  tolerations: []
-
-user:
-  affinity: {}
-  nodeSelector: {}
-  tolerations: []
-
-web:
-  affinity: {}
-  nodeSelector: {}
-  tolerations: []
+web: {}
