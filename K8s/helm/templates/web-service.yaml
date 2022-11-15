@@ -7,9 +7,12 @@ metadata:
     app: robot-shop
 spec:
   ports:
-  - name: http
+  - name: nginx
     port: 8080
     targetPort: 8080
+  - name: http-metrics
+    port: 9113
+    targetPort: 9113
   selector:
     service: web
 ---
