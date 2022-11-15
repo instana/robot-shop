@@ -5,14 +5,14 @@ groups:
         expr: .95
         labels:
           asserts_source: nodejs
-          asserts_resource_type: memory:usage
+          asserts_resource_type: heap:usage
           asserts_severity: warning
           asserts_threshold_level: source
       - record: asserts:resource:threshold
         expr: .98
         labels:
           asserts_source: nodejs
-          asserts_resource_type: memory:usage
+          asserts_resource_type: heap:usage
           asserts_severity: critical
           asserts_threshold_level: source
       - record: asserts:latency:p99:threshold
