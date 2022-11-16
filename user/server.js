@@ -18,9 +18,13 @@ var redisHost = process.env.REDIS_HOST || 'redis';
 var redisConnected = false;
 
 const logger = pino({
-    level: 'info',
+    level: 'warn',
     prettyPrint: false,
-    useLevelLabels: true
+    formatters: {
+      level: (label) => {
+        return { level: label };
+      },
+    }
 });
 const expLogger = expPino({
     logger: logger

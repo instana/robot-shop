@@ -22,9 +22,13 @@ var redisHost = process.env.REDIS_HOST || 'redis'
 var catalogueHost = process.env.CATALOGUE_HOST || 'catalogue'
 
 const logger = pino({
-    level: 'info',
+    level: 'warn',
     prettyPrint: false,
-    useLevelLabels: true
+    formatters: {
+      level: (label) => {
+        return { level: label };
+      },
+    }
 });
 const expLogger = expPino({
     logger: logger
@@ -130,7 +134,7 @@ app.delete('/cart/:id', (req, res) => {
             throw new Error('Invalid cart id: ' + req.params.id);
         }
     } catch(e) {
-        req.log.error(e);
+        logger.error(e);
         res.status(500).send(e);
         return;
     }
