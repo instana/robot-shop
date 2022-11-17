@@ -17,6 +17,28 @@ services:
       - robot-shop
     logging:
       <<: *logging
+  jaeger:
+    image: jaegertracing/all-in-one:1.38
+    networks:
+      - robot-shop
+    ports:
+      - "5778:5778"
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+      - "14250:14250"
+      - "14268:14268"
+      - "14269:14269"
+      - "9411:9411"
+    environment:
+      COLLECTOR_ZIPKIN_HOST_PORT: 9411
+      COLLECTOR_OTLP_ENABLED: true
+    volumes:
+      - type: bind
+        source: ./jaeger-sampling.json
+        target: /etc/jaeger/sampling_strategies.json
+    logging:
+      <<: *logging
   rabbitmq:
     image: rabbitmq:3.8-management-alpine
     networks:
