@@ -23,12 +23,9 @@ spec:
       - name: dispatch
         image: {{ .Values.image.repo }}/robot-shop-rs-dispatch:{{ .Values.image.dispatchVersion }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        env:
-          # agent networking access
-          - name: INSTANA_AGENT_HOST
-            valueFrom:
-              fieldRef:
-                fieldPath: status.hostIP
+        ports:
+        - name: http
+          containerPort: 8080
         resources:
           limits:
             cpu: 200m

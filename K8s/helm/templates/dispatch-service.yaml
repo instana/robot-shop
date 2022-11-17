@@ -4,9 +4,10 @@ metadata:
   name: dispatch
   labels:
     service: dispatch
+    app: robot-shop
 spec:
   ports:
-  - name: http
+  - name: http-metrics
     port: 8080
     targetPort: 8080
   selector:

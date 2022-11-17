@@ -4,6 +4,7 @@ metadata:
   name: rabbitmq
   labels:
     service: rabbitmq
+    app: robot-shop
 spec:
   ports:
   - name: tcp-amqp
@@ -12,7 +13,7 @@ spec:
   - name: http-management
     port: 15672
     targetPort: 15672
-  - name: prometheus-metrics
+  - name: http-metrics
     port: 15692
     targetPort: 15692
   - name: tcp-epmd

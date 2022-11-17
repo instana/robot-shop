@@ -2,6 +2,11 @@
 
 # set -x
 
+YAML=$(mktemp)
+trap "rm -f $YAML" 0 1 2 3
+
+clear
+
 # Changing the NUM_CLIENTS environment variable varies the load on the application
 # The bigger the number the more requests, the bigger the load
 NUM_CLIENTS=1
@@ -19,6 +24,9 @@ ERROR=0
 DAEMON="-it"
 SILENT=0
 
+# Kubernetes flag
+KUBERNETES=0
+
 USAGE="\
 
 loadgen.sh
@@ -28,6 +36,7 @@ d - run in background
 n - number of clients
 t - time to run n clients
 h - target host
+k - deploy on Kubernetes
 "
 
 if [ ! -f ../.env ]
@@ -37,12 +46,16 @@ then
 fi
 
 # get the tag info
-eval $(egrep '[A-Z]+=' ../.env)
+for VAR in $(egrep '[A-Z]+=' ../.env)
+do
+    eval $VAR
+done
 
 echo "Repo $REPO"
-echo "Tag $TAG"
+echo "Tag $LOAD_TAG"
+IMAGE="${REPO}/robot-shop-rs-load:${LOAD_TAG}"
 
-while getopts 'edn:t:h:' OPT
+while getopts 'edn:t:h:k' OPT
 do
     case $OPT in
         e)
@@ -85,6 +98,17 @@ do
                 exit 1
             fi
             ;;
+        k)
+            # test for yq and k
+            if ! which yq kubectl
+            then
+                echo "yq and/or kubectl not found on PATH"
+                echo "Bye"
+                exit 1
+            fi
+            cat load-gen-dep.yaml > $YAML
+            KUBERNETES=1
+            ;;
         *)
             echo "$USAGE"
             exit 1
@@ -92,15 +116,53 @@ do
     esac
 done
 
-docker run \
-    $DAEMON \
-    --name loadgen \
-    --rm \
-    --network=host \
-    -e "HOST=$HOST" \
-    -e "NUM_CLIENTS=$NUM_CLIENTS" \
-    -e "RUN_TIME=$RUN_TIME" \
-    -e "SILENT=$SILENT" \
-    -e "ERROR=$ERROR" \
-    ${REPO}/rs-load:${LOAD_TAG}
+/bin/echo -n "Deploying to "
+if [ $KUBERNETES -eq 0 ]
+then
+    echo "Docker"
+else
+    echo "Kubernetes"
+    # overrides for K8s
+    SILENT=1
+    RUN_TIME=0
+fi
+echo "HOST=$HOST"
+echo "NUM_CLIENTS=$NUM_CLIENTS"
+echo "RUN_TIME=$RUN_TIME"
+echo "SILENT=$SILENT"
+echo "ERROR=$ERROR"
+echo ""
+read -p "Continue <y/n>? " ANS
+if [ "$ANS" != "y" ]
+then
+    echo "Bye"
+    exit
+fi
 
+if [ $KUBERNETES -eq 0 ]
+then
+    echo "Running load generation in Docker"
+    docker run \
+        $DAEMON \
+        --name loadgen \
+        --rm \
+        --network=host \
+        -e "HOST=$HOST" \
+        -e "NUM_CLIENTS=$NUM_CLIENTS" \
+        -e "RUN_TIME=$RUN_TIME" \
+        -e "SILENT=$SILENT" \
+        -e "ERROR=$ERROR" \
+        $IMAGE
+else
+    echo "Deploying load generation to Kubernetes"
+    yq -i '.spec.template.spec.containers[0].image = "'$IMAGE'"' $YAML
+
+    yq -i '.spec.template.spec.containers[0] |= ({"env": [{"name": "HOST", "value": "'$HOST'"}]} + .)' $YAML
+    yq -i '.spec.template.spec.containers[0].env += {"name": "NUM_CLIENTS", "value": "'$NUM_CLIENTS'"}' $YAML
+    yq -i '.spec.template.spec.containers[0].env += {"name": "RUN_TIME", "value": "'$RUN_TIME'"}' $YAML
+    yq -i '.spec.template.spec.containers[0].env += {"name": "SILENT", "value": "'$SILENT'"}' $YAML
+    yq -i '.spec.template.spec.containers[0].env += {"name": "ERROR", "value": "'$ERROR'"}' $YAML
+
+    cat $YAML
+    kubectl apply -f $YAML
+fi

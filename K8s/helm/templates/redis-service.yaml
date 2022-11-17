@@ -3,13 +3,14 @@ kind: Service
 metadata:
   labels:
     service: redis
+    app: robot-shop
   name: redis
 spec:
   ports:
   - name: redis
     port: 6379
     targetPort: 6379
-  - name: exporter
+  - name: http-metrics
     port: 9121
     targetPort: 9121
   selector:

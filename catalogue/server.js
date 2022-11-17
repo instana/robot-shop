@@ -76,6 +76,14 @@ app.get('/health', (req, res) => {
     res.json(stat);
 });
 
+app.get('/ready', (req, res) => {
+    if(mongoConnected) {
+        res.send('ready');
+    } else {
+        res.status(404).send('not ready');
+    }
+});
+
 // all products
 app.get('/products', (req, res) => {
     if(mongoConnected) {

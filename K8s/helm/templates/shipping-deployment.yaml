@@ -24,7 +24,8 @@ spec:
         image: {{ .Values.image.repo }}/robot-shop-rs-shipping:{{ .Values.image.shippingVersion }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
-        - containerPort: 8080
+        - name: http
+          containerPort: 8080
         # it's Java it needs lots of memory
         resources:
           limits:
@@ -33,12 +34,20 @@ spec:
           requests:
             cpu: 500m
             memory: 1000Mi
+        # Shipping depends on MySQL which takes a long time to start
+        # Springboot is not too quick on startup either
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          failureThreshold: 60
+          successThreshold: 1
         readinessProbe:
           httpGet:
             path: /health
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          failureThreshold: 30
-          successThreshold: 1
+            port: http
+          initialDelaySeconds: 60
+          periodSeconds: 10
       restartPolicy: Always

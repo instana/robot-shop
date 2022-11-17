@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.view.RedirectView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.http.HttpStatus;
 
 @RestController
@@ -57,6 +59,17 @@ public class Controller {
     @GetMapping("/health")
     public String health() {
         return "OK";
+    }
+
+    @GetMapping("/ready")
+    public String ready() {
+        return "ready";
+    }
+
+    // Redirect normal metrics endpoint to actuator
+    @GetMapping("/metrics")
+    public RedirectView metrics(RedirectAttributes attrs) {
+        return new RedirectView("/actuator/prometheus");
     }
 
     @GetMapping("/count")

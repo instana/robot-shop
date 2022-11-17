@@ -3,13 +3,14 @@ kind: Service
 metadata:
   labels:
     service: mysql
+    app: robot-shop
   name: mysql
 spec:
   ports:
   - name: mysql
     port: 3306
     targetPort: 3306
-  - name: exporter
+  - name: http-metrics
     port: 9104
     targetPort: 9104
   selector:

@@ -2,16 +2,16 @@
 # Default is docker/robotshop/image:latest
 image:
   repo: asserts
-  cartVersion: "1.0.1"
-  catalogueVersion: "1.0.1"
-  dispatchVersion: "1.0.1"
-  mongodbVersion: "1.0"
+  cartVersion: "1.0.3"
+  catalogueVersion: "1.0.2"
+  dispatchVersion: "1.0.2"
+  mongodbVersion: "1.0.1"
   mysqlVersion: "1.0"
-  paymentVersion: "1.0.1"
-  ratingsVersion: "1.0"
-  shippingVersion: "1.0.1"
-  userVersion: "1.0.1"
-  webVersion: "1.0"
+  paymentVersion: "1.0.2"
+  ratingsVersion: "1.0.1"
+  shippingVersion: "1.0.3"
+  userVersion: "1.0.3"
+  webVersion: "1.0.1"
   pullPolicy: IfNotPresent
 
 # Payment gateway URL
@@ -19,13 +19,6 @@ payment:
   gateway: null
   #gateway: https://www.paypal.com
   #gateway: https://www.worldpay.com
-
-# EUM configuration
-# Provide your key and set the endpoint
-eum:
-  key: null
-  url: https://eum-eu-west-1.instana.io
-  #url: https://eum-us-west-2.instana.io
 
 # Pod Security Policy
 psp:
