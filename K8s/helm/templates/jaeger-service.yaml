@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: jaeger
+    app: robot-shop
+  name: jaeger
+spec:
+  ports:
+    - name: jaeger
+      port: 14250
+      targetPort: 14250
+    - name: jaeger-ui
+      port: 16686
+      targetPort: 16686
+  selector:
+    service: jaeger
