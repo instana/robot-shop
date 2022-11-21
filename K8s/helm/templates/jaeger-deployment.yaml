@@ -24,6 +24,9 @@ spec:
         - name: jaeger
           image: jaegertracing/all-in-one:1.38
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: MEMORY_MAX_TRACES
+              value: "100000"
           ports:
             - containerPort: 16686
             - containerPort: 5778
@@ -36,8 +39,8 @@ spec:
           resources:
             limits:
               cpu: 200m
-              memory: 100Mi
+              memory: 1024Mi
             requests:
               cpu: 100m
-              memory: 50Mi
+              memory: 800Mi
       restartPolicy: Always
