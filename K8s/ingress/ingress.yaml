@@ -59,7 +59,6 @@ spec:
                 name: web
                 port:
                   number: 8080
-
   tls:
     - hosts:
         - robot-shop.dev.asserts.ai
