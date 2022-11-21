@@ -59,13 +59,6 @@ spec:
                 name: web
                 port:
                   number: 8080
-          - path: /(.*)
-            pathType: Prefix
-            backend:
-              service:
-                name: jaeger
-                port:
-                  number: 16686
 
   tls:
     - hosts:
