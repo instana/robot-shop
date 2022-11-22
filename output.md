@@ -10,4 +10,3 @@ Committing directly to the master branch allows people to push features to produ
 
 # How do we prevent this
 settings -> branch -> branch protection and enable “require pull request before merging” 
-and make branch readonly 
