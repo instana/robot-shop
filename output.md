@@ -4,5 +4,3 @@ docker-compose up
 
 # Image of homepage
 ![Alt text] (./homepge.png?raw=true "Home Page"
-
-test
