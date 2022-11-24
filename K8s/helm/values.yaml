@@ -27,6 +27,9 @@ psp:
 # "special" Openshift. Set to true when deploying to any openshift flavour
 openshift: false
 
+serviceMonitor:
+  releaseLabel: prometheus
+
 # Storage class to use with redis statefulset.
 redis:
   storageClassName: gp3

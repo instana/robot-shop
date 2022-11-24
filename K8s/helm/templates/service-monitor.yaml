@@ -4,7 +4,7 @@ kind: ServiceMonitor
 metadata:
   name: metrics
   labels:
-    release: prometheus
+    release: {{ .Values.serviceMonitor.releaseLabel }}
     app: robot-shop
 spec:
   selector:
