@@ -29,5 +29,5 @@ RUN apt-get update && apt-get -y install curl
 COPY --from=build /opt/shipping/target/shipping-1.0.jar shipping.jar
 RUN wget -P /opt/shipping/ https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v1.20.0/opentelemetry-javaagent.jar
 
-CMD [ "java", "-Xmn256m", "-Xmx768m", "-javaagent:opentelemetry-javaagent.jar", "-Dotel.resource.attributes=service.name=shipping","-Dotel.traces.exporter=jaeger","-Dotel.resource.attributes=sampler.param=0.1","-Dotel.resource.attributes=sampler.type=probabilistic","-Dotel.exporter.jaeger.endpoint=http://jaeger:14250","-jar", "shipping.jar" ]
+CMD [ "java", "-Xmn256m", "-Xmx768m", "-javaagent:opentelemetry-javaagent.jar","-Dotel.metrics.exporter=none","-Dotel.resource.attributes=service.name=shipping","-Dotel.traces.exporter=jaeger","-Dotel.resource.attributes=sampler.param=0.1","-Dotel.resource.attributes=sampler.type=probabilistic","-Dotel.exporter.jaeger.endpoint=http://jaeger:14250","-jar", "shipping.jar" ]
 
