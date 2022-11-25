@@ -9,7 +9,7 @@ image:
   mysqlVersion: "1.0"
   paymentVersion: "1.0.2"
   ratingsVersion: "1.0.1"
-  shippingVersion: "1.0.5"
+  shippingVersion: "1.0.6"
   userVersion: "1.0.3"
   webVersion: "1.0.1"
   pullPolicy: IfNotPresent
