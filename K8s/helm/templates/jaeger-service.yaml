@@ -5,6 +5,7 @@ metadata:
     service: jaeger
     app: robot-shop
   name: jaeger
+  namespace: monitoring
 spec:
   ports:
     - name: jaeger

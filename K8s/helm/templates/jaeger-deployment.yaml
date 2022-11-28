@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: jaeger
-  namespace: {{.Release.Namespace}}
+  namespace: monitoring
   labels:
     service: jaeger
 spec:
@@ -38,9 +38,8 @@ spec:
             - containerPort: 9411
           resources:
             limits:
-              cpu: 200m
               memory: 2048Mi
             requests:
               cpu: 100m
-              memory: 800Mi
+              memory: 1024Mi
       restartPolicy: Always
