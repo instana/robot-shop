@@ -32,7 +32,7 @@ services:
       - "9411:9411"
     environment:
       COLLECTOR_ZIPKIN_HOST_PORT: 9411
-      COLLECTOR_OTLP_ENABLED: true
+      COLLECTOR_OTLP_ENABLED: "true"
     volumes:
       - type: bind
         source: ./jaeger-sampling.json
