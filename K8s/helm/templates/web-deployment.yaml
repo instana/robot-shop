@@ -24,7 +24,8 @@ spec:
         image: {{ .Values.image.repo }}/robot-shop-rs-web:{{ .Values.image.webVersion }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
-        - containerPort: 8080
+        - name: http
+          containerPort: 8080
         resources:
           limits:
             cpu: 200m
@@ -38,7 +39,7 @@ spec:
         args:
           - '-nginx.scrape-uri=http://localhost:8080/nginx_status'
         resources:
-          limits:
+          requests:
             cpu: 200m
             memory: 100Mi
         ports:
