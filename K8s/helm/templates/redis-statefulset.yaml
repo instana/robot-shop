@@ -29,7 +29,6 @@ spec:
             mountPath: /mnt/redis
         resources:
           limits:
-            cpu: 200m
             memory: 100Mi
           requests:
             cpu: 100m
@@ -42,7 +41,6 @@ spec:
             cpu: 100m
             memory: 50Mi
           limits:
-            cpu: 200m
             memory: 50Mi
         ports:
           - name: http-metrics
