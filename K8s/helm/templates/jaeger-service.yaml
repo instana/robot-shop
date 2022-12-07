@@ -1,3 +1,4 @@
+{{- if .Values.jaeger.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -16,3 +17,4 @@ spec:
       targetPort: 16686
   selector:
     service: jaeger
+{{- end }}

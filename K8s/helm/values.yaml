@@ -38,3 +38,6 @@ ocCreateRoute: false
 
 rabbitmq:
   enableExporter: false
+
+jaeger:
+  enabled: true

@@ -1,3 +1,4 @@
+{{- if .Values.jaeger.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -43,3 +44,4 @@ spec:
               cpu: 100m
               memory: 1024Mi
       restartPolicy: Always
+{{- end }}
