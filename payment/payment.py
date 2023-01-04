@@ -13,8 +13,15 @@ from flask_apscheduler import APScheduler
 from prometheus_client import Gauge
 from prometheus_flask_exporter import PrometheusMetrics
 
-from rabbitmq import Publisher
+from opentelemetry import trace
+from opentelemetry.exporter.jaeger.thrift import JaegerExporter
+from opentelemetry.sdk.resources import SERVICE_NAME, Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.instrumentation.requests import RequestsInstrumentor
+from opentelemetry.instrumentation.flask import FlaskInstrumentor
 
+from rabbitmq import Publisher
 
 def path(req):
     """ Use the first URI segment as the value for the 'path' label """
@@ -23,6 +30,27 @@ def path(req):
 app = Flask(__name__)
 metrics = PrometheusMetrics(app, group_by=path)
 app.logger.setLevel(logging.INFO)
+
+JAEGER = os.getenv('JAEGER_HOST', 'localhost')
+
+trace.set_tracer_provider(
+    TracerProvider(
+        resource=Resource.create({SERVICE_NAME: "payment"})
+    )
+)
+tracer = trace.get_tracer(__name__)
+jaegerhost = '{jaeger}/api/traces?format=jaeger.thrift'.format(jaeger=JAEGER)
+# create a JaegerExporter
+jaeger_exporter = JaegerExporter(
+    collector_endpoint=jaegerhost
+)
+
+# Create a BatchSpanProcessor and add the exporter to it
+span_processor = BatchSpanProcessor(jaeger_exporter)
+# add to the tracer
+trace.get_tracer_provider().add_span_processor(span_processor)
+RequestsInstrumentor().instrument()
+FlaskInstrumentor().instrument(enable_commenter=True, commenter_options={})
 
 build_info = Gauge('payment_build_info', 'Build information',
                    ['branch', 'revision', 'version'])
@@ -59,8 +87,9 @@ error_flag = False
 
 @app.errorhandler(Exception)
 def exception_handler(err):
-    app.logger.exception(str(err))
-    return str(err), 500
+    with tracer.start_as_current_span('exception_handler'):
+        app.logger.exception(str(err))
+        return str(err), 500
 
 @app.route('/health', methods=['GET'])
 def health():
@@ -69,95 +98,98 @@ def health():
 
 @app.route('/pay/<id>', methods=['POST'])
 def pay(id):
-    app.logger.info('payment for {}'.format(id))
-    cart = request.get_json()
-    app.logger.info(cart)
+    with tracer.start_as_current_span('pay'):
+        app.logger.info('payment for {}'.format(id))
+        cart = request.get_json()
+        app.logger.info(cart)
 
-    anonymous_user = True
+        anonymous_user = True
 
-    # check user exists
-    try:
-        req = requests.get('http://{user}:8080/check/{id}'.format(user=USER, id=id))
-    except requests.exceptions.RequestException as err:
-        app.logger.error(err)
-        return str(err), 500
-    if req.status_code == 200:
-        anonymous_user = False
-
-    # check that the cart is valid
-    # this will blow up if the cart is not valid
-    has_shipping = False
-    if cart.get('items') is None:
-        raise TypeError('No items in cart')
-    for item in cart.get('items'):
-        if item.get('sku') == 'SHIP':
-            has_shipping = True
-
-    if cart.get('total', 0) == 0 or has_shipping == False:
-        app.logger.warn('cart not valid')
-        return 'cart not valid', 400
-
-    # dummy call to payment gateway, hope they don't object
-    if PAYMENT_GATEWAY:
+        # check user exists
         try:
-            req = requests.get(PAYMENT_GATEWAY)
+            req = requests.get('http://{user}:8080/check/{id}'.format(user=USER, id=id))
+        except requests.exceptions.RequestException as err:
+            app.logger.error(err)
+            return str(err), 500
+        if req.status_code == 200:
+            anonymous_user = False
+
+        # check that the cart is valid
+        # this will blow up if the cart is not valid
+        has_shipping = False
+        if cart.get('items') is None:
+            raise TypeError('No items in cart')
+        for item in cart.get('items'):
+            if item.get('sku') == 'SHIP':
+                has_shipping = True
+
+        if cart.get('total', 0) == 0 or has_shipping == False:
+            app.logger.warn('cart not valid')
+            return 'cart not valid', 400
+
+        # dummy call to payment gateway, hope they don't object
+        if PAYMENT_GATEWAY:
+            try:
+                req = requests.get(PAYMENT_GATEWAY)
+            except requests.exceptions.RequestException as err:
+                app.logger.error(err)
+                return str(err), 500
+            if req.status_code != 200:
+                app.logger.error('{} returned {} - {}'.format(PAYMENT_GATEWAY, req.status_code, req.text))
+                return 'payment error', req.status_code
+            else:
+                app.logger.info('{} returned 200'.format(PAYMENT_GATEWAY))
+
+        # Generate order id
+        orderid = str(uuid.uuid4())
+        queueOrder({ 'orderid': orderid, 'user': id, 'cart': cart })
+
+        # add to order history
+        if not anonymous_user:
+            try:
+                req = requests.post('http://{user}:8080/order/{id}'.format(user=USER, id=id),
+                        data=json.dumps({'orderid': orderid, 'cart': cart}),
+                        headers={'Content-Type': 'application/json'})
+                app.logger.info('order history returned {}'.format(req.status_code))
+            except requests.exceptions.RequestException as err:
+                app.logger.error(err)
+                return str(err), 500
+
+        # delete cart
+        try:
+            req = requests.delete('http://{cart}:8080/cart/{id}?error={error}'.format(cart=CART, id=id, error=error_flag))
         except requests.exceptions.RequestException as err:
             app.logger.error(err)
             return str(err), 500
         if req.status_code != 200:
-            app.logger.error('{} returned {} - {}'.format(PAYMENT_GATEWAY, req.status_code, req.text))
-            return 'payment error', req.status_code
+            app.logger.error('cart delete returned {} - {}'.format(req.status_code, req.text))
+            return 'order history update error', req.status_code
         else:
-            app.logger.info('{} returned 200'.format(PAYMENT_GATEWAY))
+            app.logger.info('cart delete returned 200')
 
-    # Generate order id
-    orderid = str(uuid.uuid4())
-    queueOrder({ 'orderid': orderid, 'user': id, 'cart': cart })
-
-    # add to order history
-    if not anonymous_user:
-        try:
-            req = requests.post('http://{user}:8080/order/{id}'.format(user=USER, id=id),
-                    data=json.dumps({'orderid': orderid, 'cart': cart}),
-                    headers={'Content-Type': 'application/json'})
-            app.logger.info('order history returned {}'.format(req.status_code))
-        except requests.exceptions.RequestException as err:
-            app.logger.error(err)
-            return str(err), 500
-
-    # delete cart
-    try:
-        req = requests.delete('http://{cart}:8080/cart/{id}?error={error}'.format(cart=CART, id=id, error=error_flag))
-    except requests.exceptions.RequestException as err:
-        app.logger.error(err)
-        return str(err), 500
-    if req.status_code != 200:
-        app.logger.error('cart delete returned {} - {}'.format(req.status_code, req.text))
-        return 'order history update error', req.status_code
-    else:
-        app.logger.info('cart delete returned 200')
-
-    return jsonify({ 'orderid': orderid })
+        return jsonify({ 'orderid': orderid })
 
 
 def queueOrder(order):
-    app.logger.info('queue order')
+    with tracer.start_as_current_span('queueOrder'):
+        app.logger.info('queue order')
 
-    # For screenshot demo requirements optionally add in a bit of delay
-    delay = int(os.getenv('PAYMENT_DELAY_MS', 0))
-    time.sleep(delay / 1000)
+        # For screenshot demo requirements optionally add in a bit of delay
+        delay = int(os.getenv('PAYMENT_DELAY_MS', 0))
+        time.sleep(delay / 1000)
 
-    headers = {}
-    publisher.publish(order, headers)
+        headers = {}
+        publisher.publish(order, headers)
 
 
 def countItems(items):
-    count = 0
-    for item in items:
-        if item.get('sku') != 'SHIP':
-            count += item.get('qty')
+    with tracer.start_as_current_span('countItems'):
+        count = 0
+        for item in items:
+            if item.get('sku') != 'SHIP':
+                count += item.get('qty')
 
-    return count
+        return count
 
 
 # RabbitMQ

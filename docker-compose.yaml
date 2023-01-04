@@ -149,7 +149,9 @@ services:
       timeout: 10s
       retries: 3
     # Uncomment to change payment gateway
-    #environment:
+    environment:
+      JAEGER_HOST: "http://jaeger:14268"
+      OTEL_EXPORTER_JAEGER_ENDPOINT: "http://jaeger:14250"
       #PAYMENT_GATEWAY: "https://www.worldpay.com"
     logging:
       <<: *logging
