@@ -7,7 +7,7 @@ image:
   dispatchVersion: "1.0.2"
   mongodbVersion: "1.0.1"
   mysqlVersion: "1.0"
-  paymentVersion: "1.0.5"
+  paymentVersion: "1.0.6"
   ratingsVersion: "1.0.1"
   shippingVersion: "1.0.7"
   userVersion: "1.0.3"

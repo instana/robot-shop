@@ -1,7 +1,6 @@
 import json
 import pika
 import os
-from opentelemetry.instrumentation.pika import PikaInstrumentor
 
 class Publisher:
     HOST = os.getenv('AMQP_HOST', 'rabbitmq')
@@ -38,7 +37,6 @@ class Publisher:
         if self._channel is None or self._channel.is_closed or self._conn is None or self._conn.is_closed:
             self._connect()
         try:
-            PikaInstrumentor.instrument_channel(channel=self._channel)
             self._publish(msg, headers)
         except (pika.exceptions.ConnectionClosed, pika.exceptions.StreamLostError):
             self._logger.info('reconnecting to queue')
