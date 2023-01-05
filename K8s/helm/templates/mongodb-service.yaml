@@ -4,6 +4,7 @@ metadata:
   labels:
     service: mongodb
     app: robot-shop
+    type: infra
   name: mongodb
 spec:
   ports:

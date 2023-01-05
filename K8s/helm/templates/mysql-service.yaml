@@ -4,6 +4,7 @@ metadata:
   labels:
     service: mysql
     app: robot-shop
+    type: infra
   name: mysql
 spec:
   ports:

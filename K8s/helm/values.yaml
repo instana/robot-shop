@@ -27,8 +27,9 @@ psp:
 # "special" Openshift. Set to true when deploying to any openshift flavour
 openshift: false
 
-serviceMonitor:
+monitor:
   releaseLabel: prometheus
+  infraOnly: false
 
 # Storage class to use with redis statefulset.
 redis:
