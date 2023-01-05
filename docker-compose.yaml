@@ -93,11 +93,24 @@ services:
     logging:
       <<: *logging
   mysql:
-    build:
-      context: mysql
-    image: ${REPO}/robot-shop-rs-mysql-db:${MYSQL_TAG}
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=superdba
+      - MYSQL_DATABASE=cities
+      - MYSQL_USER=shipping
+      - MYSQL_PASSWORD=secret
     cap_add:
       - NET_ADMIN
+    networks:
+      - robot-shop
+    logging:
+      <<: *logging
+  loader:
+    image: ${REPO}/robot-shop-rs-loader:${LOADER_TAG}
+    build:
+      context: mysql-loader
+    depends_on:
+      - mysql
     networks:
       - robot-shop
     logging:
