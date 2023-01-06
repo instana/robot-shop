@@ -19,68 +19,95 @@ spec:
       {{ end }}
       imagePullSecrets:
         - name: docker-hub      
-      containers:
-      - name: mysql
-        image: {{ .Values.image.repo }}/robot-shop-rs-mysql-db:{{ .Values.image.mysqlVersion }}
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        # added for Istio
-        securityContext:
-          capabilities:
-            add: ["NET_ADMIN"]
-        ports:
-        - name: mysql
-          containerPort: 3306
-        resources:
-          limits:
-            memory: 1024Mi
-          requests:
-            cpu: 100m
-            memory: 700Mi
-      - name: mysql-exporter
-        image: prom/mysqld-exporter:v0.14.0
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        env:
-          - name: DATA_SOURCE_NAME
-            value: root:@(localhost:3306)/
-        ports:
-          - name: http-metrics
-            containerPort: 9104
-        args:
-        - --collect.auto_increment.columns
-        - --collect.binlog_size
-        - --collect.engine_innodb_status
-        - --collect.global_status
-        - --collect.global_variables
-        - --collect.heartbeat.database
-        - heartbeat
-        - --collect.heartbeat.table
-        - heartbeat
-        - --collect.info_schema.clientstats
-        - --collect.info_schema.innodb_cmp
-        - --collect.info_schema.innodb_cmpmem
-        - --collect.info_schema.innodb_metrics
-        - --no-collect.info_schema.innodb_tablespaces
-        - --collect.info_schema.processlist
-        - --collect.info_schema.processlist.min_time
-        - "0"
-        - --collect.info_schema.query_response_time
-        - --collect.info_schema.schemastats
-        - --collect.info_schema.tables
-        - --collect.info_schema.tables.databases
-        - '*'
-        - --collect.info_schema.tablestats
-        - --collect.info_schema.userstats
-        - --collect.perf_schema.eventsstatements
-        - --collect.perf_schema.eventsstatements.digest_text_limit
-        - "120"
-        - --collect.perf_schema.eventsstatements.timelimit
-        - "86400"
-        - --collect.perf_schema.eventswaits
-        - --collect.perf_schema.file_events
-        - --collect.perf_schema.file_instances
-        - --collect.perf_schema.indexiowaits
-        - --collect.perf_schema.tableiowaits
-        - --collect.perf_schema.tablelocks
-        - --collect.slave_hosts
-        - --collect.slave_status
       restartPolicy: Always
+      containers:
+        - name: mysql
+          image: mysql:5.7
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials
+                  key: rootPassword
+                  optional: false
+            - name: MYSQL_DATABASE
+              value: cities
+            - name: MYSQL_USER
+              value: shipping
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials
+                  key: userPassword
+                  optional: false
+          # added for Istio
+          securityContext:
+            capabilities:
+              add: ["NET_ADMIN"]
+          ports:
+            - name: mysql
+              containerPort: 3306
+          resources:
+            limits:
+              memory: 1024Mi
+            requests:
+              cpu: 100m
+              memory: 700Mi 
+        - name: mysql-loader
+          image: {{ .Values.image.repo }}/robot-shop-rs-loader:{{ .Values.image.loaderVersion }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials
+                  key: rootPassword
+                  optional: false
+        - name: mysql-exporter
+          image: prom/mysqld-exporter:v0.14.0
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: DATA_SOURCE_NAME
+              value: root:@(localhost:3306)/
+          ports:
+            - name: http-metrics
+              containerPort: 9104
+          args:
+            - --collect.auto_increment.columns
+            - --collect.binlog_size
+            - --collect.engine_innodb_status
+            - --collect.global_status
+            - --collect.global_variables
+            - --collect.heartbeat.database
+            - heartbeat
+            - --collect.heartbeat.table
+            - heartbeat
+            - --collect.info_schema.clientstats
+            - --collect.info_schema.innodb_cmp
+            - --collect.info_schema.innodb_cmpmem
+            - --collect.info_schema.innodb_metrics
+            - --no-collect.info_schema.innodb_tablespaces
+            - --collect.info_schema.processlist
+            - --collect.info_schema.processlist.min_time
+            - "0"
+            - --collect.info_schema.query_response_time
+            - --collect.info_schema.schemastats
+            - --collect.info_schema.tables
+            - --collect.info_schema.tables.databases
+            - '*'
+            - --collect.info_schema.tablestats
+            - --collect.info_schema.userstats
+            - --collect.perf_schema.eventsstatements
+            - --collect.perf_schema.eventsstatements.digest_text_limit
+            - "120"
+            - --collect.perf_schema.eventsstatements.timelimit
+            - "86400"
+            - --collect.perf_schema.eventswaits
+            - --collect.perf_schema.file_events
+            - --collect.perf_schema.file_instances
+            - --collect.perf_schema.indexiowaits
+            - --collect.perf_schema.tableiowaits
+            - --collect.perf_schema.tablelocks
+            - --collect.slave_hosts
+            - --collect.slave_status

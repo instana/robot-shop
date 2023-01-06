@@ -106,9 +106,11 @@ services:
     logging:
       <<: *logging
   loader:
-    image: ${REPO}/robot-shop-rs-loader:${LOADER_TAG}
     build:
       context: mysql-loader
+    image: ${REPO}/robot-shop-rs-loader:${LOADER_TAG}
+    environment:
+      - MYSQL_ROOT_PASSWORD=superdba
     depends_on:
       - mysql
     networks:

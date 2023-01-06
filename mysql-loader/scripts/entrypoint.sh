@@ -1,30 +1,38 @@
 #!/bin/sh
 
-echo "Loader starting"
+PASSWORD=${MYSQL_ROOT_PASSWORD:-"superdba"}
+
+log() {
+    MSG="$1"
+    TS=$(date -Iseconds)
+    echo "${TS} ${MSG}"
+}
+
+log "Loader starting"
 
 if [ -n "$1"]
 then
     exec $@
 fi
 
-echo "Connecting to MySQL"
+log "Connecting to MySQL"
 while true
 do
     # test connection
-    echo "SELECT 1" | mysql --user=root --password=superdba -h mysql mysql > /dev/null 2>&1
+    echo "SELECT 1" | mysql --user=root --password=${PASSWORD} -h mysql mysql > /dev/null 2>&1
     RESULT="$?"
     if [ "$RESULT" -eq 0 ]
     then
         break
     fi
-    echo "still waiting"
+    log "still waiting"
     sleep 5
 done
 
-echo "Processing files"
+log "Processing files"
 for FILE in [0-9][0-9]*
 do
-    echo "$FILE"
+    log "$FILE"
     if echo "$FILE" | egrep -q '\.gz$'
     then
         # gzip file
@@ -32,5 +40,13 @@ do
     else
         CAT="cat"
     fi
-    $CAT $FILE | mysql --user=root --password=superdba -h mysql
+    $CAT $FILE | mysql --user=root --password=${PASSWORD} -h mysql
+done
+
+# keep idling to prevent restarts
+log "Finished loading"
+while true
+do
+    log "sleeping"
+    sleep 5
 done
