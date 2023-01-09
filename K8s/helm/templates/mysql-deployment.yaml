@@ -70,6 +70,12 @@ spec:
           env:
             - name: DATA_SOURCE_NAME
               value: root:@(localhost:3306)/
+            - name: MYSQLD_EXPORTER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials
+                  key: rootPassword
+                  optional: false
           ports:
             - name: http-metrics
               containerPort: 9104
