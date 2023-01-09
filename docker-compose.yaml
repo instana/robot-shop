@@ -33,10 +33,40 @@ services:
     environment:
       COLLECTOR_ZIPKIN_HOST_PORT: 9411
       COLLECTOR_OTLP_ENABLED: "true"
+      SPAN_STORAGE_TYPE: "elasticsearch"
+      ES_SERVER_URLS: "http://host.docker.internal:9200"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
     volumes:
       - type: bind
         source: ./jaeger-sampling.json
         target: /etc/jaeger/sampling_strategies.json
+    logging:
+      <<: *logging
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.8
+    container_name: elasticsearch
+    networks:
+      - robot-shop
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://host.docker.internal:9200" ]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - 9200:9200
+      - 9300:9300
     logging:
       <<: *logging
   rabbitmq:

@@ -26,8 +26,10 @@ spec:
           image: jaegertracing/all-in-one:1.38
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            - name: MEMORY_MAX_TRACES
-              value: "100000"
+            - name: SPAN_STORAGE_TYPE
+              value: "elasticsearch"
+            - name: ES_SERVER_URLS
+              value: "http://es-jaeger:9200"
           ports:
             - containerPort: 16686
             - containerPort: 5778
