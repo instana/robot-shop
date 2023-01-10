@@ -15,7 +15,6 @@ spec:
   serviceName: es-jaeger
   template:
     metadata:
-      creationTimestamp: null
       labels:
         service : es-jaeger
     spec:
