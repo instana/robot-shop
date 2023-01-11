@@ -20,6 +20,13 @@ spec:
       imagePullSecrets:
         - name: docker-hub      
       restartPolicy: Always
+      volumes:
+        - name: config
+          configMap:
+            name: mysql-config
+            items:
+              - key: my-cnf
+                path: .my.cnf
       containers:
         - name: mysql
           image: mysql:5.7
@@ -68,14 +75,17 @@ spec:
           image: prom/mysqld-exporter:v0.14.0
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            - name: DATA_SOURCE_NAME
-              value: root:@(localhost:3306)/
+            # Not sure this works, also set in the ConfigMap mount
             - name: MYSQLD_EXPORTER_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: mysql-credentials
                   key: rootPassword
                   optional: false
+          volumeMounts:
+            - name: config
+              mountPath: /home
+              readOnly: true
           ports:
             - name: http-metrics
               containerPort: 9104
