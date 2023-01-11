@@ -19,7 +19,7 @@ log "Connecting to MySQL"
 while true
 do
     # test connection
-    echo "SELECT 1" | mysql --user=root --password=${PASSWORD} -h mysql mysql > /dev/null 2>&1
+    echo "SELECT 1" | mysql --user=root --password=${PASSWORD} -h mysql --connect-timeout=2 mysql > /dev/null 2>&1
     RESULT="$?"
     if [ "$RESULT" -eq 0 ]
     then
