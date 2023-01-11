@@ -18,6 +18,19 @@ spec:
       labels:
         service : es-jaeger
     spec:
+      initContainers:
+      - name: create
+        image: busybox:1.28
+        command: [ 'mkdir', '-p', '/usr/share/elasticsearch/data/nodes/' ]
+        volumeMounts:
+          - mountPath: /usr/share/elasticsearch/data
+            name: elasticsearch-data
+      - name: file-permissions
+        image: busybox:1.28
+        command: [ 'chown', '-R', '1000:1000', '/usr/share/elasticsearch/' ]
+        volumeMounts:
+          - mountPath: /usr/share/elasticsearch/data
+            name: elasticsearch-data
       containers:
         - env:
             - name: cluster.name
@@ -62,16 +75,3 @@ spec:
         resources:
           requests:
             storage: 10Gi
-  extraInitContainers:
-    - name: create
-      image: busybox:1.28
-      command: ['mkdir', '/usr/share/elasticsearch/data/nodes/']
-      volumeMounts:
-      - mountPath: /usr/share/elasticsearch/data
-        name: elasticsearch-data
-    - name: file-permissions
-      image: busybox:1.28
-      command: ['chown', '-R', '1000:1000', '/usr/share/elasticsearch/']
-      volumeMounts:
-      - mountPath: /usr/share/elasticsearch/data
-        name: elasticsearch-data
