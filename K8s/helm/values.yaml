@@ -40,5 +40,5 @@ ocCreateRoute: false
 rabbitmq:
   enableExporter: false
 
-jaeger:
+tracing:
   enabled: true
