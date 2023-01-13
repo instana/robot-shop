@@ -206,6 +206,7 @@ services:
     image: ${REPO}/robot-shop-rs-dispatch:${DISPATCH_TAG}
     depends_on:
       - rabbitmq
+      - mongodb
     networks:
       - robot-shop
     logging:
