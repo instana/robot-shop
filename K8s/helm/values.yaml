@@ -7,7 +7,7 @@ image:
   dispatchVersion: "1.0.2"
   mongodbVersion: "1.0.1"
   loaderVersion: "1.0.1"
-  paymentVersion: "1.0.6"
+  paymentVersion: "1.0.7"
   ratingsVersion: "1.0.1"
   shippingVersion: "1.0.9"
   userVersion: "1.0.3"
