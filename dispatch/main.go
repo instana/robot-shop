@@ -47,8 +47,10 @@ func init() {
 // uri - mongodb://user:pass@host:port
 func connectToMongo(uri string) *mongo.Client {
 	log.Println("Connecting to", uri)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
 	for {
-		client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+		client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
 		if err == nil {
 			return client
 		}
@@ -68,7 +70,7 @@ func connectToRabbitMQ(uri string) *amqp.Connection {
 
 		log.Println(err)
 		log.Printf("Reconnecting to %s\n", uri)
-		time.Sleep(1 * time.Second)
+		time.Sleep(2 * time.Second)
 	}
 }
 
@@ -126,22 +128,37 @@ func getOrderId(order []byte) string {
 	return id
 }
 
-func processOrder(headers map[string]interface{}, order string) {
+func processOrder(headers map[string]interface{}, order []byte) {
+	start := time.Now()
 	log.Printf("processing order %s\n", order)
 
 	if mongodbClient != nil {
+		// parse string to json
+		var o map[string]interface{}
+		err := json.Unmarshal(order, &o)
+		if err != nil {
+			log.Println("error parsing order", err)
+			return
+		}
+		// add _id field
+		o["_id"] = o["orderid"]
+
 		// save the order
-		ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
 		coll := mongodbClient.Database("orders").Collection("orders")
-		res, err := coll.InsertOne(ctx, order)
+		res, err := coll.InsertOne(ctx, o)
 		if err == nil {
-			log.Println("insert result", res)
+			log.Println("insert result", res.InsertedID)
 		} else {
 			log.Println("insertion error", err)
 		}
 	}
 
+	// add a little extra time
 	time.Sleep(time.Duration(42+rand.Int63n(42)) * time.Millisecond)
+	duration := time.Since(start)
+	methodDurationHistogram.WithLabelValues("dispatchOrder").Observe(duration.Seconds())
 }
 
 func main() {
@@ -205,13 +222,8 @@ func main() {
 			failOnError(err, "Failed to consume")
 
 			for d := range msgs {
-				start := time.Now()
-				log.Printf("Order %s\n", d.Body)
 				log.Printf("Headers %v\n", d.Headers)
-				id := getOrderId(d.Body)
-				go processOrder(d.Headers, id)
-				duration := time.Since(start)
-				methodDurationHistogram.WithLabelValues("dispatchOrder").Observe(duration.Seconds())
+				go processOrder(d.Headers, d.Body)
 			}
 		}
 	}()
