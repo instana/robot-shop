@@ -19,11 +19,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const (
-	Service = "dispatch"
-)
-
 var (
+	version          = "unknown"
 	rabbitChan       *amqp.Channel
 	rabbitCloseError chan *amqp.Error
 	rabbitReady      chan bool
@@ -42,6 +39,16 @@ var methodDurationHistogram = prometheus.NewHistogramVec(
 
 func init() {
 	prometheus.MustRegister(methodDurationHistogram)
+
+	g := prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "version_info",
+		ConstLabels: prometheus.Labels{
+			"version": version,
+		},
+	})
+	g.Set(1)
+
+	prometheus.MustRegister(g)
 }
 
 // uri - mongodb://user:pass@host:port
@@ -158,11 +165,17 @@ func processOrder(headers map[string]interface{}, order []byte) {
 	// add a little extra time
 	time.Sleep(time.Duration(42+rand.Int63n(42)) * time.Millisecond)
 	duration := time.Since(start)
-	methodDurationHistogram.WithLabelValues("dispatchOrder").Observe(duration.Seconds())
+	methodDurationHistogram.WithLabelValues("processOrder").Observe(duration.Seconds())
+
+	// crash out for Crash Loop Assertion
+	if errorPercent > 0 && rand.Intn(100) < errorPercent {
+		// TODO - better message text
+		log.Fatal("crashing out")
+	}
 }
 
 func main() {
-	log.Println("mongo client", mongodbClient)
+	log.Println("Version", version)
 	rand.Seed(time.Now().Unix())
 
 	// Init amqpUri

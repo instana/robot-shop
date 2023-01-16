@@ -151,6 +151,8 @@ services:
   dispatch:
     build:
       context: dispatch
+      args:
+        VERSION: $DISPATCH_TAG
     image: ${REPO}/robot-shop-rs-dispatch:${DISPATCH_TAG}
     depends_on:
       - rabbitmq
