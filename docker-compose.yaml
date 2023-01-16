@@ -154,6 +154,8 @@ services:
       args:
         VERSION: $DISPATCH_TAG
     image: ${REPO}/robot-shop-rs-dispatch:${DISPATCH_TAG}
+    environment:
+      DISPATCH_ERROR_PERCENT: "0"
     depends_on:
       - rabbitmq
       - mongodb
