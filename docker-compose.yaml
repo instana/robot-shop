@@ -163,6 +163,19 @@ services:
       - robot-shop
     logging:
       <<: *logging
+  reports:
+    build:
+      context: reports
+      args:
+        VERSION: $REPORTS_TAG
+    image: ${REPO}/robot-shop-rs-reports:${REPORTS_TAG}
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - robot-shop
+    logging:
+      <<: *logging
   web:
     build:
       context: web

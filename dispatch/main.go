@@ -64,7 +64,7 @@ func connectToMongo(uri string) *mongo.Client {
 
 		log.Println(err)
 		log.Printf("Reconnecting to %s\n", uri)
-		time.Sleep(1 * time.Second)
+		time.Sleep(2 * time.Second)
 	}
 }
 
