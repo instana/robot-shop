@@ -5,6 +5,7 @@ metadata:
   labels:
     service: web
     app: robot-shop
+    type: infra
 spec:
   ports:
   - name: http

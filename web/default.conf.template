@@ -82,4 +82,9 @@ server {
         stub_status on;
         access_log off;
     }
+
+    # Dummy metrics endpoint
+    location /metrics {
+        alias /usr/share/nginx/html/metrics.txt;
+    }
 }

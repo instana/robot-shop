@@ -1,4 +1,4 @@
-{{- if .Values.jaeger.enabled }}
+{{- if .Values.tracing.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -15,6 +15,9 @@ spec:
     - name: jaeger-ui
       port: 16686
       targetPort: 16686
+    - name: jaeger-thirft
+      port: 14268
+      targetPort: 14268
   selector:
     service: jaeger
 {{- end }}

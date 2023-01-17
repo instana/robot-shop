@@ -13,16 +13,44 @@ from flask_apscheduler import APScheduler
 from prometheus_client import Gauge
 from prometheus_flask_exporter import PrometheusMetrics
 
-from rabbitmq import Publisher
+from opentelemetry import trace
+from opentelemetry.exporter.jaeger.thrift import JaegerExporter
+from opentelemetry.sdk.resources import SERVICE_NAME, Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.instrumentation.requests import RequestsInstrumentor
+from opentelemetry.instrumentation.flask import FlaskInstrumentor
 
+from rabbitmq import Publisher
 
 def path(req):
     """ Use the first URI segment as the value for the 'path' label """
-    return "/" + req.path[1:].split("/")[0]
+    return "/" + req.path[1:].split("/")[0] + "/<id>"
 
 app = Flask(__name__)
 metrics = PrometheusMetrics(app, group_by=path)
 app.logger.setLevel(logging.INFO)
+
+JAEGER = os.getenv('JAEGER_HOST', 'localhost')
+
+trace.set_tracer_provider(
+    TracerProvider(
+        resource=Resource.create({SERVICE_NAME: "payment"})
+    )
+)
+tracer = trace.get_tracer(__name__)
+jaegerhost = '{jaeger}/api/traces?format=jaeger.thrift'.format(jaeger=JAEGER)
+# create a JaegerExporter
+jaeger_exporter = JaegerExporter(
+    collector_endpoint=jaegerhost
+)
+
+# Create a BatchSpanProcessor and add the exporter to it
+span_processor = BatchSpanProcessor(jaeger_exporter)
+# add to the tracer
+trace.get_tracer_provider().add_span_processor(span_processor)
+RequestsInstrumentor().instrument()
+FlaskInstrumentor().instrument_app(app)
 
 build_info = Gauge('payment_build_info', 'Build information',
                    ['branch', 'revision', 'version'])

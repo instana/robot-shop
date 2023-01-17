@@ -4,6 +4,7 @@ metadata:
   labels:
     service: redis
     app: robot-shop
+    type: infra
   name: redis
 spec:
   ports:

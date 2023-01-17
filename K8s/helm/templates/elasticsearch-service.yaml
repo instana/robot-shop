@@ -1,0 +1,21 @@
+{{- if .Values.tracing.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: es-jaeger
+    app: robot-shop
+    type: infra
+  name: es-jaeger
+  namespace: monitoring
+spec:
+  ports:
+    - name: es-jager-port
+      port: 9200
+      targetPort: 9200
+    - name: es-jaeger-add
+      port: 9300
+      targetPort: 9300
+  selector:
+    service: es-jaeger
+{{- end }}

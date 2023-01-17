@@ -33,10 +33,40 @@ services:
     environment:
       COLLECTOR_ZIPKIN_HOST_PORT: 9411
       COLLECTOR_OTLP_ENABLED: "true"
+      SPAN_STORAGE_TYPE: "elasticsearch"
+      ES_SERVER_URLS: "http://host.docker.internal:9200"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
     volumes:
       - type: bind
         source: ./jaeger-sampling.json
         target: /etc/jaeger/sampling_strategies.json
+    logging:
+      <<: *logging
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.8
+    container_name: elasticsearch
+    networks:
+      - robot-shop
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://host.docker.internal:9200" ]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - 9200:9200
+      - 9300:9300
     logging:
       <<: *logging
   rabbitmq:
@@ -95,11 +125,26 @@ services:
     logging:
       <<: *logging
   mysql:
-    build:
-      context: mysql
-    image: ${REPO}/robot-shop-rs-mysql-db:${MYSQL_TAG}
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=superdba
+      - MYSQL_DATABASE=cities
+      - MYSQL_USER=shipping
+      - MYSQL_PASSWORD=secret
     cap_add:
       - NET_ADMIN
+    networks:
+      - robot-shop
+    logging:
+      <<: *logging
+  loader:
+    build:
+      context: mysql-loader
+    image: ${REPO}/robot-shop-rs-loader:${LOADER_TAG}
+    environment:
+      - MYSQL_ROOT_PASSWORD=superdba
+    depends_on:
+      - mysql
     networks:
       - robot-shop
     logging:
@@ -151,7 +196,9 @@ services:
       timeout: 10s
       retries: 3
     # Uncomment to change payment gateway
-    #environment:
+    environment:
+      JAEGER_HOST: "http://jaeger:14268"
+      OTEL_EXPORTER_JAEGER_ENDPOINT: "http://jaeger:14250"
       #PAYMENT_GATEWAY: "https://www.worldpay.com"
     logging:
       <<: *logging

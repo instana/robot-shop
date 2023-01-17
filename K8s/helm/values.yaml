@@ -6,12 +6,12 @@ image:
   catalogueVersion: "1.0.2"
   dispatchVersion: "1.0.2"
   mongodbVersion: "1.0.1"
-  mysqlVersion: "1.0"
-  paymentVersion: "1.0.2"
+  loaderVersion: "1.0.1"
+  paymentVersion: "1.0.7"
   ratingsVersion: "1.0.1"
-  shippingVersion: "1.0.7"
+  shippingVersion: "1.0.9"
   userVersion: "1.0.3"
-  webVersion: "1.0.1"
+  webVersion: "1.0.2"
   pullPolicy: IfNotPresent
 
 # Payment gateway URL
@@ -27,8 +27,9 @@ psp:
 # "special" Openshift. Set to true when deploying to any openshift flavour
 openshift: false
 
-serviceMonitor:
+monitor:
   releaseLabel: prometheus
+  infraOnly: false
 
 # Storage class to use with redis statefulset.
 redis:
@@ -39,5 +40,5 @@ ocCreateRoute: false
 rabbitmq:
   enableExporter: false
 
-jaeger:
+tracing:
   enabled: true

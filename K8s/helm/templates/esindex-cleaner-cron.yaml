@@ -1,0 +1,19 @@
+{{- if .Values.tracing.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: esindexcleaner
+  namespace: monitoring
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: esindexcleaner
+              image: jaegertracing/jaeger-es-index-cleaner:1.38
+              imagePullPolicy: IfNotPresent
+              args: ["3","http://es-jaeger:9200"]
+          restartPolicy: OnFailure
+{{- end }}
