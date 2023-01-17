@@ -169,9 +169,17 @@ services:
       args:
         VERSION: $REPORTS_TAG
     image: ${REPO}/robot-shop-rs-reports:${REPORTS_TAG}
+    environment:
+      REPORTS_ERROR_PERCENT: "0"
     depends_on:
       - mongodb
       - redis
+    networks:
+      - robot-shop
+    logging:
+      <<: *logging
+  pushgateway:
+    image: prom/pushgateway:v1.5.1
     networks:
       - robot-shop
     logging:

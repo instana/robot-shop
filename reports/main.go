@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
+	"math/rand"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/prometheus/client_golang/prometheus/push"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -19,6 +20,7 @@ import (
 
 var (
 	version       = "unknown"
+	pusher        *push.Pusher
 	mongodbClient *mongo.Client
 	mongodbReady  chan bool
 	redisClient   *redis.Client
@@ -107,13 +109,13 @@ func generateReport() {
 		var keys []string
 		var err error
 
-		keys, cursor, err = redisClient.Scan(connCtx, cursor, "*", 0).Result()
+		keys, cursor, err = redisClient.Scan(connCtx, cursor, "*", 10).Result()
 		if err != nil {
 			log.Println("Redis error:", err)
 			break
 		}
 		for _, key := range keys {
-			log.Println("key", key)
+			log.Println("key:", key)
 			if key != "anonymous-counter" {
 				stat := redisClient.Get(connCtx, key)
 				if stat.Err() != nil {
@@ -185,6 +187,8 @@ func generateReport() {
 }
 
 func init() {
+	pusher = push.New("http://pushgateway:9091", "reports")
+
 	prometheus.MustRegister(methodDurationHistogram)
 
 	g := prometheus.NewGauge(prometheus.GaugeOpts{
@@ -227,9 +231,31 @@ func main() {
 	defer cancel()
 	connCtx = ctx
 
-	// generate the reports
-	go generateReport()
+	// get error threshold from environment
+	var errorPercent int
+	epct, ok := os.LookupEnv("REPORTS_ERROR_PERCENT")
+	if ok {
+		epcti, err := strconv.Atoi(epct)
+		if err == nil {
+			if epcti > 100 {
+				epcti = 100
+			}
+			if epcti < 0 {
+				epcti = 0
+			}
+			errorPercent = epcti
+		}
+	}
+	log.Printf("Error Percent is %d\n", errorPercent)
 
-	http.Handle("/metrics", promhttp.Handler())
-	panic(http.ListenAndServe(":8080", nil))
+	// generate the reports
+	generateReport()
+	if err := pusher.Add(); err != nil {
+		log.Println("Failed to push metrics", err)
+	}
+
+	if errorPercent > 0 && rand.Intn(100) < errorPercent {
+		// TODO - better error message
+		log.Fatal("Crashing out")
+	}
 }
