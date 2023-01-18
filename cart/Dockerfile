@@ -11,8 +11,6 @@ RUN npm install
 COPY server.js /opt/server/
 COPY tracing.js /opt/server/
 
-ENV OTEL_TRACES_SAMPLER=traceidratio
-ENV OTEL_TRACES_SAMPLER_ARG=0.2
 
 CMD ["node", "-r","./tracing.js","server.js"]
 
