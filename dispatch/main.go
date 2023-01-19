@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -13,17 +14,17 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/streadway/amqp"
-)
 
-const (
-	Service = "dispatch"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var (
-	amqpUri          string
+	version          = "unknown"
 	rabbitChan       *amqp.Channel
 	rabbitCloseError chan *amqp.Error
 	rabbitReady      chan bool
+	mongodbClient    *mongo.Client
 	errorPercent     int
 )
 
@@ -38,6 +39,33 @@ var methodDurationHistogram = prometheus.NewHistogramVec(
 
 func init() {
 	prometheus.MustRegister(methodDurationHistogram)
+
+	g := prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "version_info",
+		ConstLabels: prometheus.Labels{
+			"version": version,
+		},
+	})
+	g.Set(1)
+
+	prometheus.MustRegister(g)
+}
+
+// uri - mongodb://user:pass@host:port
+func connectToMongo(uri string) *mongo.Client {
+	log.Println("Connecting to", uri)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	for {
+		client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
+		if err == nil {
+			return client
+		}
+
+		log.Println(err)
+		log.Printf("Reconnecting to %s\n", uri)
+		time.Sleep(2 * time.Second)
+	}
 }
 
 func connectToRabbitMQ(uri string) *amqp.Connection {
@@ -49,7 +77,7 @@ func connectToRabbitMQ(uri string) *amqp.Connection {
 
 		log.Println(err)
 		log.Printf("Reconnecting to %s\n", uri)
-		time.Sleep(1 * time.Second)
+		time.Sleep(2 * time.Second)
 	}
 }
 
@@ -62,7 +90,7 @@ func rabbitConnector(uri string) {
 			return
 		}
 
-		log.Printf("Connecting to %s\n", amqpUri)
+		log.Printf("Connecting to %s\n", uri)
 		rabbitConn := connectToRabbitMQ(uri)
 		rabbitConn.NotifyClose(rabbitCloseError)
 
@@ -107,16 +135,47 @@ func getOrderId(order []byte) string {
 	return id
 }
 
-func createSpan(headers map[string]interface{}, order string) {
-	// headers is map[string]interface{}
+func processOrder(headers map[string]interface{}, order []byte) {
+	start := time.Now()
+	log.Printf("processing order %s\n", order)
 
-	// get the order id
-	log.Printf("order %s\n", order)
+	if mongodbClient != nil {
+		// parse string to json
+		var o map[string]interface{}
+		err := json.Unmarshal(order, &o)
+		if err != nil {
+			log.Println("error parsing order", err)
+			return
+		}
+		// add _id field
+		o["_id"] = o["orderid"]
 
+		// save the order
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
+		coll := mongodbClient.Database("orders").Collection("orders")
+		res, err := coll.InsertOne(ctx, o)
+		if err == nil {
+			log.Println("insert result", res.InsertedID)
+		} else {
+			log.Println("insertion error", err)
+		}
+	}
+
+	// add a little extra time
 	time.Sleep(time.Duration(42+rand.Int63n(42)) * time.Millisecond)
+	duration := time.Since(start)
+	methodDurationHistogram.WithLabelValues("processOrder").Observe(duration.Seconds())
+
+	// crash out for Crash Loop Assertion
+	if errorPercent > 0 && rand.Intn(100) < errorPercent {
+		// TODO - better message text
+		log.Fatal("crashing out")
+	}
 }
 
 func main() {
+	log.Println("Version", version)
 	rand.Seed(time.Now().Unix())
 
 	// Init amqpUri
@@ -125,7 +184,13 @@ func main() {
 	if !ok {
 		amqpHost = "rabbitmq"
 	}
-	amqpUri = fmt.Sprintf("amqp://guest:guest@%s:5672/", amqpHost)
+	amqpUri := fmt.Sprintf("amqp://guest:guest@%s:5672/", amqpHost)
+
+	mongodbHost, ok := os.LookupEnv("MONGO_HOST")
+	if !ok {
+		mongodbHost = "mongodb"
+	}
+	mongodbUri := fmt.Sprintf("mongodb://%s:27017", mongodbHost)
 
 	// get error threshold from environment
 	errorPercent = 0
@@ -154,6 +219,11 @@ func main() {
 
 	rabbitCloseError <- amqp.ErrClosed
 
+	// MongoDB connection
+	go func() {
+		mongodbClient = connectToMongo(mongodbUri)
+	}()
+
 	go func() {
 		for {
 			// wait for rabbit to be ready
@@ -165,20 +235,12 @@ func main() {
 			failOnError(err, "Failed to consume")
 
 			for d := range msgs {
-				start := time.Now()
-				log.Printf("Order %s\n", d.Body)
 				log.Printf("Headers %v\n", d.Headers)
-				id := getOrderId(d.Body)
-				go createSpan(d.Headers, id)
-				duration := time.Since(start)
-				methodDurationHistogram.WithLabelValues("dispatchOrder").Observe(duration.Seconds())
+				go processOrder(d.Headers, d.Body)
 			}
 		}
 	}()
 
 	http.Handle("/metrics", promhttp.Handler())
 	panic(http.ListenAndServe(":8080", nil))
-
-	log.Println("Waiting for messages")
-	select {}
 }
