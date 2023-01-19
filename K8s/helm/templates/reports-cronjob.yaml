@@ -7,6 +7,8 @@ metadata:
 spec:
 # Minute Hour Day Month DayOfWeek
   schedule: "*/10 * * * *"
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
       template:
