@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: reports
+  labels:
+    service: reports
+spec:
+# Minute Hour Day Month DayOfWeek
+  schedule: "*/10 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          imagePullSecrets:
+            - name: docker-hub
+          restartPolicy: Never
+          containers:
+            - name: reports
+              image: {{ .Values.image.repo }}/robot-shop-rs-reports:{{ .Values.image.reportsVersion }}
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              env:
+                - name: REPORTS_ERROR_PERCENT
+                  value: "0"

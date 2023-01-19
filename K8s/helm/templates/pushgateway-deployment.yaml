@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pushgateway
+  labels:
+    service: pushgateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: pushgateway
+  template:
+    metadata:
+      labels:
+        service: pushgateway
+    spec:
+      {{ if .Values.psp.enabled }}
+      serviceAccountName: robot-shop
+      {{ end }}
+      imagePullSecrets:
+        - name: docker-hub      
+      containers:
+      - name: pushgateway
+        image: prom/pushgateway:v1.5.1
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: http-metrics
+          containerPort: 9091
+        resources:
+          limits:
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+      restartPolicy: Always
