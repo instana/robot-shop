@@ -23,6 +23,9 @@ spec:
       - name: dispatch
         image: {{ .Values.image.repo }}/robot-shop-rs-dispatch:{{ .Values.image.dispatchVersion }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+          - name: DISPATCH_ERROR_PERCENT
+            value: "0"
         ports:
         - name: http
           containerPort: 8080
