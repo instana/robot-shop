@@ -187,7 +187,7 @@ func generateReport() {
 }
 
 func init() {
-	pusher = push.New("http://pushgateway:9091", "reports")
+	pusher = push.New("http://pushgateway:9091", "reports").Gatherer(prometheus.DefaultGatherer)
 
 	prometheus.MustRegister(methodDurationHistogram)
 
