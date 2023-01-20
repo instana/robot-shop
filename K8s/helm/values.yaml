@@ -8,7 +8,6 @@ image:
   mongodbVersion: "1.0.1"
   loaderVersion: "1.0.1"
   paymentVersion: "1.0.7"
-  paymentVersion: "1.0.6"
   reportsVersion: "1.0.0"
   ratingsVersion: "1.0.1"
   shippingVersion: "1.0.9"
