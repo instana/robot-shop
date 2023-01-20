@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dispatch
+  name: pushgateway
   labels:
-    service: dispatch
+    service: pushgateway
 spec:
   replicas: 1
   selector:
     matchLabels:
-      service: dispatch
+      service: pushgateway
   template:
     metadata:
       labels:
-        service: dispatch
+        service: pushgateway
     spec:
       {{ if .Values.psp.enabled }}
       serviceAccountName: robot-shop
@@ -20,19 +20,16 @@ spec:
       imagePullSecrets:
         - name: docker-hub      
       containers:
-      - name: dispatch
-        image: {{ .Values.image.repo }}/robot-shop-rs-dispatch:{{ .Values.image.dispatchVersion }}
+      - name: pushgateway
+        image: prom/pushgateway:v1.5.1
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        env:
-          - name: DISPATCH_ERROR_PERCENT
-            value: "0"
         ports:
-        - name: http
-          containerPort: 8080
+        - name: http-metrics
+          containerPort: 9091
         resources:
           limits:
-            memory: 100Mi
+            memory: 200Mi
           requests:
             cpu: 100m
-            memory: 50Mi
+            memory: 100Mi
       restartPolicy: Always
