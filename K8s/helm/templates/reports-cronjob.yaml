@@ -7,10 +7,15 @@ metadata:
 spec:
 # Minute Hour Day Month DayOfWeek
   schedule: "*/10 * * * *"
-  successfulJobsHistoryLimit: 5
-  failedJobsHistoryLimit: 3
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
   jobTemplate:
     spec:
+      completions: 1
+      parallelism: 1
+      completionMode: NonIndexed
+      backoffLimit: 1
       template:
         spec:
           imagePullSecrets:
