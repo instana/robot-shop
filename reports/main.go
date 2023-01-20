@@ -204,6 +204,7 @@ func init() {
 
 func main() {
 	log.Println("version", version)
+	rand.Seed(time.Now().Unix())
 
 	mongodbReady = make(chan bool)
 	redisReady = make(chan bool)
