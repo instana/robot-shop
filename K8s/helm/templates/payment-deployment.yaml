@@ -30,15 +30,15 @@ spec:
         env:
           {{- if .Values.payment.failureHour }}
           - name: FAILURE_HOUR
-            value: {{ .Values.payment.failureHour }}
+            value: {{ .Values.payment.failureHour | quote }}
           {{- end }}
           {{- if .Values.payment.failureFromMinute }}
           - name: FAILURE_FROM_MINUTE
-            value: {{ .Values.payment.failureFromMinute }}
+            value: {{ .Values.payment.failureFromMinute | quote }}
           {{- end }}
           {{- if .Values.payment.failureTillMinute }}
           - name: FAILURE_TILL_MINUTE
-            value: {{ .Values.payment.failureTillMinute }}
+            value: {{ .Values.payment.failureTillMinute | quote }}
           {{- end }}
           {{- if .Values.payment.gateway }}
           - name: PAYMENT_GATEWAY

@@ -39,15 +39,15 @@ spec:
         env:
           {{- if .Values.shipping.failureHour }}
           - name: FAILURE_HOUR
-            value: {{ .Values.shipping.failureHour }}
+            value: {{ .Values.shipping.failureHour | quote }}
           {{- end }}
           {{- if .Values.shipping.failureFromMinute }}
           - name: FAILURE_FROM_MINUTE
-            value: {{ .Values.shipping.failureFromMinute }}
+            value: {{ .Values.shipping.failureFromMinute | quote }}
           {{- end }}
           {{- if .Values.shipping.failureTillMinute }}
           - name: FAILURE_TILL_MINUTE
-            value: {{ .Values.shipping.failureTillMinute }}
+            value: {{ .Values.shipping.failureTillMinute | quote }}
           {{- end }}
         ports:
         - name: http

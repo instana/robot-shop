@@ -25,7 +25,13 @@ spec:
             value: "1"
           - name: ERROR
             value: "0"
-        image: asserts/robot-shop-rs-load:1.0
+          - name: FAILURE_HOUR
+            value: "10"
+          - name: FAILURE_FROM_MINUTE
+            value: "0"
+          - name: FAILURE_TILL_MINUTE
+            value: "15"
+        image: asserts/robot-shop-rs-load:1.0.1
         resources:
           limits:
             cpu: 1000m
