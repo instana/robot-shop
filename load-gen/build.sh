@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # get the tag info
-eval $(egrep '[A-Z]+=' ../.env)
+eval "$(egrep '[A-Z]+=' ../.env)"
 
 echo "Repo $REPO"
 echo "Tag $LOAD_TAG"
