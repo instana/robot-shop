@@ -36,6 +36,19 @@ spec:
         name: shipping
         image: {{ .Values.image.repo }}/robot-shop-rs-shipping:{{ .Values.image.shippingVersion }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+          {{- if .Values.shipping.failureHour }}
+          - name: FAILURE_HOUR
+            value: {{ .Values.shipping.failureHour }}
+          {{- end }}
+          {{- if .Values.shipping.failureFromMinute }}
+          - name: FAILURE_FROM_MINUTE
+            value: {{ .Values.shipping.failureFromMinute }}
+          {{- end }}
+          {{- if .Values.shipping.failureTillMinute }}
+          - name: FAILURE_TILL_MINUTE
+            value: {{ .Values.shipping.failureTillMinute }}
+          {{- end }}
         ports:
         - name: http
           containerPort: 8080
