@@ -2,9 +2,9 @@ FROM golang:1.17
 
 WORKDIR /go/src/app
 
-COPY *.go .
+COPY * .
 
-RUN go mod init dispatch && go get
+RUN go mod tidy && go get
 RUN go install
 
 CMD dispatch
