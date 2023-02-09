@@ -14,6 +14,6 @@ spec:
             - name: esindexcleaner
               image: jaegertracing/jaeger-es-index-cleaner:1.38
               imagePullPolicy: IfNotPresent
-              args: ["3","http://es-jaeger:9200"]
+              args: ["8","http://es-jaeger:9200"]
           restartPolicy: OnFailure
 {{- end }}
