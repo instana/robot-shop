@@ -28,6 +28,18 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         # agent networking access
         env:
+          {{- if .Values.payment.failureHour }}
+          - name: FAILURE_HOUR
+            value: {{ .Values.payment.failureHour | quote }}
+          {{- end }}
+          {{- if .Values.payment.failureFromMinute }}
+          - name: FAILURE_FROM_MINUTE
+            value: {{ .Values.payment.failureFromMinute | quote }}
+          {{- end }}
+          {{- if .Values.payment.failureTillMinute }}
+          - name: FAILURE_TILL_MINUTE
+            value: {{ .Values.payment.failureTillMinute | quote }}
+          {{- end }}
           {{- if .Values.payment.gateway }}
           - name: PAYMENT_GATEWAY
             value: {{ .Values.payment.gateway }}

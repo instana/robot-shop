@@ -65,13 +65,16 @@ scheduler.start()
 
 GOOD_BUILD_INFO = ['HEAD', 'a3a55c9305750c400a7d3174ccdc9fe093e7699f', '1.0.0']
 BAD_BUILD_INFO = ['HEAD', '728b09facd4dfaf88e6346f72b60a430dc4b9260', '1.0.1']
+failure_hour = int(os.getenv('FAILURE_HOUR', '14'))
+failure_start_min = int(os.getenv('FAILURE_FROM_MINUTE', '0'))
+failure_end_min = int(os.getenv('FAILURE_TILL_MINUTE', '30'))
+print(f'Failure duration is from {failure_hour:02d}:{failure_start_min:02d} - {failure_hour:02d}:{failure_end_min:02d} UTC')
 
 
 @scheduler.task('interval', minutes=1)
 def update_error_flag():
     global error_flag
-    # Simulate payment errors between 2:00 and 2:30 PM
-    error_flag = datetime.now().hour == 14 and datetime.now().minute < 30
+    error_flag = datetime.now().hour == failure_hour and failure_start_min <= datetime.now().minute < failure_end_min
 
     if error_flag:
         if build_info.labels(*GOOD_BUILD_INFO):

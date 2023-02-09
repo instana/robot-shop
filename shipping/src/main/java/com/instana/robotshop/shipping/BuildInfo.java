@@ -2,6 +2,9 @@ package com.instana.robotshop.shipping;
 
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -9,6 +12,7 @@ import java.time.LocalDateTime;
 
 @Component
 public class BuildInfo {
+    private static final Logger logger = LoggerFactory.getLogger(BuildInfo.class);
     private static final String TAG_BRANCH = "branch";
     private static final String TAG_REVISION = "revision";
     private static final String TAG_VERSION = "version";
@@ -19,15 +23,26 @@ public class BuildInfo {
 
     private final MeterRegistry meterRegistry;
     private Gauge buildInfoGauge;
+    private final int failureHour;
+    private final int failureStartMin;
+    private final int failureEndMin;
 
-    public BuildInfo(MeterRegistry meterRegistry) {
+    public BuildInfo(MeterRegistry meterRegistry,
+                     @Value("${FAILURE_HOUR:10}") int failureHour,
+                     @Value("${FAILURE_FROM_MINUTE:0}") int failureStartMin,
+                     @Value("${FAILURE_TILL_MINUTE:15}") int failireEndMin) {
         this.meterRegistry = meterRegistry;
+        this.failureHour = failureHour;
+        this.failureStartMin = failureStartMin;
+        this.failureEndMin = failireEndMin;
+        logger.info(String.format("Failure duration is from %02d:%02d to %02d:%02d UTC",
+                failureHour, failureStartMin, failureHour, failureEndMin));
     }
 
     @Scheduled(fixedDelay = 10000)
     public void run() {
         LocalDateTime now = LocalDateTime.now();
-        if (now.getHour() == 10 && now.getMinute() < 15) {
+        if (now.getHour() == failureHour && now.getMinute() >= failureStartMin && now.getMinute() < failureEndMin) {
             if (buildInfoGauge != null && GOOD_BUILD_VERSION.equals(buildInfoGauge.getId().getTag(TAG_VERSION))) {
                 meterRegistry.remove(buildInfoGauge);
             }
