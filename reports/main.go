@@ -208,6 +208,9 @@ func main() {
 
 	mongodbReady = make(chan bool)
 	redisReady = make(chan bool)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	connCtx = ctx
 
 	mongodbHost, ok := os.LookupEnv("MONGO_HOST")
 	if !ok {
@@ -228,9 +231,6 @@ func main() {
 		redisClient = connectToRedis(redisUri)
 		redisReady <- true
 	}()
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-	defer cancel()
-	connCtx = ctx
 
 	// get error threshold from environment
 	var errorPercent int
