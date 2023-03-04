@@ -34,13 +34,14 @@ setup:
     post-deployment: |
       IP=$(kubectl describe svc web -n robot-shop | grep "LoadBalancer Ingress:" | awk '{print $3}')
       echo "http://$IP:8080" > HOST.txt
-    test:
-      host-file: HOST.txt
-      duration: 60
-      users: 100
-      rate: 20
-      tests:
-      - load-gen/robot-shop.py
+    benchmarking:
+      testing:
+        host-file: HOST.txt
+        duration: 60
+        users: 100
+        rate: 20
+        tests:
+        - load-gen/robot-shop.py
     cleanup: |
       kubectl delete ns robot-shop
 
