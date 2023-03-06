@@ -17,17 +17,17 @@ then
     echo "Enabling Instana EUM"
     result=$(curl -kv -s --connect-timeout 10 "$INSTANA_EUM_REPORTING_URL" 2>&1 | grep "301 Moved Permanently")
     if [ -n "$result" ]; 
-     then
-     echo '301 Moved Permanently found!'
-     [[ "${INSTANA_EUM_REPORTING_URL}" != */ ]] &&  INSTANA_EUM_REPORTING_URL="${INSTANA_EUM_REPORTING_URL}/"
-     sed -i "s|INSTANA_EUM_KEY|$INSTANA_EUM_KEY|" $BASE_DIR/eum-tmpl.html
-     sed -i "s|INSTANA_EUM_REPORTING_URL|$INSTANA_EUM_REPORTING_URL|" $BASE_DIR/eum-tmpl.html
-     cp $BASE_DIR/eum-tmpl.html $BASE_DIR/eum.html
+    then
+        echo '301 Moved Permanently found!'
+        [[ "${INSTANA_EUM_REPORTING_URL}" != */ ]] &&  INSTANA_EUM_REPORTING_URL="${INSTANA_EUM_REPORTING_URL}/"
+        sed -i "s|INSTANA_EUM_KEY|$INSTANA_EUM_KEY|" $BASE_DIR/eum-tmpl.html
+        sed -i "s|INSTANA_EUM_REPORTING_URL|$INSTANA_EUM_REPORTING_URL|" $BASE_DIR/eum-tmpl.html
+        cp $BASE_DIR/eum-tmpl.html $BASE_DIR/eum.html
     else
-     echo "Go with the user input"
-     sed -i "s|INSTANA_EUM_KEY|$INSTANA_EUM_KEY|" $BASE_DIR/eum-tmpl.html
-     sed -i "s|INSTANA_EUM_REPORTING_URL|$INSTANA_EUM_REPORTING_URL|" $BASE_DIR/eum-tmpl.html
-     cp $BASE_DIR/eum-tmpl.html $BASE_DIR/eum.html
+        echo "Go with the user input"
+        sed -i "s|INSTANA_EUM_KEY|$INSTANA_EUM_KEY|" $BASE_DIR/eum-tmpl.html
+        sed -i "s|INSTANA_EUM_REPORTING_URL|$INSTANA_EUM_REPORTING_URL|" $BASE_DIR/eum-tmpl.html
+        cp $BASE_DIR/eum-tmpl.html $BASE_DIR/eum.html
     fi
 
 else
