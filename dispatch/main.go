@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"math/rand"
@@ -9,10 +8,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/instana/go-sensor"
-	ot "github.com/opentracing/opentracing-go"
-	"github.com/opentracing/opentracing-go/ext"
-	otlog "github.com/opentracing/opentracing-go/log"
+	instana "github.com/instana/go-sensor"
+	"github.com/instana/go-sensor/instrumentation/instaamqp"
+
 	"github.com/streadway/amqp"
 )
 
@@ -21,20 +19,18 @@ const (
 )
 
 var (
+	sensor           *instana.Sensor
 	amqpUri          string
 	rabbitChan       *amqp.Channel
+	wrabbitChan      *instaamqp.AmqpChannel
 	rabbitCloseError chan *amqp.Error
 	rabbitReady      chan bool
 	errorPercent     int
-
-	dataCenters = []string{
-		"asia-northeast2",
-		"asia-south1",
-		"europe-west3",
-		"us-east1",
-		"us-west1",
-	}
 )
+
+func init() {
+	sensor = instana.NewSensor(Service)
+}
 
 func connectToRabbitMQ(uri string) *amqp.Connection {
 	for {
@@ -67,6 +63,7 @@ func rabbitConnector(uri string) {
 		// create mappings here
 		rabbitChan, err = rabbitConn.Channel()
 		failOnError(err, "Failed to create channel")
+		wrabbitChan = instaamqp.WrapChannel(sensor, rabbitChan, uri)
 
 		// create exchange
 		err = rabbitChan.ExchangeDeclare("robot-shop", "direct", true, false, false, false, nil)
@@ -91,88 +88,8 @@ func failOnError(err error, msg string) {
 	}
 }
 
-func getOrderId(order []byte) string {
-	id := "unknown"
-	var f interface{}
-	err := json.Unmarshal(order, &f)
-	if err == nil {
-		m := f.(map[string]interface{})
-		id = m["orderid"].(string)
-	}
-
-	return id
-}
-
-func createSpan(headers map[string]interface{}, order string) {
-	// headers is map[string]interface{}
-	// carrier is map[string]string
-	carrier := make(ot.TextMapCarrier)
-	// convert by copying k, v
-	for k, v := range headers {
-		carrier[k] = v.(string)
-	}
-
-	// get the order id
-	log.Printf("order %s\n", order)
-
-	// opentracing
-	var span ot.Span
-	tracer := ot.GlobalTracer()
-	spanContext, err := tracer.Extract(ot.HTTPHeaders, carrier)
-	if err == nil {
-		log.Println("Creating child span")
-		// create child span
-		span = tracer.StartSpan("getOrder", ot.ChildOf(spanContext))
-
-		fakeDataCenter := dataCenters[rand.Intn(len(dataCenters))]
-		span.SetTag("datacenter", fakeDataCenter)
-	} else {
-		log.Println(err)
-		log.Println("Failed to get context from headers")
-		log.Println("Creating root span")
-		// create root span
-		span = tracer.StartSpan("getOrder")
-	}
-
-	span.SetTag(string(ext.SpanKind), ext.SpanKindConsumerEnum)
-	span.SetTag(string(ext.MessageBusDestination), "robot-shop")
-	span.SetTag("exchange", "robot-shop")
-	span.SetTag("sort", "consume")
-	span.SetTag("address", "rabbitmq")
-	span.SetTag("key", "orders")
-	span.LogFields(otlog.String("orderid", order))
-	defer span.Finish()
-
-	time.Sleep(time.Duration(42+rand.Int63n(42)) * time.Millisecond)
-	if rand.Intn(100) < errorPercent {
-		span.SetTag("error", true)
-		span.LogFields(
-			otlog.String("error.kind", "Exception"),
-			otlog.String("message", "Failed to dispatch to SOP"))
-		log.Println("Span tagged with error")
-	}
-
-	processSale(span)
-}
-
-func processSale(parentSpan ot.Span) {
-	tracer := ot.GlobalTracer()
-	span := tracer.StartSpan("processSale", ot.ChildOf(parentSpan.Context()))
-	defer span.Finish()
-	span.SetTag(string(ext.SpanKind), "intermediate")
-	span.LogFields(otlog.String("info", "Order sent for processing"))
-	time.Sleep(time.Duration(42+rand.Int63n(42)) * time.Millisecond)
-}
-
 func main() {
 	rand.Seed(time.Now().Unix())
-
-	// Instana tracing
-	ot.InitGlobalTracer(instana.NewTracerWithOptions(&instana.Options{
-		Service:           Service,
-		LogLevel:          instana.Info,
-		EnableAutoProfile: true,
-	}))
 
 	// Init amqpUri
 	// get host from environment
@@ -216,14 +133,12 @@ func main() {
 			log.Printf("Rabbit MQ ready %v\n", ready)
 
 			// subscribe to bound queue
-			msgs, err := rabbitChan.Consume("orders", "", true, false, false, false, nil)
+			msgs, err := wrabbitChan.Consume("orders", "", true, false, false, false, nil)
 			failOnError(err, "Failed to consume")
 
 			for d := range msgs {
 				log.Printf("Order %s\n", d.Body)
 				log.Printf("Headers %v\n", d.Headers)
-				id := getOrderId(d.Body)
-				go createSpan(d.Headers, id)
 			}
 		}
 	}()
