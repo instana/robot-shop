@@ -25,8 +25,8 @@ spec:
             value: "1"
           - name: ERROR
             value: "0"
-          - name: FAILURE_HOUR
-            value: "10"
+#          - name: FAILURE_HOUR
+#            value: "10"
           - name: FAILURE_FROM_MINUTE
             value: "0"
           - name: FAILURE_TILL_MINUTE
