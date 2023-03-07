@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.Calendar;
 
 @Component
 public class BuildInfo {
@@ -23,26 +24,27 @@ public class BuildInfo {
 
     private final MeterRegistry meterRegistry;
     private Gauge buildInfoGauge;
-    private final int failureHour;
+    private final Integer failureHour;
     private final int failureStartMin;
     private final int failureEndMin;
 
     public BuildInfo(MeterRegistry meterRegistry,
-                     @Value("${FAILURE_HOUR:10}") int failureHour,
+                     @Value("${FAILURE_HOUR:#{null}}") Integer failureHour,
                      @Value("${FAILURE_FROM_MINUTE:0}") int failureStartMin,
-                     @Value("${FAILURE_TILL_MINUTE:15}") int failireEndMin) {
+                     @Value("${FAILURE_TILL_MINUTE:15}") int failureEndMin) {
         this.meterRegistry = meterRegistry;
         this.failureHour = failureHour;
         this.failureStartMin = failureStartMin;
-        this.failureEndMin = failireEndMin;
-        logger.info(String.format("Failure duration is from %02d:%02d to %02d:%02d UTC",
-                failureHour, failureStartMin, failureHour, failureEndMin));
+        this.failureEndMin = failureEndMin;
+        logger.info("Failure hour - {}, failure start minute - {}, failure end minute - {}",
+                failureHour, failureStartMin, failureEndMin);
     }
 
     @Scheduled(fixedDelay = 10000)
     public void run() {
         LocalDateTime now = LocalDateTime.now();
-        if (now.getHour() == failureHour && now.getMinute() >= failureStartMin && now.getMinute() < failureEndMin) {
+        if (now.getHour() == getFailureHour() && now.getMinute() >= failureStartMin && now.getMinute() < failureEndMin) {
+            logger.info("Shipping is within failure window");
             if (buildInfoGauge != null && GOOD_BUILD_VERSION.equals(buildInfoGauge.getId().getTag(TAG_VERSION))) {
                 meterRegistry.remove(buildInfoGauge);
             }
@@ -53,6 +55,10 @@ public class BuildInfo {
             }
             buildInfoGauge = registerGoodBuild();
         }
+    }
+
+    private Integer getFailureHour() {
+        return failureHour != null ? failureHour : Calendar.getInstance().get(Calendar.DAY_OF_MONTH) % 24;
     }
 
     private Gauge registerGoodBuild() {

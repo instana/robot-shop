@@ -77,9 +77,9 @@ class UserBehavior(HttpUser):
         # country codes
         codes = self.client.get('/api/shipping/codes', headers={'x-forwarded-for': fake_ip}).json()
         # Select a country with many cities to simulate excessive load in shipping service between 10:00 and 10:15 AM.
-        failure_hour = int(os.getenv('FAILURE_HOUR', '14'))
+        failure_hour = int(os.getenv('FAILURE_HOUR', datetime.now().day % 24))
         failure_start_min = int(os.getenv('FAILURE_FROM_MINUTE', '0'))
-        failure_end_min = int(os.getenv('FAILURE_TILL_MINUTE', '30'))
+        failure_end_min = int(os.getenv('FAILURE_TILL_MINUTE', '15'))
         within_error_window = datetime.now().hour == failure_hour and failure_start_min <= datetime.now().minute < failure_end_min
         if within_error_window:
             code = next((code for code in codes if code['code'] == 'us'))
