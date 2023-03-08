@@ -8,3 +8,19 @@
 
 You should expect to see a similar homepage to this one:
 ![stans robot shop by Refael](./Refael-stan-robot-shop.png)
+
+## Why we should use the Pull request mechanisim instead of updating Master/Main directly
+
+1. **Reflect production:** The Main (f.k.a Master) branch should reflect the code currently used in our production environment; by commiting to Main we break it and create an illusion of updated code which actually is not yet deployed
+
+2. **Code timeline:** By branching out and using Pull Requests we can better track our changes and implement a healthy development methodology of peer-code-review. and keep our application source code clean and maintained - this is especially true when we have multiple dev teams and/or in a microservice architecture.
+
+3. **Track specific feature work:** by using branches - developers can integrate partial working feature and benefit from the current integration (partial code > no code) and easily revert if needed without disturbing other teams cycles - this also means we can automate deployment and dev environments to test these branches before merging to master.
+(no one wants to be that dev who pushed to master and overwrite their peers 5 hour work :rage: )
+
+## How to prevent commit to master branch
+
+1. First - I believe this starts with education of our engineers about the risks and why we shouldn't do it unless we absolutely have to.
+2. Health code review process - implementing a pull request peer review before merging and automation connected to these pull requests for testing, depolying, and monitoring.
+3. Github's **"Require pull request reviews before merging"** feature which can be enabled through ```Settings > Branches > Branch Protection Rules```
+    - You can also enforce on moderators / admins to avoid accidents, they can remove it in case of an emergency.
