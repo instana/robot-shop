@@ -44,7 +44,6 @@ public class BuildInfo {
     public void run() {
         LocalDateTime now = LocalDateTime.now();
         if (now.getHour() == getFailureHour() && now.getMinute() >= failureStartMin && now.getMinute() < failureEndMin) {
-            logger.info("Shipping is within failure window");
             if (buildInfoGauge != null && GOOD_BUILD_VERSION.equals(buildInfoGauge.getId().getTag(TAG_VERSION))) {
                 meterRegistry.remove(buildInfoGauge);
             }

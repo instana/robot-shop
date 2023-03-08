@@ -27,6 +27,10 @@ class UserBehavior(HttpUser):
         "60.242.161.215"
     ]
 
+    failure_hour = int(os.getenv('FAILURE_HOUR', datetime.now().day % 24))
+    failure_start_min = int(os.getenv('FAILURE_FROM_MINUTE', '0'))
+    failure_end_min = int(os.getenv('FAILURE_TILL_MINUTE', '15'))
+
     def on_start(self):
         """ on_start is called when a Locust start before any task is scheduled """
         print('Starting')
@@ -77,10 +81,7 @@ class UserBehavior(HttpUser):
         # country codes
         codes = self.client.get('/api/shipping/codes', headers={'x-forwarded-for': fake_ip}).json()
         # Select a country with many cities to simulate excessive load in shipping service between 10:00 and 10:15 AM.
-        failure_hour = int(os.getenv('FAILURE_HOUR', datetime.now().day % 24))
-        failure_start_min = int(os.getenv('FAILURE_FROM_MINUTE', '0'))
-        failure_end_min = int(os.getenv('FAILURE_TILL_MINUTE', '15'))
-        within_error_window = datetime.now().hour == failure_hour and failure_start_min <= datetime.now().minute < failure_end_min
+        within_error_window = datetime.now().hour == self.failure_hour and self.failure_start_min <= datetime.now().minute < self.failure_end_min
         if within_error_window:
             code = next((code for code in codes if code['code'] == 'us'))
         else:
