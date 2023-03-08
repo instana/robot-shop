@@ -145,7 +145,8 @@ services:
       args:
         # agent key to download tracing libs
         KEY: ${INSTANA_AGENT_KEY}
-    image: ${REPO}/rs-web:${TAG}
+    image: rs-web
+    #image: ${REPO}/rs-web:${TAG}
     depends_on:
       - catalogue
       - user

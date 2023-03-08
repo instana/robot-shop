@@ -24,3 +24,19 @@ You should expect to see a similar homepage to this one:
 2. Health code review process - implementing a pull request peer review before merging and automation connected to these pull requests for testing, depolying, and monitoring.
 3. Github's **"Require pull request reviews before merging"** feature which can be enabled through ```Settings > Branches > Branch Protection Rules```
     - You can also enforce on moderators / admins to avoid accidents, they can remove it in case of an emergency.
+    
+![Set Master as a protected branch](define-master-as-protected-branch.png)
+
+## Editing the homepage
+### Implement changes to web/index.html
+1. Adding 2 files (cycode new rabbit and stans robot v2)
+2. Add a simple signature 
+
+### rebuild the images
+1. In my docker settings I've disabled docker-compose v2 as the images are old and seem to use the old standard 
+2. copy the images to the following location ``` ./web/static/media```
+3. re-build the web docker using ```docker build ./web/ -t rs-web```
+4. Update docker-compose.yaml to point the new local docker under ```Services->web->image```
+5. Lunch the app with the new image 
+6. Printscreen and update the repo with it ![Cycode's Roboship](./Final-homepage.png)
+7. Git commit, push, pull request, and approving it
