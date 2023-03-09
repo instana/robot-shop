@@ -45,11 +45,13 @@ public class BuildInfo {
         LocalDateTime now = LocalDateTime.now();
         if (now.getHour() == getFailureHour() && now.getMinute() >= failureStartMin && now.getMinute() < failureEndMin) {
             if (buildInfoGauge != null && GOOD_BUILD_VERSION.equals(buildInfoGauge.getId().getTag(TAG_VERSION))) {
+                logger.info("Shipping failure scenario - begin");
                 meterRegistry.remove(buildInfoGauge);
             }
             buildInfoGauge = registerBadBuild();
         } else {
             if (buildInfoGauge != null && BAD_BUILD_VERSION.equals(buildInfoGauge.getId().getTag(TAG_VERSION))) {
+                logger.info("Shipping failure scenario - end");
                 meterRegistry.remove(buildInfoGauge);
             }
             buildInfoGauge = registerGoodBuild();
