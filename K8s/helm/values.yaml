@@ -7,7 +7,7 @@ image:
   dispatchVersion: "1.0.3"
   mongodbVersion: "1.0.1"
   loaderVersion: "1.0.1"
-  paymentVersion: "1.0.8"
+  paymentVersion: "1.0.9"
   reportsVersion: "1.0.1"
   ratingsVersion: "1.0.1"
   shippingVersion: "1.0.12"
@@ -21,8 +21,8 @@ payment:
   #gateway: https://www.paypal.com
   #gateway: https://www.worldpay.com
   failureHour: 14
-  failureFromMinute: 0
-  failureTillMinute: 30
+  failureFromMinute: 30
+  failureTillMinute: 60
 
 shipping:
   failureHour: null
