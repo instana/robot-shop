@@ -1,0 +1,43 @@
+receivers:
+  jaeger:
+    protocols:
+      grpc:
+      thrift_http:
+
+exporters:
+  prometheus:
+    namespace: default
+    endpoint: 0.0.0.0:8889
+  jaeger:
+    endpoint: http://jaeger:14250
+    tls:
+      insecure: true
+
+processors:
+  assertsprocessor:
+    asserts_server:
+      endpoint: https://chief.app.dev.asserts.ai/api-server
+      user: shana@asserts.ai
+      password: znGepmTSmGE1dmpvCsIG7XcQ6qnRTcAYRhxsjTJf
+    asserts_env: dev
+    asserts_site: dev
+    span_attribute_match_regex:
+      "rpc.system": "aws-api"
+      "rpc.service": "(Sqs)|(DynamoDb)"
+    request_context_regex:
+      "http.url": "https?://.+(/.+)"
+    attributes_as_metric_labels:
+      - "rpc.system"
+      - "rpc.service"
+      - "rpc.method"
+      - "aws.table.name"
+      - "aws.queue.url"
+service:
+  telemetry:
+    logs:
+      level: "debug"
+  pipelines:
+    traces:
+      receivers: [jaeger]
+      processors: [assertsprocessor]
+      exporters: [jaeger]

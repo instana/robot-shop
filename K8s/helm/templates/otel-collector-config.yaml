@@ -1,0 +1,50 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: collector-config
+data:
+  collector-config.yaml: |
+    receivers:
+      jaeger:
+        protocols:
+          grpc:
+          thrift_http:
+
+    exporters:
+      prometheus:
+        namespace: default
+        endpoint: 0.0.0.0:8889
+      jaeger:
+        endpoint: http://jaeger.monitoring.svc.cluster.local:14250
+        tls:
+          insecure: true
+
+    processors:
+      assertsprocessor:
+        asserts_server:
+          endpoint: {{ .Values.otelcollector.assertsServer }}
+          user: {{ .Values.otelcollector.assertsUser }}
+          password: {{ .Values.otelcollector.assertsPassword }}
+        asserts_env: {{ .Values.otelcollector.assertsEnv }}
+        asserts_site: {{ .Values.otelcollector.assertsSite }}
+        span_attribute_match_regex:
+          "rpc.system": "aws-api"
+          "rpc.service": "(Sqs)|(DynamoDb)"
+        request_context_regex:
+          "http.url": "https?://.+(/.+)"
+        attributes_as_metric_labels:
+          - "rpc.system"
+          - "rpc.service"
+          - "rpc.method"
+          - "aws.table.name"
+          - "aws.queue .url"
+    service:
+      telemetry:
+        logs:
+          level: "debug"
+      pipelines:
+        traces:
+          receivers: [jaeger]
+          processors: [assertsprocessor]
+          exporters: [jaeger]

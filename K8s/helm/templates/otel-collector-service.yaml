@@ -1,0 +1,32 @@
+{{- if .Values.tracing.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: otel-collector
+    app: robot-shop
+  name: otel-collector
+  namespace: robot-shop
+spec:
+  ports:
+    - name: jaeger
+      port: 14250
+      targetPort: 14250
+    - name: otlp
+      port: 4317
+      targetPort: 4317
+    - name: jaeger-thrift
+      port: 14268
+      targetPort: 14268
+    - name: jaeger-http
+      port: 14278
+      targetPort: 14278
+    - name: collector-metrics
+      port: 8888
+      targetPort: 8888
+    - name: prom-metrics
+      port: 8889
+      targetPort: 8889
+  selector:
+    service: otel-collector
+  {{- end }}

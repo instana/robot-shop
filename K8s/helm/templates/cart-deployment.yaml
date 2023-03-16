@@ -28,7 +28,7 @@ spec:
           containerPort: 8080
         env:
           - name: OTEL_EXPORTER_JAEGER_ENDPOINT
-            value: "http://jaeger.monitoring.svc.cluster.local:14268/api/traces"
+            value: "http://otel-collector:14268/api/traces"
         livenessProbe:
           httpGet:
             path: /health

@@ -28,9 +28,7 @@ spec:
         - -Dotel.metrics.exporter=none
         - -Dotel.resource.attributes=service.name=shipping
         - -Dotel.traces.exporter=jaeger
-        - -Dotel.traces.sampler=traceidratio
-        - -Dotel.traces.sampler.arg=0.2
-        - -Dotel.exporter.jaeger.endpoint=http://jaeger.monitoring.svc.cluster.local:14250
+        - -Dotel.exporter.jaeger.endpoint=http://otel-collector:14250
         - -jar
         - shipping.jar
         name: shipping

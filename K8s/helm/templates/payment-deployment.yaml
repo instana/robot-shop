@@ -45,9 +45,7 @@ spec:
             value: {{ .Values.payment.gateway }}
           {{- end }}
           - name: JAEGER_HOST
-            value: "http://jaeger.monitoring.svc.cluster.local:14268"
-          - name: OTEL_EXPORTER_JAEGER_ENDPOINT
-            value: "http://jaeger.monitoring.svc.cluster.local:14250"
+            value: "http://otel-collector:14268"
         ports:
         - name: http
           containerPort: 8080

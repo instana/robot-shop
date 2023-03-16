@@ -2,17 +2,18 @@
 # Default is docker/robotshop/image:latest
 image:
   repo: asserts
-  cartVersion: "1.0.7"
+  cartVersion: "1.0.8"
   catalogueVersion: "1.0.2"
   dispatchVersion: "1.0.3"
   mongodbVersion: "1.0.1"
   loaderVersion: "1.0.1"
-  paymentVersion: "1.0.8"
+  paymentVersion: "1.0.9"
   reportsVersion: "1.0.1"
   ratingsVersion: "1.0.1"
-  shippingVersion: "1.0.12"
+  shippingVersion: "1.0.13"
   userVersion: "1.0.3"
   webVersion: "1.0.2"
+  otelcollectorVersion: "v0.0.55"
   pullPolicy: IfNotPresent
 
 # Payment gateway URL
@@ -51,3 +52,11 @@ rabbitmq:
 
 tracing:
   enabled: true
+
+otelcollector:
+  assertsServer: https://chief.app.dev.asserts.ai/api-server
+  assertsUser: shana@asserts.ai
+  assertsPassword: znGepmTSmGE1dmpvCsIG7XcQ6qnRTcAYRhxsjTJf
+  assertsEnv: dev
+  assertsSite: dev
+
