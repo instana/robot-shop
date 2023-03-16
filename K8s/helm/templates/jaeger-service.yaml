@@ -9,6 +9,12 @@ metadata:
   namespace: monitoring
 spec:
   ports:
+    - name: otlp
+      port: 4317
+      targetPort: 4317
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318
     - name: jaeger
       port: 14250
       targetPort: 14250

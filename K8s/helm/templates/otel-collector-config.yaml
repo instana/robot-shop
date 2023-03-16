@@ -6,17 +6,19 @@ metadata:
 data:
   collector-config.yaml: |
     receivers:
-      jaeger:
+      otlp:
         protocols:
           grpc:
-          thrift_http:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
 
     exporters:
       prometheus:
         namespace: default
         endpoint: 0.0.0.0:8889
-      jaeger:
-        endpoint: http://jaeger.monitoring.svc.cluster.local:14250
+      otlp:
+        endpoint: http://jaeger.monitoring.svc.cluster.local:4317
         tls:
           insecure: true
 
@@ -38,13 +40,19 @@ data:
           - "rpc.service"
           - "rpc.method"
           - "aws.table.name"
-          - "aws.queue .url"
+          - "aws.queue.url"
     service:
       telemetry:
         logs:
           level: "debug"
       pipelines:
         traces:
-          receivers: [jaeger]
+          receivers: [otlp]
           processors: [assertsprocessor]
-          exporters: [jaeger]
+          exporters: [otlp]
+        metrics:
+          receivers: [otlp]
+          exporters: [prometheus]
+        logs:
+          receivers: [otlp]
+          exporters: [otlp]

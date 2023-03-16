@@ -27,8 +27,7 @@ spec:
         - -javaagent:opentelemetry-javaagent.jar
         - -Dotel.metrics.exporter=none
         - -Dotel.resource.attributes=service.name=shipping
-        - -Dotel.traces.exporter=jaeger
-        - -Dotel.exporter.jaeger.endpoint=http://otel-collector:14250
+        - -Dotel.exporter.otlp.traces.endpoint=http://otel-collector:4317
         - -jar
         - shipping.jar
         name: shipping

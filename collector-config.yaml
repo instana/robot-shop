@@ -1,17 +1,19 @@
 receivers:
-  jaeger:
+  otlp:
     protocols:
       grpc:
-      thrift_http:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
 
 exporters:
+  otlp:
+    endpoint: http://jaeger:4317
+    tls:
+      insecure: true
   prometheus:
     namespace: default
     endpoint: 0.0.0.0:8889
-  jaeger:
-    endpoint: http://jaeger:14250
-    tls:
-      insecure: true
 
 processors:
   assertsprocessor:
@@ -38,6 +40,12 @@ service:
       level: "debug"
   pipelines:
     traces:
-      receivers: [jaeger]
+      receivers: [otlp]
       processors: [assertsprocessor]
-      exporters: [jaeger]
+      exporters: [otlp]
+    metrics:
+      receivers: [otlp]
+      exporters: [prometheus]
+    logs:
+      receivers: [otlp]
+      exporters: [otlp]

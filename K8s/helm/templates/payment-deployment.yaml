@@ -44,8 +44,8 @@ spec:
           - name: PAYMENT_GATEWAY
             value: {{ .Values.payment.gateway }}
           {{- end }}
-          - name: JAEGER_HOST
-            value: "http://otel-collector:14268"
+          - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+            value: "http://otel-collector:4318/v1/traces"
         ports:
         - name: http
           containerPort: 8080

@@ -58,12 +58,10 @@ services:
     ports:
       - "8888:8888"   # Prometheus metrics exposed by the collector
       - "8889:8889"   # Prometheus exporter metrics
-      - "14278"
-      - "14268"
-      - "14250"
       - "4317"
+      - "4318"
     volumes:
-      - "./otel-collector-config.yml:/etc/asserts/collector-config.yaml"
+      - "./collector-config.yaml:/etc/asserts/collector-config.yaml"
     logging:
       <<: *logging
 networks:
