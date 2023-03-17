@@ -30,6 +30,8 @@ spec:
               value: "elasticsearch"
             - name: ES_SERVER_URLS
               value: "http://es-jaeger:9200"
+            - name: COLLECTOR_OTLP_ENABLED
+              value: "true"
           ports:
             - containerPort: 16686
             - containerPort: 5778
