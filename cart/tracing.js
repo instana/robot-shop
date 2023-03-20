@@ -3,17 +3,16 @@
 const process = require('process');
 const opentelemetry = require('@opentelemetry/sdk-node');
 const { HttpInstrumentation } = require("@opentelemetry/instrumentation-http");
-const { JaegerExporter } = require("@opentelemetry/exporter-jaeger");
+const { OTLPTraceExporter } = require("@opentelemetry/exporter-trace-otlp-grpc");
 const { Resource } = require('@opentelemetry/resources');
 const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
+const { ExpressInstrumentation, ExpressRequestInfo } = require('@opentelemetry/instrumentation-express');
 
-const jaegerExporter = new JaegerExporter();
+const traceExporter = new OTLPTraceExporter()
+
 const sdk = new opentelemetry.NodeSDK({
-  resource: new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]: 'cart',
-  }),
-  traceExporter: jaegerExporter,
-  instrumentations: [new HttpInstrumentation()]
+  traceExporter: traceExporter,
+  instrumentations: [new HttpInstrumentation(), new ExpressInstrumentation()]
 });
 
 // initialize the SDK and register with the OpenTelemetry API

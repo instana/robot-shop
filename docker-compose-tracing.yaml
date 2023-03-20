@@ -7,11 +7,13 @@ services:
     ports:
       # UI port
       - "16686:16686"
+      - "14250:14250"
+      - "4317:4317"
     environment:
       COLLECTOR_ZIPKIN_HOST_PORT: 9411
       COLLECTOR_OTLP_ENABLED: "true"
       SPAN_STORAGE_TYPE: "elasticsearch"
-      ES_SERVER_URLS: "http://host.docker.internal:9200"
+      ES_SERVER_URLS: "http://elasticsearch:9200"
     depends_on:
       elasticsearch:
         condition: service_healthy
@@ -44,5 +46,23 @@ services:
       nofile:
         soft: 65536
         hard: 65536
+    ports:
+      - "9200:9200"
+      - "9300:9300"
     logging:
       <<: *logging
+  otelcollector:
+    image: ${REPO}/otel-collector:${COLLECTOR_TAG}
+    networks:
+      - robot-shop
+    ports:
+      - "8888:8888"   # Prometheus metrics exposed by the collector
+      - "8889:8889"   # Prometheus exporter metrics
+      - "4317"
+      - "4318"
+    volumes:
+      - "./collector-config.yaml:/etc/asserts/collector-config.yaml"
+    logging:
+      <<: *logging
+networks:
+  robot-shop:

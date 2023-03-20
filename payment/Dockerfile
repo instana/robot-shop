@@ -11,8 +11,6 @@ RUN pip install -r requirements.txt
 
 COPY *.py /app/
 COPY payment.ini /app/
-ENV OTEL_TRACES_SAMPLER=traceidratio
-ENV OTEL_TRACES_SAMPLER_ARG=0.2
 
 #CMD ["python", "payment.py"]
 CMD ["uwsgi", "--ini", "payment.ini"]

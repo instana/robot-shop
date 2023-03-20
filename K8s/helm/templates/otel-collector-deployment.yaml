@@ -1,0 +1,53 @@
+{{- if .Values.tracing.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel-collector
+  namespace: robot-shop
+  labels:
+    service: otel-collector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: otel-collector
+  template:
+    metadata:
+      labels:
+        service: otel-collector
+    spec:
+      {{ if .Values.psp.enabled }}
+      serviceAccountName: robot-shop
+      {{ end }}
+      imagePullSecrets:
+        - name: docker-hub
+      containers:
+        - name: otel-collector
+          image: {{ .Values.image.repo }}/otel-collector:{{ .Values.image.otelcollectorVersion }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 4317
+            - containerPort: 4318
+            - containerPort: 14250
+            - containerPort: 14268
+            - containerPort: 14278
+            - containerPort: 8889
+            - containerPort: 8888
+          volumeMounts:
+            - mountPath: /etc/asserts
+              name: collector-config
+          resources:
+            limits:
+              memory: 2048Mi
+            requests:
+              cpu: 100m
+              memory: 1024Mi
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            items:
+            - key: collector-config.yaml
+              path: collector-config.yaml
+            name: collector-config
+          name: collector-config
+  {{- end }}

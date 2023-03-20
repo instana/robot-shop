@@ -6,6 +6,6 @@ prometheus_client
 prometheus-flask-exporter
 flask_apscheduler
 opentelemetry-sdk
-opentelemetry-exporter-jaeger
 opentelemetry-instrumentation-flask
 opentelemetry-instrumentation-requests
+opentelemetry-exporter-otlp-proto-grpc
