@@ -28,7 +28,7 @@ spec:
           containerPort: 8080
         env:
           - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
-            value: "http://otel-collector:4318/v1/traces"
+            value: "http://otel-collector:4317"
         livenessProbe:
           httpGet:
             path: /health

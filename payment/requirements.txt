@@ -8,4 +8,4 @@ flask_apscheduler
 opentelemetry-sdk
 opentelemetry-instrumentation-flask
 opentelemetry-instrumentation-requests
-opentelemetry-exporter-otlp-proto-http
+opentelemetry-exporter-otlp-proto-grpc

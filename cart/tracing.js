@@ -3,7 +3,7 @@
 const process = require('process');
 const opentelemetry = require('@opentelemetry/sdk-node');
 const { HttpInstrumentation } = require("@opentelemetry/instrumentation-http");
-const { OTLPTraceExporter } = require("@opentelemetry/exporter-trace-otlp-http");
+const { OTLPTraceExporter } = require("@opentelemetry/exporter-trace-otlp-grpc");
 const { Resource } = require('@opentelemetry/resources');
 const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
 const { ExpressInstrumentation, ExpressRequestInfo } = require('@opentelemetry/instrumentation-express');

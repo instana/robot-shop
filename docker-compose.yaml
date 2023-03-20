@@ -64,7 +64,7 @@ services:
     networks:
       - robot-shop
     environment:
-      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otelcollector:4318/v1/traces
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otelcollector:4317
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
       interval: 10s
@@ -145,7 +145,7 @@ services:
       retries: 3
     # Uncomment to change payment gateway
     environment:
-      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otelcollector:4318/v1/traces
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otelcollector:4317
       #PAYMENT_GATEWAY: "https://www.worldpay.com"
     logging:
       <<: *logging
