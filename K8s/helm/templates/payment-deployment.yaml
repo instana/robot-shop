@@ -46,6 +46,8 @@ spec:
           {{- end }}
           - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
             value: "http://otel-collector:4317"
+          - name: OTEL_RESOURCE_ATTRIBUTES
+            value: "service.name=payment,service.namespace=robot-shop"
         ports:
         - name: http
           containerPort: 8080

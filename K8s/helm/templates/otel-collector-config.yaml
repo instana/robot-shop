@@ -10,8 +10,6 @@ data:
         protocols:
           grpc:
             endpoint: 0.0.0.0:4317
-          http:
-            endpoint: 0.0.0.0:4318
 
     exporters:
       prometheus:
@@ -42,9 +40,6 @@ data:
           - "aws.table.name"
           - "aws.queue.url"
     service:
-      telemetry:
-        logs:
-          level: "debug"
       pipelines:
         traces:
           receivers: [otlp]

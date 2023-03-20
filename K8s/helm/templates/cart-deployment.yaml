@@ -29,6 +29,8 @@ spec:
         env:
           - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
             value: "http://otel-collector:4317"
+          - name: OTEL_RESOURCE_ATTRIBUTES
+            value: "service.name=cart,service.namespace=robot-shop"
         livenessProbe:
           httpGet:
             path: /health

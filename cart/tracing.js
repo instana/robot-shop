@@ -11,9 +11,6 @@ const { ExpressInstrumentation, ExpressRequestInfo } = require('@opentelemetry/i
 const traceExporter = new OTLPTraceExporter()
 
 const sdk = new opentelemetry.NodeSDK({
-  resource: new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]: 'cart',
-  }),
   traceExporter: traceExporter,
   instrumentations: [new HttpInstrumentation(), new ExpressInstrumentation()]
 });

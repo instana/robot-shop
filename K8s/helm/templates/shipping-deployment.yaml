@@ -26,7 +26,6 @@ spec:
         - -Xmx768m
         - -javaagent:opentelemetry-javaagent.jar
         - -Dotel.metrics.exporter=none
-        - -Dotel.resource.attributes=service.name=shipping
         - -Dotel.exporter.otlp.traces.endpoint=http://otel-collector:4317
         - -jar
         - shipping.jar
@@ -46,6 +45,8 @@ spec:
           - name: FAILURE_TILL_MINUTE
             value: {{ .Values.shipping.failureTillMinute | quote }}
           {{- end }}
+          - name: OTEL_RESOURCE_ATTRIBUTES
+            value: "service.name=shipping,service.namespace=robot-shop"
         ports:
         - name: http
           containerPort: 8080

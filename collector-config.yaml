@@ -19,8 +19,6 @@ processors:
   assertsprocessor:
     asserts_server:
       endpoint: https://chief.app.dev.asserts.ai/api-server
-      user: shana@asserts.ai
-      password: znGepmTSmGE1dmpvCsIG7XcQ6qnRTcAYRhxsjTJf
     asserts_env: dev
     asserts_site: dev
     span_attribute_match_regex:

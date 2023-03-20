@@ -32,9 +32,7 @@ metrics = PrometheusMetrics(app, group_by=path)
 app.logger.setLevel(logging.INFO)
 
 trace.set_tracer_provider(
-    TracerProvider(
-        resource=Resource.create({SERVICE_NAME: "payment"})
-    )
+    TracerProvider()
 )
 tracer = trace.get_tracer(__name__)
 otlpexporter = OTLPSpanExporter()
