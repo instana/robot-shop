@@ -57,4 +57,4 @@ otelcollector:
   assertsServer: https://chief.app.dev.asserts.ai/api-server
   assertsEnv: dev
   assertsSite: dev
-
+  tracesPerRequest: 1
