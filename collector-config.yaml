@@ -21,6 +21,7 @@ processors:
       endpoint: https://chief.app.dev.asserts.ai/api-server
     asserts_env: dev
     asserts_site: dev
+    trace_rate_limit_per_service_per_request: 1
     span_attribute_match_regex:
       "rpc.system": "aws-api"
       "rpc.service": "(Sqs)|(DynamoDb)"

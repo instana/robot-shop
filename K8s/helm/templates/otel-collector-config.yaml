@@ -28,6 +28,7 @@ data:
           password: {{ .Values.otelcollector.assertsPassword }}
         asserts_env: {{ .Values.otelcollector.assertsEnv }}
         asserts_site: {{ .Values.otelcollector.assertsSite }}
+        trace_rate_limit_per_service_per_request: {{ .Values.otelcollector.tracesPerRequest }}
         span_attribute_match_regex:
           "rpc.system": "aws-api"
           "rpc.service": "(Sqs)|(DynamoDb)"
