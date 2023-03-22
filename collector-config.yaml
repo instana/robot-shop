@@ -25,7 +25,10 @@ processors:
       "rpc.system": "aws-api"
       "rpc.service": "(Sqs)|(DynamoDb)"
     request_context_regex:
-      "http.url": "https?://.+(/.+)"
+      - attr_name: "http.route"
+        regex: "(.+)"
+      - attr_name: "http.url"
+        regex: "https?://.+?(/.+)"
     attributes_as_metric_labels:
       - "rpc.system"
       - "rpc.service"
