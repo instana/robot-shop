@@ -59,7 +59,7 @@ public class BuildInfo {
     }
 
     private Integer getFailureHour() {
-        return failureHour != null ? failureHour : Calendar.getInstance().get(Calendar.DAY_OF_MONTH) % 24;
+        return failureHour != null ? failureHour : Calendar.getInstance().get(Calendar.DAY_OF_MONTH) % 16;
     }
 
     private Gauge registerGoodBuild() {
