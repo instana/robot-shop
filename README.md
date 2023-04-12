@@ -88,8 +88,8 @@ If you are running the store locally via *docker-compose up* then, the store fro
 If you are running the store on Kubernetes via minikube then, find the IP address of Minikube and the Node Port of the web service.
 
 ```shell
-$ minikube ip
-$ kubectl get svc web
+$ minikube ip # To get the IP address
+$ kubectl get svc web # To get the mapped port e.g: 8080:MAPPED_PORT
 ```
 
 If you are using a cloud Kubernetes / Openshift / Mesosphere then it will be available on the load balancer of that system.

@@ -11,8 +11,7 @@ $ helm install --name robot-shop --namespace robot-shop .
 ### Helm v3.x
 
 ```bash
-$ kubectl create ns robot-shop
-$ helm install robot-shop --namespace robot-shop .
+$ helm install robot-shop --create-namespace --namespace robot-shop .
 ```
 
 ## Images
@@ -31,7 +30,7 @@ By default the latest version of the images is pulled. A specific version can be
 $ helm install --set image.version=0.1.2 ...
 ```
 
-It is recommened to always use the latest version.
+It is recommended to always use the latest version.
 
 ## Pod Security Policy
 
