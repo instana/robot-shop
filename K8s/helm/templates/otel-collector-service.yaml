@@ -21,12 +21,15 @@ spec:
     - name: jaeger-http
       port: 14278
       targetPort: 14278
-    - name: collector-metrics
+    - name: otel-metrics
       port: 8888
       targetPort: 8888
     - name: prom-metrics
       port: 8889
       targetPort: 8889
+    - name: http-metrics
+      port: 9465
+      targetPort: 9465
   selector:
     service: otel-collector
   {{- end }}

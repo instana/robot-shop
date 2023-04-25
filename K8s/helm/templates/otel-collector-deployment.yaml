@@ -26,12 +26,20 @@ spec:
           image: {{ .Values.image.repo }}/otel-collector:{{ .Values.image.otelcollectorVersion }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: 4317
-            - containerPort: 14250
-            - containerPort: 14268
-            - containerPort: 14278
-            - containerPort: 8889
-            - containerPort: 8888
+            - name: otlp
+              containerPort: 4317
+            - name: jaeger
+              containerPort: 14250
+            - name: jaeger-thrift
+              containerPort: 14268
+            - name: jaeger-http
+              containerPort: 14278
+            - name: otel-metrics
+              containerPort: 8889
+            - name: prom-metrics
+              containerPort: 8888
+            - name: http-metrics
+              containerPort: 9465
           volumeMounts:
             - mountPath: /etc/asserts
               name: collector-config
