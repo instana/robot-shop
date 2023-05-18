@@ -28,6 +28,8 @@ spec:
           ports:
             - name: otlp
               containerPort: 4317
+            - name: otlphttp
+              containerPort: 4318
             - name: jaeger
               containerPort: 14250
             - name: jaeger-thrift

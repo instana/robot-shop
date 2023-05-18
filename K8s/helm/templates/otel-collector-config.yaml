@@ -30,31 +30,44 @@ data:
         asserts_site: {{ .Values.otelcollector.assertsSite }}
         trace_rate_limit_per_service_per_request: {{ .Values.otelcollector.tracesPerRequest }}
         capture_metrics: true
-        error_type_config:
-           http.status_code:
-            - error_type: client_errors
-              value_match_regex: 4..
-            - error_type: server_errors
-              value_match_regex: 5..
-        request_context_regex:
-          robot-shop#payment:
-            - attr_name: "http.url"
-              span_kind: "Server"
-              regex: "http://cart:8080(/cart)/anonymous-.*"
-            - attr_name: "http.url"
-              span_kind: "Server"
-              regex: "http://user:8080(/check)/anonymous-.*"
-          robot-shop#shipping:
-            - attr_name: "http.url"
-              span_kind: "Server"
-              regex: "http://cart:8080(/shipping)/anonymous-.*"
-          default:
-            - attr_name: "http.route"
-              span_kind: "Server"
-              regex: "(.+)"
-            - attr_name: "http.url"
-              span_kind: "Server"
-              regex: "https?://.+?((/[^/?]+){1,2}).*"
+        custom_attributes:
+          "asserts.error.type":
+            "default":
+              - value_expr: client_errors
+                regex: 4..
+                source_attributes: ["http.status_code"]
+                span_kinds: ["Client", "Server"]
+              - value_expr: server_errors
+                regex: 5..
+                source_attributes: ["http.status_code"]
+                span_kinds: ["Client", "Server"]
+          "asserts.request.context":
+            robot-shop#payment:
+              - source_attributes: ["http.url"]
+                span_kinds: ["Client"]
+                regex: "http://cart:8080(/cart)/anonymous-.*"
+              - source_attributes: ["http.url"]
+                span_kinds: ["Client"]
+                regex: "http://user:8080(/check)/anonymous-.*"
+            robot-shop#shipping:
+              - source_attributes: ["http.url"]
+                span_kinds: ["Client"]
+                regex: "http://cart:8080(/shipping)/anonymous-.*"
+            default:
+              - source_attributes: ["http.route"]
+                regex: "(.+)"
+                span_kinds: ["Server"]
+              - source_attributes: ["db.operation", "db.name", "net.peer.name", "net.peer.port"]
+                regex: "(.+);(.*);(.+);(.*)"
+                span_kinds: ["Client"]
+                value_expr: $1#$2#$3#$4
+              - source_attributes: ["net.peer.name", "net.peer.port"]
+                regex: (.+);(.*)
+                span_kinds: ["Client"]
+                value_expr: $1#$2
+              - source_attributes: ["http.url"]
+                span_kinds: ["Client", "Server"]
+                regex: "https?://.+?((/[^/?]+){1,2}).*"
         attributes_as_metric_labels:
           - "rpc.system"
           - "rpc.service"
