@@ -13,7 +13,7 @@ image:
   shippingVersion: "1.0.17"
   userVersion: "1.0.3"
   webVersion: "1.0.2"
-  otelcollectorVersion: "v0.0.78"
+  otelcollectorVersion: "v0.0.81"
   pullPolicy: IfNotPresent
 
 # Payment gateway URL
@@ -57,4 +57,4 @@ otelcollector:
   assertsServer: https://chief.app.dev.asserts.ai/api-server
   assertsEnv: dev
   assertsSite: dev
-  tracesPerRequest: 1
+  tracesPerRequest: 3
