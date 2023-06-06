@@ -37,7 +37,7 @@ processors:
       "asserts.request.context":
         robot-shop#payment:
           - source_attributes: ["http.url"]
-            span_kinds: ["Server"]
+            span_kinds: ["Client"]
             regex: "http://cart:8080(/cart)/anonymous-.*"
           - source_attributes: ["http.url"]
             span_kinds: ["Client"]
@@ -45,14 +45,22 @@ processors:
             value_expr: "$$1/<id>"
         robot-shop#shipping:
           - source_attributes: ["http.url"]
-            span_kinds: ["Server"]
+            span_kinds: ["Client"]
             regex: "http://cart:8080(/shipping)/anonymous-.*"
         default:
           - source_attributes: ["http.route"]
             regex: "(.+)"
             span_kinds: ["Server"]
+          - source_attributes: ["db.operation", "db.name", "net.peer.name", "net.peer.port"]
+            regex: "(.+);(.*);(.+);(.*)"
+            span_kinds: ["Client"]
+            value_expr: $$1#$$2#$$3#$$4
+          - source_attributes: ["net.peer.name", "net.peer.port"]
+            regex: (.+);(.*)
+            span_kinds: ["Client"]
+            value_expr: $$1#$$2
           - source_attributes: ["http.url"]
-            span_kinds: ["Server"]
+            span_kinds: ["Client", "Server"]
             regex: "https?://.+?((/[^/?]+){1,2}).*"
     attributes_as_metric_labels:
       - "rpc.system"
@@ -60,6 +68,13 @@ processors:
       - "rpc.method"
       - "aws.table.name"
       - "aws.queue.url"
+      - "db.system"
+      - "db.name"
+      - "db.operation"
+    groupbytrace:
+      wait_duration: 10s
+      num_traces: 1000
+      num_workers: 1
 service:
   telemetry:
     logs:
@@ -67,7 +82,7 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [assertsprocessor]
+      processors: [groupbytrace, assertsprocessor]
       exporters: [otlp]
     metrics:
       receivers: [otlp]
