@@ -48,6 +48,8 @@ spec:
             value: "http://otel-collector:4317"
           - name: OTEL_RESOURCE_ATTRIBUTES
             value: "service.name=payment,service.namespace=robot-shop"
+          - name:  OTEL_METRICS_EXPORTER
+            value: "none"
         ports:
         - name: http
           containerPort: 8080

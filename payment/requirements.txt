@@ -5,7 +5,5 @@ pika
 prometheus_client
 prometheus-flask-exporter
 flask_apscheduler
-opentelemetry-sdk
-opentelemetry-instrumentation-flask
-opentelemetry-instrumentation-requests
-opentelemetry-exporter-otlp-proto-grpc
+opentelemetry-distro
+opentelemetry-exporter-otlp

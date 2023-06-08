@@ -13,14 +13,6 @@ from flask_apscheduler import APScheduler
 from prometheus_client import Gauge
 from prometheus_flask_exporter import PrometheusMetrics
 
-from opentelemetry import trace
-from opentelemetry.sdk.resources import SERVICE_NAME, Resource
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from opentelemetry.instrumentation.requests import RequestsInstrumentor
-from opentelemetry.instrumentation.flask import FlaskInstrumentor
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
-
 from rabbitmq import Publisher
 
 def path(req):
@@ -30,19 +22,6 @@ def path(req):
 app = Flask(__name__)
 metrics = PrometheusMetrics(app, group_by=path)
 app.logger.setLevel(logging.INFO)
-
-trace.set_tracer_provider(
-    TracerProvider()
-)
-tracer = trace.get_tracer(__name__)
-otlpexporter = OTLPSpanExporter()
-
-# Create a BatchSpanProcessor and add the exporter to it
-span_processor = BatchSpanProcessor(otlpexporter)
-# add to the tracer
-trace.get_tracer_provider().add_span_processor(span_processor)
-RequestsInstrumentor().instrument()
-FlaskInstrumentor().instrument_app(app)
 
 build_info = Gauge('payment_build_info', 'Build information',
                    ['branch', 'revision', 'version'])
