@@ -150,6 +150,7 @@ services:
     environment:
       OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otelcollector:4317
       OTEL_RESOURCE_ATTRIBUTES: "service.name=payment,service.namespace=robot-shop"
+      OTEL_METRICS_EXPORTER: "none"
       #PAYMENT_GATEWAY: "https://www.worldpay.com"
     logging:
       <<: *logging

@@ -71,10 +71,10 @@ processors:
       - "db.system"
       - "db.name"
       - "db.operation"
-    groupbytrace:
-      wait_duration: 10s
-      num_traces: 1000
-      num_workers: 1
+  groupbytrace:
+    wait_duration: 10s
+    num_traces: 1000
+    num_workers: 1
 service:
   telemetry:
     logs:

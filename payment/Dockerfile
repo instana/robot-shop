@@ -8,10 +8,11 @@ WORKDIR /app
 COPY requirements.txt /app/
 
 RUN pip install -r requirements.txt
+RUN opentelemetry-bootstrap -a install
 
 COPY *.py /app/
 COPY payment.ini /app/
 
 #CMD ["python", "payment.py"]
-CMD ["uwsgi", "--ini", "payment.ini"]
+CMD ["opentelemetry-instrument","uwsgi", "--ini", "payment.ini"]
 
