@@ -7,7 +7,7 @@ COPY go.* ./
 RUN go mod download
 
 COPY *.go ./
-RUN CGO_ENABLED=1 go build -a -installsuffix cgo -ldflags "-X main.version=$VERSION" -o dispatch
+RUN CGO_ENABLED=0 go build -ldflags "-X main.version=$VERSION" -o dispatch
 
 FROM debian:11-slim
 
