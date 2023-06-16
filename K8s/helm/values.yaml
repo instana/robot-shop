@@ -9,7 +9,7 @@ image:
   loaderVersion: "1.0.1"
   paymentVersion: "1.0.14"
   reportsVersion: "1.0.1"
-  ratingsVersion: "1.0.1"
+  ratingsVersion: "1.0.2"
   shippingVersion: "1.0.17"
   userVersion: "1.0.3"
   webVersion: "1.0.2"
