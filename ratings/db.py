@@ -6,10 +6,10 @@ import sys
 import mysql.connector
 
 class DB():
-    MYSQL_HOST = os.getenv('MYSQL_HOST', 'mysql')
-    MYSQL_PORT = os.getenv('MYSQL_PORT', '3306')
-    MYSQL_USER = os.getenv('MYSQL_USER', 'ratings')
-    MYSQL_PASS = os.getenv('MYSQL_PASS', 'iloveit')
+    MYSQL_HOST = os.getenv('SHOP_MYSQL_HOST', 'mysql')
+    MYSQL_PORT = os.getenv('SHOP_MYSQL_PORT', '3306')
+    MYSQL_USER = os.getenv('SHOP_MYSQL_USER', 'ratings')
+    MYSQL_PASS = os.getenv('SHOP_MYSQL_PASS', 'iloveit')
 
     mysql_pool_cnx = None
 
