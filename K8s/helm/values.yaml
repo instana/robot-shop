@@ -4,7 +4,7 @@ image:
   repo: asserts
   cartVersion: "1.0.11"
   catalogueVersion: "1.0.2"
-  dispatchVersion: "1.0.3"
+  dispatchVersion: "1.0.4"
   mongodbVersion: "1.0.1"
   loaderVersion: "1.0.1"
   paymentVersion: "1.0.14"
