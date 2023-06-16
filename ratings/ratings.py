@@ -11,19 +11,17 @@ from flask import Flask
 from flask import jsonify
 from flask import request
 
-from prometheus_flask_exporter import PrometheusMetrics
+import db
 
 CATALOGUE_HOST = os.getenv('SHOP_CATALOGUE_HOST', 'catalogue')
-MYSQL_HOST = os.getenv('SHOP_MYSQL_HOST', 'mysql')
-MYSQL_PORT = os.getenv('SHOP_MYSQL_PORT', '3306')
-MYSQL_USER = os.getenv('SHOP_MYSQL_USER', 'ratings')
-MYSQL_PASS = os.getenv('SHOP_MYSQL_PASS', 'iloveit')
 
-mysql_pool_cnx = None
+from prometheus_flask_exporter import PrometheusMetrics
 
 def path(req):
     ''' Use the first URI segment'''
     return '/' + req.path[1:].split('/')[0]
+
+db = db.DB()
 
 app = Flask(__name__)
 metrics = PrometheusMetrics(app, group_by=path)
@@ -35,13 +33,6 @@ def exception_handler(err):
     app.logger.exception(str(err))
     return str(err), 500
 
-'''Loop waiting for MySQL
-This is run once when the service starts'''
-@app.before_first_request
-def init_db():
-    # attempt MySQL connection in background
-    loop = threading.Thread(target=db_connect_loop, daemon=True)
-    loop.start()
 
 @app.route('/health', methods=['GET'])
 def health():
@@ -52,7 +43,7 @@ def health():
 @app.route('/ready', methods=['GET'])
 def ready():
     # test connection
-    if mysql_pool_cnx and mysql_pool_cnx.is_connected():
+    if db.status():
         return 'ready'
     else:
         return 'not ready', 404
@@ -170,31 +161,6 @@ def get_product(sku):
         
     return product
 
-def db_connect_loop():
-    while True:
-        if mysql_pool_cnx == None or not mysql_pool_cnx.is_connected():
-            db_connect()
-            time.sleep(5)
-
-def db_connect():
-    global mysql_pool_cnx
-
-    app.logger.info('Connecting to MySQL {}:{}'.format(MYSQL_HOST, MYSQL_PORT))
-    try:
-        mysql_pool_cnx = mysql.connector.connect(
-            user=MYSQL_USER,
-            password=MYSQL_PASS,
-            host=MYSQL_HOST,
-            port=MYSQL_PORT,
-            database='ratings',
-            pool_name='ratings',
-            pool_size=10,
-            pool_reset_session=True
-        )
-        app.logger.info('MySQL Connected OK')
-    except mysql.connector.Error as err:
-        app.logger.error(err)
-        mysql_pool_cnx = None
 
 if __name__ == '__main__':
     port = int(os.getenv('SHOP_RATINGS_PORT', '8080'))
