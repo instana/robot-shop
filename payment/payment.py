@@ -11,6 +11,7 @@ from flask import jsonify
 from flask import request
 from flask_apscheduler import APScheduler
 from prometheus_client import Gauge
+from prometheus_client import Counter
 from prometheus_flask_exporter import PrometheusMetrics
 
 from rabbitmq import Publisher
@@ -25,6 +26,7 @@ app.logger.setLevel(logging.INFO)
 
 build_info = Gauge('payment_build_info', 'Build information',
                    ['branch', 'revision', 'version'])
+payment_item_counter = Counter('payment_items_counter', 'running count of items for payment')
 
 CART = os.getenv('CART_HOST', 'cart')
 USER = os.getenv('USER_HOST', 'user')
@@ -99,6 +101,9 @@ def pay(id):
         app.logger.warn('cart not valid')
         return 'cart not valid', 400
 
+    # one less do not count shipping item
+    payment_item_counter.inc(len(cart.get('items')) - 1)
+    
     # dummy call to payment gateway, hope they don't object
     if PAYMENT_GATEWAY:
         try:
