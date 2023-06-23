@@ -12,6 +12,7 @@ from flask import request
 from flask_apscheduler import APScheduler
 from prometheus_client import Gauge
 from prometheus_client import Counter
+from prometheus_client import Histogram
 from prometheus_flask_exporter import PrometheusMetrics
 
 from rabbitmq import Publisher
@@ -27,6 +28,8 @@ app.logger.setLevel(logging.INFO)
 build_info = Gauge('payment_build_info', 'Build information',
                    ['branch', 'revision', 'version'])
 payment_item_counter = Counter('payment_items_counter', 'running count of items for payment')
+cart_value = Histogram('payment_cart_value', 'cart value at payment', buckets=(100, 200, 500, 1000, 2000, 5000, 10000, float('inf')))
+cart_size = Histogram('payment_cart_size', 'number of items in cart at payment', buckets=(1, 3, 5, 10, 15, float('inf')))
 
 CART = os.getenv('CART_HOST', 'cart')
 USER = os.getenv('USER_HOST', 'user')
@@ -101,8 +104,10 @@ def pay(id):
         app.logger.warn('cart not valid')
         return 'cart not valid', 400
 
-    # one less do not count shipping item
-    payment_item_counter.inc(len(cart.get('items')) - 1)
+    # business metrics
+    payment_item_counter.inc(countItems(cart.get('items')))
+    cart_size.observe(countItems(cart.get('items')))
+    cart_value.observe(cart.get('total'))
     
     # dummy call to payment gateway, hope they don't object
     if PAYMENT_GATEWAY:

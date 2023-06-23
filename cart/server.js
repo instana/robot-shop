@@ -274,6 +274,9 @@ app.get('/update/:id/:sku/:qty', (req, res) => {
                 if(qty == 0) {
                     cart.items.splice(idx, 1);
                 } else {
+                    if(qty > cart.items[idx].qty) {
+                        addedCounter.inc(qty - cart.items[idx].qty)
+                    }
                     cart.items[idx].qty = qty;
                     cart.items[idx].subtotal = cart.items[idx].price * qty;
                 }
