@@ -2,12 +2,12 @@
 # Default is docker/robotshop/image:latest
 image:
   repo: asserts
-  cartVersion: "1.0.12"
+  cartVersion: "1.0.13"
   catalogueVersion: "1.0.2"
   dispatchVersion: "1.0.4"
   mongodbVersion: "1.0.1"
   loaderVersion: "1.0.1"
-  paymentVersion: "1.0.15"
+  paymentVersion: "1.0.16"
   reportsVersion: "1.0.1"
   ratingsVersion: "1.0.2"
   shippingVersion: "1.0.17"
