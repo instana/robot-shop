@@ -75,7 +75,7 @@ class UserBehavior(HttpUser):
 
         cart = self.client.get('/api/cart/cart/{}'.format(uniqueid), headers={'x-forwarded-for': fake_ip}, name='/api/cart/cart').json()
         item = choice(cart['items'])
-        self.client.get('/api/cart/update/{}/{}/2'.format(uniqueid, item['sku']), headers={'x-forwarded-for': fake_ip}, name='/api/cart/update')
+        self.client.get('/api/cart/update/{}/{}/{}'.format(uniqueid, item['sku'], randint(0, 2)), headers={'x-forwarded-for': fake_ip}, name='/api/cart/update')
 
         # country codes
         codes = self.client.get('/api/shipping/codes', headers={'x-forwarded-for': fake_ip}).json()

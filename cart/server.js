@@ -7,12 +7,9 @@ const pino = require('pino');
 const expPino = require('express-pino-logger');
 // Prometheus
 const promClient = require('prom-client');
-const Registry = promClient.Registry;
-const register = new Registry();
-const counter = new promClient.Counter({
-    name: 'items_added',
-    help: 'running count of items added to cart',
-    registers: [register]
+const addedCounter = new promClient.Counter({
+    name: 'cart_items_added',
+    help: 'running count of items added to cart'
 });
 
 
@@ -97,13 +94,6 @@ app.get('/ready', (req, res) => {
         res.status(404).send('not ready');
     }
 });
-
-// Prometheus
-app.get('/metrics', (req, res) => {
-    res.header('Content-Type', 'text/plain');
-    res.send(register.metrics());
-});
-
 
 // get cart with id
 app.get('/cart/:id', (req, res) => {
@@ -234,7 +224,7 @@ app.get('/add/:id/:sku/:qty', (req, res) => {
 
             // save the new cart
             saveCart(req.params.id, cart).then((data) => {
-                counter.inc(qty);
+                addedCounter.inc(qty);
                 res.json(cart);
             }).catch((err) => {
                 req.log.error(err);
@@ -284,6 +274,9 @@ app.get('/update/:id/:sku/:qty', (req, res) => {
                 if(qty == 0) {
                     cart.items.splice(idx, 1);
                 } else {
+                    if(qty > cart.items[idx].qty) {
+                        addedCounter.inc(qty - cart.items[idx].qty)
+                    }
                     cart.items[idx].qty = qty;
                     cart.items[idx].subtotal = cart.items[idx].price * qty;
                 }
