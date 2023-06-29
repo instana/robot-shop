@@ -11,7 +11,7 @@ image:
   reportsVersion: "1.0.1"
   ratingsVersion: "1.0.2"
   shippingVersion: "1.0.17"
-  userVersion: "1.0.3"
+  userVersion: "1.0.4"
   webVersion: "1.0.2"
   otelcollectorVersion: "v0.0.83"
   pullPolicy: IfNotPresent
