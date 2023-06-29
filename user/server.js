@@ -332,7 +332,7 @@ function mongoLoop() {
 
 mongoLoop();
 
-function getOneK() {
+function getData() {
     return new Promise((resolve, reject) => {
         let size = 1024 * 1024;
         fs.open('/dev/urandom', 'r', (err, fd) => {
@@ -344,6 +344,7 @@ function getOneK() {
                 if (err) {
                     reject(err);
                 } else {
+                    fs.close(fd);
                     resolve(buffer);
                 }
             });
@@ -357,9 +358,9 @@ function randRange(min, max) {
 
 var hog = [];
 function memoryHog() {
-    if (randRange(1, 100) < 10) {
+    if (randRange(1, 100) < 10 && hog.length == 0) {
         for (let i = 0; i < 10; i++) {
-            getOneK().then((b) => {
+            getData().then((b) => {
                 hog.push(b);
                 console.log('hog pushed');
             }).catch((err) => {
