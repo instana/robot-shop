@@ -7,6 +7,7 @@ const express = require('express');
 const promMid = require('express-prometheus-middleware');
 const pino = require('pino');
 const expPino = require('express-pino-logger');
+const bcrypt = require('bcryptjs');
 
 // MongoDB
 var db;
@@ -357,8 +358,11 @@ function randRange(min, max) {
 }
 
 var hog = [];
+var hashCount = 0;
 function memoryHog() {
-    if (randRange(1, 100) < 10 && hog.length < 40) {
+    const hogLength = 30;
+
+    if (randRange(1, 100) < 10 && hog.length < hogLength) {
         for (let i = 0; i < 10; i++) {
             getData().then((b) => {
                 hog.push(b);
@@ -369,14 +373,36 @@ function memoryHog() {
         }
     }
 
-    if (randRange(1, 100) < 10 && hog.length >= 40) {
+    if (randRange(1, 100) < 10 && hog.length >= hogLength) {
         console.log('free the hog');
         hog = [];
     }
     setTimeout(memoryHog, 1000);
 }
 
+// burn some CPU
+function hash() {
+    const start = new Date();
+    bcrypt.hash('i love hash browns', 10, () => {
+        console.log(`${hashCount} hashed up in ${new Date() - start}ms`);
+    });
+    if (hashCount++ < 1000) {
+        setTimeout(hash);
+    } else {
+        // reset
+        hashCount = 0;
+    }
+}
+
+function hashLoop() {
+    if (randRange(1, 100) == 1 && hashCount == 0) {
+        hash();
+    }
+    setTimeout(hashLoop, 60000);
+}
+
 setTimeout(memoryHog, 5000);
+setTimeout(hashLoop, 10000);
 
 // fire it up!
 const port = process.env.USER_SERVER_PORT || '8080';
