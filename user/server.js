@@ -1,3 +1,4 @@
+const fs = require('fs');
 const mongoClient = require('mongodb').MongoClient;
 const mongoObjectID = require('mongodb').ObjectID;
 const redis = require('redis');
@@ -330,6 +331,51 @@ function mongoLoop() {
 }
 
 mongoLoop();
+
+function getOneK() {
+    return new Promise((resolve, reject) => {
+        let size = 1024 * 1024;
+        fs.open('/dev/urandom', 'r', (err, fd) => {
+            if (err) {
+                reject(err);
+            }
+            let buffer = Buffer.alloc(size);
+            fs.read(fd, buffer, 0, size, 0, (err, num) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(buffer);
+                }
+            });
+        });
+    });    
+}
+
+function randRange(min, max) {
+    return (Math.random() * (max - min)) + min;
+}
+
+var hog = [];
+function memoryHog() {
+    if (randRange(1, 100) < 10) {
+        for (let i = 0; i < 10; i++) {
+            getOneK().then((b) => {
+                hog.push(b);
+                console.log('hog pushed');
+            }).catch((err) => {
+                console.log(err.message);
+            })
+        }
+        // free the hog
+        setTimeout(() => {
+            hog = [];
+            console.log('hog released');
+        }, 60000);
+    }
+    setTimeout(memoryHog, 1000);
+}
+
+setTimeout(memoryHog, 5000);
 
 // fire it up!
 const port = process.env.USER_SERVER_PORT || '8080';
