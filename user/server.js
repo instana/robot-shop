@@ -358,20 +358,20 @@ function randRange(min, max) {
 
 var hog = [];
 function memoryHog() {
-    if (randRange(1, 100) < 10 && hog.length == 0) {
+    if (randRange(1, 100) < 10 && hog.length < 40) {
         for (let i = 0; i < 10; i++) {
             getData().then((b) => {
                 hog.push(b);
-                console.log('hog pushed');
+                console.log(`hog pushed ${hog.length}`);
             }).catch((err) => {
                 console.log(err.message);
             })
         }
-        // free the hog
-        setTimeout(() => {
-            hog = [];
-            console.log('hog released');
-        }, 60000);
+    }
+
+    if (randRange(1, 100) < 10 && hog.length >= 40) {
+        console.log('free the hog');
+        hog = [];
     }
     setTimeout(memoryHog, 1000);
 }
