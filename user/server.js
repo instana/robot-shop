@@ -1,6 +1,7 @@
 const fs = require('fs');
+const os = require('os');
 const mongoClient = require('mongodb').MongoClient;
-const mongoObjectID = require('mongodb').ObjectID;
+//const mongoObjectID = require('mongodb').ObjectID;
 const redis = require('redis');
 const bodyParser = require('body-parser');
 const express = require('express');
@@ -288,6 +289,33 @@ app.get('/history/:id', (req, res) => {
     }
 });
 
+app.get('/hash', (req, res) => {
+    hash();
+    res.send('OK\n');
+});
+
+app.get('/free', (req, res) => {
+    hog = [];
+    res.send('OK\n');
+});
+
+app.get('/hog', (req, res) => {
+    memoryHog(10);
+    res.send('OK\n');
+});
+
+app.get('/memory', (req, res) => {
+    const usage = process.memoryUsage();
+    data = [];
+    for (let key in usage) {
+        data.push(`${key}: ${Math.round(usage[key] / 1024 / 1024 * 100) / 100}MB`);
+    }
+    data.push(`OS Total ${Math.round(os.totalmem() / 1024 / 1024 * 100) / 100}MB`);
+    data.push(`OS Free ${Math.round(os.freemem() / 1024 / 1024 * 100) / 100}MB`);
+    data.push('');
+    res.send(data.join('\n'));
+});
+
 // connect to Redis
 logger.info('connecting to redis host %s', redisHost);
 var redisClient = redis.createClient({
@@ -359,33 +387,44 @@ function randRange(min, max) {
 
 var hog = [];
 var hashCount = 0;
-function memoryHog() {
-    const hogLength = 30;
+function memoryHog(size) {
+    const hogMaxLength = 30;
 
-    if (randRange(1, 100) < 10 && hog.length < hogLength) {
-        for (let i = 0; i < 10; i++) {
-            getData().then((b) => {
-                hog.push(b);
-                console.log(`hog pushed ${hog.length}`);
-            }).catch((err) => {
-                console.log(err.message);
-            })
-        }
+    if (hog.length + size > hogMaxLength) {
+        size = hogMaxLength - hog.length;
     }
 
-    if (randRange(1, 100) < 10 && hog.length >= hogLength) {
+    for (let i = 0; i < size; i++) {
+        getData().then((b) => {
+            hog.push(b);
+            console.log(`hog pushed ${hog.length}`);
+        }).catch((err) => {
+            logger.error(err.message);
+        });
+    }
+}
+
+function hogLoop() {
+    if (randRange(1, 100) < 10) {
+        memoryHog(10);
+    }
+
+    if (randRange(1, 100) < 5) {
+        // free
         console.log('free the hog');
         hog = [];
     }
-    setTimeout(memoryHog, 1000);
+    setTimeout(hogLoop, 10000);
 }
 
 // burn some CPU
 function hash() {
-    const start = new Date();
-    bcrypt.hash('i love hash browns', 10, () => {
-        console.log(`${hashCount} hashed up in ${new Date() - start}ms`);
-    });
+    // hash uses some memory
+    // free memory hog to prevent OOM
+    hog = [];
+    let salt = bcrypt.genSaltSync(10);
+    let h = bcrypt.hashSync('i love hash browns', 10);
+    console.log(`salt: ${salt} - hash: ${h}`);
     if (hashCount++ < 1000) {
         setTimeout(hash);
     } else {
@@ -395,13 +434,13 @@ function hash() {
 }
 
 function hashLoop() {
-    if (randRange(1, 100) == 1 && hashCount == 0) {
+    if (randRange(1, 100) < 2 && hashCount == 0) {
         hash();
     }
     setTimeout(hashLoop, 60000);
 }
 
-setTimeout(memoryHog, 5000);
+setTimeout(hogLoop, 5000);
 setTimeout(hashLoop, 10000);
 
 // fire it up!
