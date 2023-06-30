@@ -312,6 +312,7 @@ app.get('/memory', (req, res) => {
     }
     data.push(`OS Total ${Math.round(os.totalmem() / 1024 / 1024 * 100) / 100}MB`);
     data.push(`OS Free ${Math.round(os.freemem() / 1024 / 1024 * 100) / 100}MB`);
+    data.push(`Hog size ${hog.length}`);
     data.push('');
     res.send(data.join('\n'));
 });
@@ -363,7 +364,7 @@ mongoLoop();
 
 function getData() {
     return new Promise((resolve, reject) => {
-        let size = 1024 * 1024;
+        const size = 1024 * 1024;
         fs.open('/dev/urandom', 'r', (err, fd) => {
             if (err) {
                 reject(err);
@@ -388,7 +389,7 @@ function randRange(min, max) {
 var hog = [];
 var hashCount = 0;
 function memoryHog(size) {
-    const hogMaxLength = 30;
+    const hogMaxLength = 40;
 
     if (hog.length + size > hogMaxLength) {
         size = hogMaxLength - hog.length;
@@ -424,8 +425,8 @@ function hash() {
     hog = [];
     let salt = bcrypt.genSaltSync(10);
     let h = bcrypt.hashSync('i love hash browns', 10);
-    console.log(`salt: ${salt} - hash: ${h}`);
-    if (hashCount++ < 1000) {
+    //console.log(`salt: ${salt} - hash: ${h}`);
+    if (hashCount++ < 2000) {
         setTimeout(hash);
     } else {
         // reset
