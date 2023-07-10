@@ -1,7 +1,6 @@
 const fs = require('fs');
 const os = require('os');
 const mongoClient = require('mongodb').MongoClient;
-//const mongoObjectID = require('mongodb').ObjectID;
 const redis = require('redis');
 const bodyParser = require('body-parser');
 const express = require('express');
