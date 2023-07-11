@@ -30,6 +30,13 @@ shipping:
   failureFromMinute: 0
   failureTillMinute: 15
 
+user:
+  env:
+    #- name: CPU_HOG
+      #value: "1"
+    #- name: MEM_HOG
+      #value: "1"
+
 # Pod Security Policy
 psp:
   enabled: false
