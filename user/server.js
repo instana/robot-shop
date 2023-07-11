@@ -443,9 +443,11 @@ function hashLoop() {
 
 // Optionally let the hogs out - oink, oink!
 if (process.env.CPU_HOG) {
+    console.log('CPU hog is loose');
     setTimeout(hogLoop, 5000);
 }
 if (process.env.MEM_HOG) {
+    console.log('memory hog is loose');
     setTimeout(hashLoop, 10000);
 }
 
