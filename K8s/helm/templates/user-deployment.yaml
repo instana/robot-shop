@@ -26,6 +26,11 @@ spec:
         ports:
         - name: http
           containerPort: 8080
+        env:
+          {{- range .Values.user.env }}
+          - name: {{ .name }}
+            value: "{{ .value }}"
+          {{- end }}
         livenessProbe:
           httpGet:
             path: /health

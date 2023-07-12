@@ -11,7 +11,7 @@ image:
   reportsVersion: "1.0.1"
   ratingsVersion: "1.0.2"
   shippingVersion: "1.0.17"
-  userVersion: "1.0.3"
+  userVersion: "1.0.4"
   webVersion: "1.0.2"
   otelcollectorVersion: "v0.0.88"
   pullPolicy: IfNotPresent
@@ -29,6 +29,13 @@ shipping:
   failureHour: null
   failureFromMinute: 0
   failureTillMinute: 15
+
+user:
+  env:
+    #- name: CPU_HOG
+      #value: "1"
+    #- name: MEM_HOG
+      #value: "1"
 
 # Pod Security Policy
 psp:

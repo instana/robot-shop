@@ -1,11 +1,13 @@
+const fs = require('fs');
+const os = require('os');
 const mongoClient = require('mongodb').MongoClient;
-const mongoObjectID = require('mongodb').ObjectID;
 const redis = require('redis');
 const bodyParser = require('body-parser');
 const express = require('express');
 const promMid = require('express-prometheus-middleware');
 const pino = require('pino');
 const expPino = require('express-pino-logger');
+const bcrypt = require('bcryptjs');
 
 // MongoDB
 var db;
@@ -286,6 +288,35 @@ app.get('/history/:id', (req, res) => {
     }
 });
 
+// Testing endpoints
+app.get('/hash', (req, res) => {
+    hash();
+    res.send('OK\n');
+});
+
+app.get('/free', (req, res) => {
+    hog = [];
+    res.send('OK\n');
+});
+
+app.get('/hog', (req, res) => {
+    memoryHog(10);
+    res.send('OK\n');
+});
+
+app.get('/memory', (req, res) => {
+    const usage = process.memoryUsage();
+    data = [];
+    for (let key in usage) {
+        data.push(`${key}: ${Math.round(usage[key] / 1024 / 1024 * 100) / 100}MB`);
+    }
+    data.push(`OS Total ${Math.round(os.totalmem() / 1024 / 1024 * 100) / 100}MB`);
+    data.push(`OS Free ${Math.round(os.freemem() / 1024 / 1024 * 100) / 100}MB`);
+    data.push(`Hog size ${hog.length}`);
+    data.push('');
+    res.send(data.join('\n'));
+});
+
 // connect to Redis
 logger.info('connecting to redis host %s', redisHost);
 var redisClient = redis.createClient({
@@ -330,6 +361,95 @@ function mongoLoop() {
 }
 
 mongoLoop();
+
+function getData() {
+    return new Promise((resolve, reject) => {
+        const size = 1024 * 1024;
+        fs.open('/dev/urandom', 'r', (err, fd) => {
+            if (err) {
+                reject(err);
+            }
+            let buffer = Buffer.alloc(size);
+            fs.read(fd, buffer, 0, size, 0, (err, num) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    fs.close(fd);
+                    resolve(buffer);
+                }
+            });
+        });
+    });    
+}
+
+function randRange(min, max) {
+    return (Math.random() * (max - min)) + min;
+}
+
+var hog = [];
+var hashCount = 0;
+function memoryHog(size) {
+    const hogMaxLength = 40;
+
+    if (hog.length + size > hogMaxLength) {
+        size = hogMaxLength - hog.length;
+    }
+
+    for (let i = 0; i < size; i++) {
+        getData().then((b) => {
+            hog.push(b);
+            logger.info(`hog pushed ${hog.length}`);
+        }).catch((err) => {
+            logger.error(err.message);
+        });
+    }
+}
+
+function hogLoop() {
+    if (randRange(1, 100) < 10) {
+        memoryHog(10);
+    }
+
+    if (randRange(1, 100) < 5) {
+        // free
+        logger.info('free the hog');
+        hog = [];
+    }
+    setTimeout(hogLoop, 10000);
+}
+
+// burn some CPU
+function hash() {
+    // hash uses some memory
+    // free memory hog to prevent OOM
+    hog = [];
+    let salt = bcrypt.genSaltSync(10);
+    let h = bcrypt.hashSync('i love hash browns', salt);
+    //console.log(`salt: ${salt} - hash: ${h}`);
+    if (hashCount++ < 2000) {
+        setTimeout(hash);
+    } else {
+        // reset
+        hashCount = 0;
+    }
+}
+
+function hashLoop() {
+    if (randRange(1, 100) < 2 && hashCount == 0) {
+        hash();
+    }
+    setTimeout(hashLoop, 60000);
+}
+
+// Optionally let the hogs out - oink, oink!
+if (process.env.CPU_HOG) {
+    console.log('CPU hog is loose');
+    setTimeout(hogLoop, 5000);
+}
+if (process.env.MEM_HOG) {
+    console.log('memory hog is loose');
+    setTimeout(hashLoop, 10000);
+}
 
 // fire it up!
 const port = process.env.USER_SERVER_PORT || '8080';
