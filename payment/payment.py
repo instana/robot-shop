@@ -104,11 +104,6 @@ def pay(id):
         app.logger.warn('cart not valid')
         return 'cart not valid', 400
 
-    # business metrics
-    payment_item_counter.inc(countItems(cart.get('items')))
-    cart_size.observe(countItems(cart.get('items')))
-    cart_value.observe(cart.get('total'))
-    
     # dummy call to payment gateway, hope they don't object
     if PAYMENT_GATEWAY:
         try:
@@ -149,6 +144,11 @@ def pay(id):
     else:
         app.logger.info('cart delete returned 200')
 
+    # business metrics
+    payment_item_counter.inc(countItems(cart.get('items')))
+    cart_size.observe(countItems(cart.get('items')))
+    cart_value.observe(cart.get('total'))
+    
     return jsonify({ 'orderid': orderid })
 
 
