@@ -19,6 +19,10 @@ data:
         endpoint: http://jaeger.monitoring.svc.cluster.local:4317
         tls:
           insecure: true
+      otlp/tempo:
+        endpoint: tempo-dev-01-dev-us-central-0.grafana.net:443
+        headers:
+          authorization: Basic ${env:TEMPO_TOKEN}
 
     processors:
       assertsprocessor:
@@ -92,7 +96,7 @@ data:
         traces:
           receivers: [otlp]
           processors: [groupbytrace, assertsprocessor]
-          exporters: [otlp]
+          exporters: [otlp, otlp/tempo]
         metrics:
           receivers: [otlp]
           exporters: [prometheus]

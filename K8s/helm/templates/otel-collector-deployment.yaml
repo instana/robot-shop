@@ -23,6 +23,9 @@ spec:
         - name: docker-hub
       containers:
         - name: otel-collector
+          envFrom:
+          - secretRef:
+              name: grafana-dev-tempo
           image: {{ .Values.image.repo }}/otel-collector:{{ .Values.image.otelcollectorVersion }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
