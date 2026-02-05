@@ -1,0 +1,12 @@
+version: 0.0
+os: linux
+
+files:
+  - source: /
+    destination: /home/ubuntu/robot-shop
+
+hooks:
+  AfterInstall:
+    - location: scripts/deploy.sh
+      timeout: 300
+      runas: ubuntu
