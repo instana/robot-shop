@@ -53,10 +53,13 @@ spec:
       spec:
         accessModes: [ "ReadWriteOnce" ]
         {{ if not .Values.openshift }}
-        storageClassName: {{ .Values.redis.storageClassName }}
         volumeMode: Filesystem
-        {{ end }}
+        {{- end }}
+        {{- if .Values.redis.storageClassName }}
+        storageClassName: {{ .Values.redis.storageClassName | quote }}
+        {{- end }}
         resources:
           requests:
-            storage: 1Gi
+            storage: {{ .Values.redis.storageSize | default "1Gi" }}
+            
 

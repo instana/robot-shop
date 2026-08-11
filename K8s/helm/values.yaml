@@ -55,8 +55,18 @@ ratings: {}
 
 redis:
   # Storage class to use with redis statefulset.
-  storageClassName: standard
-
+  storageClassName: "" # empty = cluster default StorageClass
+                        # AKS: managed-csi | EKS:gp3 | GKE: standard
+  storageSize: "1Gi"
+  tag: "7.2-alpine"
+  resources:
+    limits:
+      cpu: 200m
+      memory: 100Mi
+    requests:
+      cpu: 100m
+      memory: 50Mi
+  
 shipping: {}
 
 user: {}
