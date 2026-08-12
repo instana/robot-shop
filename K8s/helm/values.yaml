@@ -55,7 +55,7 @@ ratings: {}
 
 redis:
   # Storage class to use with redis statefulset.
-  storageClassName: standard
+  storageClassName: managed-csi
 
 shipping: {}
 
