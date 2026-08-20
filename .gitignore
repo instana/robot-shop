@@ -3,3 +3,6 @@
 *-private.*
 vendor/
 Gopkg.lock
+.venv/
+__pycache__/
+.pytest_cache/

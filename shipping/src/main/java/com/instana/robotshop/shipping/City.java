@@ -58,7 +58,7 @@ public class City {
         return this.region;
     }
 
-    public void setRegion(String code) {
+    public void setRegion(String region) {
         this.region = region;
     }
 

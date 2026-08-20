@@ -1,6 +1,7 @@
 import json
 import pika
 import os
+import time
 
 class Publisher:
     HOST = os.getenv('AMQP_HOST', 'rabbitmq')
@@ -20,10 +21,22 @@ class Publisher:
 
     def _connect(self):
         if not self._conn or self._conn.is_closed or self._channel is None or self._channel.is_closed:
-            self._conn = pika.BlockingConnection(self._params)
-            self._channel = self._conn.channel()
-            self._channel.exchange_declare(exchange=self.EXCHANGE, exchange_type=self.TYPE, durable=True)
-            self._logger.info('connected to broker')
+            attempts = max(1, int(os.getenv('AMQP_CONNECT_ATTEMPTS', '5')))
+            delay = max(0, float(os.getenv('AMQP_CONNECT_RETRY_DELAY', '1')))
+
+            for attempt in range(1, attempts + 1):
+                try:
+                    self._conn = pika.BlockingConnection(self._params)
+                    self._channel = self._conn.channel()
+                    self._channel.exchange_declare(exchange=self.EXCHANGE, exchange_type=self.TYPE, durable=True)
+                    self._logger.info('connected to broker')
+                    return
+                except (pika.exceptions.AMQPError, OSError) as err:
+                    if attempt == attempts:
+                        raise
+                    self._logger.warning('broker connection failed (attempt %s/%s): %s; retrying',
+                                         attempt, attempts, err)
+                    time.sleep(delay)
 
     def _publish(self, msg, headers):
         self._channel.basic_publish(exchange=self.EXCHANGE,
